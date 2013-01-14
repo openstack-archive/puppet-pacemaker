@@ -1,7 +1,8 @@
 define pacemaker::corosync() {
 
     package {["pacemaker", "cman",
-              "ccs", "resource-agents"]:
+              "ccs", "resource-agents",
+              "pacemaker-cli"]:
 	    ensure  => "installed",
     }
 
