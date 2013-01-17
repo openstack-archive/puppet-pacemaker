@@ -51,11 +51,12 @@ define pacemaker::corosync::node() {
     service { "cman":
         ensure => "running",
         require => File["/etc/sysconfig/cman"],
-        status => "/usr/sbin/cman_tool status",
+        hasstatus => true,
     }
     
     service { "pacemaker":
         ensure => "running",
         require => Service["cman"],
+        hasstatus => true,
     }
 }
