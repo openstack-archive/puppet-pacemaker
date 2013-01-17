@@ -28,7 +28,7 @@ define pacemaker::corosync() {
 
 define pacemaker::corosync::node() {
 
-   exec {"Create Node $name":
+    exec {"Create Node $name":
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addnode $name",
         unless => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsnodes | grep $name:",
         require => Package["ccs"], 
@@ -41,16 +41,16 @@ define pacemaker::corosync::node() {
         require => Package["ccs"], 
     }
 
-    exec {"Activte Fencing Redirect for Node $name":
+    exec {"Activate Fencing Redirect for Node $name":
         subscribe => Exec["Create Node $name"],
         refreshonly => true,
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addfenceinst pcmk-redirect $name pcmk-redirect port=$name",
-        require => [Package["ccs"], Service["cman"]]
+        require => [Package["ccs"], Service["cman"], Exec["Add Fencing Redirect Method to Node $name"]]
     }
 
     service { "cman":
         ensure => "running",
-        require => File["/etc/sysconfig/cman"],
+        require => [File["/etc/sysconfig/cman"],Exec["Create Node $name"]],
         hasstatus => true,
     }
     
