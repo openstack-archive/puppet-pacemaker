@@ -45,12 +45,13 @@ define pacemaker::corosync::node() {
         subscribe => Exec["Create Node $name"],
         refreshonly => true,
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addfenceinst pcmk-redirect $name pcmk-redirect port=$name",
-        require => Package["ccs"], 
+        require => [Package["ccs"], Service["cman"]]
     }
 
     service { "cman":
         ensure => "running",
         require => File["/etc/sysconfig/cman"],
+        status => "/usr/sbin/cman_tool status",
     }
     
     service { "pacemaker":
