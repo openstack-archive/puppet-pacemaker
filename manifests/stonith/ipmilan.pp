@@ -11,9 +11,9 @@ define pacemaker::stonith::ipmilan($hostlist, $address, $user="stonith", $passwo
         }
     } else {
         exec { "Creating stonith::ipmilan ${name}":
-        command => "/usr/sbin/crm configure primitive stonith-ipmilan-${name} stonith::fence_ipmilan params pcmk_host_list=\"${hostlist}\" ipaddr=${address} login=${user} passwd=${password} op monitor interval=\"20\"",
+        command => "/usr/sbin/pcs stonith create stonith-ipmilan-${name} fence_ipmilan pcmk_host_list=\"${hostlist}\" ipaddr=${address} login=${user} passwd=${password} op monitor interval=20s",
         unless  => "/usr/sbin/crm_resource -r stonith-ipmilan-${name} -t primitive -q > /dev/null 2>&1",
-        require => [Package["ipmitool"],Service["pacemaker"]]
+        require => [Package["ipmitool"],Service["pacemaker"],Package["pcs"]]
         }
     }
 }

@@ -7,9 +7,9 @@ define pacemaker::crm::ip($address, $stickiness=0, $ensure = present) {
         }
     } else {
         exec { "Creating ip ${name}":
-    	command => "/usr/sbin/crm -F configure primitive ip-${name} ocf:heartbeat:IPaddr2 params ip=${address} cidr_netmask=32 op monitor interval=\"20\"",
+    	command => "/usr/sbin/pcs resource create ip-${name} IPaddr2 ip=${address} cidr_netmask=32 op monitor interval=30s",
     	unless  => "/usr/sbin/crm_resource -r ip-${name} -t primitive -q > /dev/null 2>&1",
-        require => Service["pacemaker"]
+        require => [Service["pacemaker"],Package["pcs"]]
         }
     }
 }
