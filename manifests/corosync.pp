@@ -1,11 +1,15 @@
 define pacemaker::corosync() {
 
     package {["pacemaker", "cman", "corosync",
-              "ccs", "resource-agents",
-              "pacemaker-cli"]:
+              "ccs", "pacemaker-cli"]:
 	    ensure  => "installed",
     }
 
+    firewall { '001 corosync mcast':
+        proto    => 'udp',
+        dport    => ['5404', '5405'],
+        action   => 'accept',
+    }
 
     file {"/etc/sysconfig/cman":
         source  => "puppet:///modules/pacemaker/etc/sysconfig/cman",
@@ -24,7 +28,7 @@ define pacemaker::corosync() {
     }
 
     exec {"Setup Pacemaker Fencing Device":
-        subscribe => Exec["Create Cluster"],
+        subscribe   => Exec["Create Cluster"],
         refreshonly => true,
         command     => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addfencedev pcmk-redirect agent=fence_pcmk",
         unless      => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsfencedev | grep 'pcmk-redirect: agent=fence_pcmk'",
@@ -34,7 +38,8 @@ define pacemaker::corosync() {
     service { "cman":
         ensure    => "running",
         require   => [File["/etc/sysconfig/cman"],
-                      File["/etc/corosync/service.d/pcmk"]]
+                      File["/etc/corosync/service.d/pcmk"],
+                      Firewall['001 corosync mcast']],
         hasstatus => true,
     }
     
@@ -49,33 +54,24 @@ define pacemaker::corosync::node() {
 
     exec {"Create Node $name":
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addnode $name",
-        unless => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsnodes | grep $name:",
-        require => Package["ccs"], 
+        unless  => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsnodes | grep $name:",
+        require => [Package["ccs"], Exec["Create Cluster"]],
+        notify  => Service["cman"],
     }
 
     exec {"Add Fencing Redirect Method to Node $name":
         subscribe => Exec["Create Node $name"],
-        refreshonly => true,
+        #refreshonly => true,
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addmethod pcmk-redirect $name",
-        require => Package["ccs"], 
+        unless  => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsfenceinst $name | grep '  pcmk-redirect'",
+        require => [Package["ccs"],Exec["Create Node $name"]]
     }
 
     exec {"Activate Fencing Redirect for Node $name":
         subscribe => Exec["Create Node $name"],
-        refreshonly => true,
+        #refreshonly => true,
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addfenceinst pcmk-redirect $name pcmk-redirect port=$name",
-        require => [Package["ccs"], Service["cman"], Exec["Add Fencing Redirect Method to Node $name"]]
-    }
-
-    service { "cman":
-        ensure => "running",
-        require => [File["/etc/sysconfig/cman"],Exec["Create Node $name"]],
-        hasstatus => true,
-    }
-    
-    service { "pacemaker":
-        ensure => "running",
-        require => Service["cman"],
-        hasstatus => true,
+        unless  => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsfenceinst $name | grep 'pcmk-redirect: port=$name'",
+        require => [Package["ccs"], Exec["Add Fencing Redirect Method to Node $name"]]
     }
 }

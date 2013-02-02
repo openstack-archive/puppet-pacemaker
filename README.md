@@ -35,25 +35,9 @@ Installs Pacemaker and corosync and creates a cluster
 
 pacemaker::corosync { "cluster-name": }
 
-### configure the firewall
-corosync will not start without the firewall allowing mcast traffic
-
-firewall { '001 corosync mcast':
-    proto    => 'udp',
-    dport    => ['5404', '5405'],
-    action   => 'accept',
-}
-
 ### Add some Nodes
-pacemaker::corosync::node { "10.10.10.1":
-    require => [Pacemaker::Corosync["cluster-name"],
-                Firewall['001 corosync mcast']],
-}
-
-pacemaker::corosync::node { "10.10.10.2":
-    require => [Pacemaker::Corosync["cluster-name"],
-                Firewall['001 corosync mcast']],
-}
+pacemaker::corosync::node { "10.10.10.1": }
+pacemaker::corosync::node { "10.10.10.2": }
 
 ### Add a stonith device
 pacemaker::stonith::ipmilan { "10.10.10.100":
