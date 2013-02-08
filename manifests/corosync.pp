@@ -1,6 +1,6 @@
 define pacemaker::corosync() {
 
-    package {["pacemaker", "cman",
+    package {["pacemaker", "cman", "corosync",
               "ccs", "resource-agents",
               "pacemaker-cli"]:
 	    ensure  => "installed",
@@ -8,8 +8,13 @@ define pacemaker::corosync() {
 
 
     file {"/etc/sysconfig/cman":
-        source => "puppet:///modules/pacemaker/cman",
+        source  => "puppet:///modules/pacemaker/etc/sysconfig/cman",
         require => Package["cman"], 
+    }
+
+    file {"/etc/corosync/service.d/pcmk":
+        source  => "puppet:///modules/pacemaker/etc/corosync/service.d/pcmk",
+        require => Package["corosync"], 
     }
 
     exec {"Create Cluster":
@@ -21,8 +26,22 @@ define pacemaker::corosync() {
     exec {"Setup Pacemaker Fencing Device":
         subscribe => Exec["Create Cluster"],
         refreshonly => true,
-        command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addfencedev pcmk-redirect agent=fence_pcmk",
-        require => Package["ccs"], 
+        command     => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --addfencedev pcmk-redirect agent=fence_pcmk",
+        unless      => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --lsfencedev | grep 'pcmk-redirect: agent=fence_pcmk'",
+        require     => [Package["ccs"], Exec["Create Cluster"]],
+    }
+
+    service { "cman":
+        ensure    => "running",
+        require   => [File["/etc/sysconfig/cman"],
+                      File["/etc/corosync/service.d/pcmk"]]
+        hasstatus => true,
+    }
+    
+    service { "pacemaker":
+        ensure    => "running",
+        require   => Service["cman"],
+        hasstatus => true,
     }
 }
 
