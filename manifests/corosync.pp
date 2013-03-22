@@ -27,6 +27,13 @@ define pacemaker::corosync() {
         require => Package["ccs"], 
     }
 
+    exec {"Disable RGManager":
+        subscribe   => Exec["Create Cluster"],
+        refreshonly => true,
+        command     => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --setrm disabled=1",
+        require     => [Package["ccs"], Exec["Create Cluster"]],
+    }
+
     exec {"Setup Pacemaker Fencing Device":
         subscribe   => Exec["Create Cluster"],
         refreshonly => true,
