@@ -1,4 +1,4 @@
-define pacemaker::crm::ip($address, $stickiness=0, $ensure = present) {
+define pacemaker::resources::ip($address, $stickiness=0, $ensure = present) {
     if($ensure == absent) {
         exec { "Removing ip ${name}":
     	command => "/usr/sbin/crm_resource -D -r ip-${name} -t primitive",
