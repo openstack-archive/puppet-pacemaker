@@ -16,11 +16,6 @@ define pacemaker::corosync() {
         require => Package["cman"], 
     }
 
-    file {"/etc/corosync/service.d/pcmk":
-        source  => "puppet:///modules/pacemaker/etc/corosync/service.d/pcmk",
-        require => Package["corosync"], 
-    }
-
     exec {"Create Cluster":
         creates => "/etc/cluster/cluster.conf",
         command => "/usr/sbin/ccs -f /etc/cluster/cluster.conf --createcluster $name",
@@ -45,7 +40,6 @@ define pacemaker::corosync() {
     service { "cman":
         ensure    => "running",
         require   => [File["/etc/sysconfig/cman"],
-                      File["/etc/corosync/service.d/pcmk"],
                       Firewall['001 corosync mcast']],
         hasstatus => true,
     }
