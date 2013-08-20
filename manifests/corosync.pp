@@ -1,9 +1,4 @@
-define pacemaker::corosync() {
-
-    package {["pacemaker", "pcs", "cman", "corosync",
-              "pacemaker-cli"]:
-	    ensure  => "installed",
-    }
+class pacemaker::corosync($cluster_name, $cluster_members) inherits pacemaker {
 
     firewall { '001 corosync mcast':
         proto    => 'udp',
@@ -11,18 +6,36 @@ define pacemaker::corosync() {
         action   => 'accept',
     }
 
-    exec {"Create Cluster":
-        creates => "/etc/cluster/cluster.conf",
-        command => "/usr/sbin/pcs -f /etc/cluster/cluster.conf --createcluster $name",
-        require => Package["pcs"], 
+    #exec {"Disable RGManager":
+    #    subscribe   => Exec["Create Cluster"],
+    #    refreshonly => true,
+    #    command     => "/usr/sbin/pcs -f /etc/cluster/cluster.conf --setrm disabled=1",
+    #    require     => [Package["pcs"], Exec["Create Cluster"]],
+    #}
+
+    package {["pacemaker", "pcs", "cman"]:
+	ensure  => "installed",
     }
 
-    exec {"Disable RGManager":
-        subscribe   => Exec["Create Cluster"],
-        refreshonly => true,
-        command     => "/usr/sbin/pcs -f /etc/cluster/cluster.conf --setrm disabled=1",
-        require     => [Package["pcs"], Exec["Create Cluster"]],
+    exec {"Set password for hacluster user on $cluster_name":
+        command => "/bin/echo CHANGEME | /usr/bin/passwd --stdin hacluster",
+        creates => "/etc/cluster/cluster.conf",
+        require => [Package["pcs"], Package["pacemaker"]]
     }
+    
+    exec {"Create Cluster $cluster_name":
+        creates => "/etc/cluster/cluster.conf",
+        command => "/usr/sbin/pcs cluster setup --name $cluster_name $cluster_members",
+        require => [Package["pcs"], Package["cman"]],
+    }
+
+    exec {"Start Cluster $cluster_name":
+        unless => "/usr/sbin/pcs status > /dev/null 2>&1",
+        command => "/usr/sbin/pcs cluster start",
+    }
+}
+
+define pacemaker::fencing_redirect() {
 
     exec {"Setup Pacemaker Fencing Device":
         subscribe   => Exec["Create Cluster"],
@@ -31,21 +44,6 @@ define pacemaker::corosync() {
         unless      => "/usr/sbin/pcs -f /etc/cluster/cluster.conf --lsfencedev | grep 'pcmk-redirect: agent=fence_pcmk'",
         require     => [Package["pcs"], Exec["Create Cluster"]],
     }
-
-    service { "cman":
-        ensure    => "running",
-        require   => Firewall['001 corosync mcast'],
-        hasstatus => true,
-    }
-    
-    service { "pacemaker":
-        ensure    => "running",
-        require   => Service["cman"],
-        hasstatus => true,
-    }
-}
-
-define pacemaker::corosync::node() {
 
     exec {"Create Node $name":
         command => "/usr/sbin/pcs -f /etc/cluster/cluster.conf --addnode $name",
