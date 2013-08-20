@@ -32,12 +32,12 @@ This module is based on work by Dan Radez
 
 ### pacemaker
 Installs Pacemaker and corosync and creates a cluster
+class {"pacemaker::corosync":
+    cluster_name => "cluster_name",
+    cluster_members => "192.168.122.3 192.168.122.7",
+}
 
-pacemaker::corosync { "cluster-name": }
-
-### Add some Nodes
-pacemaker::corosync::node { "10.10.10.1": }
-pacemaker::corosync::node { "10.10.10.2": }
+The pacemaker::corosync resource must be executed on each node
 
 ### Add a stonith device
 pacemaker::stonith::ipmilan { "10.10.10.100":
@@ -47,8 +47,12 @@ pacemaker::stonith::ipmilan { "10.10.10.100":
     hostlist => "10.10.10.1 10.10.10.2",
 }
 
-
 ### Add a floating ip
-pacemaker::crm::ip { "10.10.10.3":
-    address => "10.10.10.3",
+class {"pacemaker::resource::ip":
+    ip_address => "192.168.122.223",
+}
+
+### Manage a Linux Standard Build service
+class {"pacemaker::resource::lsb":
+    name => "httpd",
 }
