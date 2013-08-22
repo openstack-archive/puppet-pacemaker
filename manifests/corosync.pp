@@ -32,6 +32,7 @@ class pacemaker::corosync($cluster_name, $cluster_members) inherits pacemaker {
     exec {"Start Cluster $cluster_name":
         unless => "/usr/sbin/pcs status > /dev/null 2>&1",
         command => "/usr/sbin/pcs cluster start",
+        require => Exec["Create Cluster $cluster_name"],
     }
 }
 

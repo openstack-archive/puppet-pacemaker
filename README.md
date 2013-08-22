@@ -39,12 +39,16 @@ class {"pacemaker::corosync":
 
 The pacemaker::corosync resource must be executed on each node
 
+### Disable stonith
+class {"pacemaker::stonith":
+    disable => true,
+}
+
 ### Add a stonith device
-pacemaker::stonith::ipmilan { "10.10.10.100":
+class {"pacemaker::stonith::ipmilan":
     address => "10.10.10.100",
     user => "admin",
     password => "admin",
-    hostlist => "10.10.10.1 10.10.10.2",
 }
 
 ### Add a floating ip
