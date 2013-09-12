@@ -1,6 +1,12 @@
 # Pacemaker module for puppet
 
-This module manages pacemaker on Linux distros with the ccs tool.
+This module manages pacemaker on Linux distros with the pcs tool.
+
+## License
+Apache 2.0
+
+## Support & Contact
+Please log tickets and issues at https://github.com/radez/puppet-pacemaker
 
 ## Description
 
