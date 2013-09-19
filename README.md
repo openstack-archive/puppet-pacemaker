@@ -38,24 +38,24 @@ This module is based on work by Dan Radez
 
 ### pacemaker
 Installs Pacemaker and corosync and creates a cluster
-class {"pacemaker::corosync":
-    cluster_name => "cluster_name",
-    cluster_members => "192.168.122.3 192.168.122.7",
-}
+    class {"pacemaker::corosync":
+        cluster_name => "cluster_name",
+        cluster_members => "192.168.122.3 192.168.122.7",
+    }
 
 The pacemaker::corosync resource must be executed on each node
 
 ### Disable stonith
-class {"pacemaker::stonith":
-    disable => true,
-}
+    class {"pacemaker::stonith":
+        disable => true,
+    }
 
 ### Add a stonith device
-class {"pacemaker::stonith::ipmilan":
-    address => "10.10.10.100",
-    user => "admin",
-    password => "admin",
-}
+    class {"pacemaker::stonith::ipmilan":
+        address => "10.10.10.100",
+        user => "admin",
+        password => "admin",
+    }
 
 ### Resources
 Any of the following resources support a group propery.
@@ -64,19 +64,19 @@ and add the resource to the group. This has been demonstrated
 on the ip address example, but is not a required propery.
 
 #### Add a floating ip
-class {"pacemaker::resource::ip":
-    ip_address => "192.168.122.223",
-    group => "my_group",
-}
+    class {"pacemaker::resource::ip":
+        ip_address => "192.168.122.223",
+        group => "my_group",
+    }
 
 #### Manage a Linux Standard Build service
-class {"pacemaker::resource::lsb":
-    name => "httpd",
-}
+    class {"pacemaker::resource::lsb":
+        name => "httpd",
+    }
 
 #### Manage a shared filesystem
-class {"pacemaker::resource::filesystem":
-    device => "192.168.122.1:/var/www/html",
-    directory => "/mnt",
-    fstype => "nfs",
-}
+    class {"pacemaker::resource::filesystem":
+        device => "192.168.122.1:/var/www/html",
+        directory => "/mnt",
+        fstype => "nfs",
+    }

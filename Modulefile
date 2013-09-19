@@ -1,5 +1,5 @@
 name    'radez-pacemaker'
-version '0.0.1'
+version '0.0.2'
 source 'https://github.com/radez/puppet-pacemaker'
 author 'radez'
 license 'Apache License, Version 2.0'
@@ -9,3 +9,4 @@ project_page 'https://github.com/radez/puppet-pacemaker'
 
 ## Add dependencies, if any:
 # dependency 'username/name', '>= 1.2.0'
+dependency 'puppetlabs/stdlib'
