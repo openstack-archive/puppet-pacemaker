@@ -28,13 +28,22 @@ class {"pacemaker::stonith::ipmilan":
     password => "admin",
 }
 
-### Add a floating ip
 class {"pacemaker::resource::ip":
-    ip_address => "192.168.122.203",
+    ip_address => "192.168.122.223",
+    #ensure => "absent",
+    group => 'test-group',
 }
 
-### Manage a Linux Standard Build service
 class {"pacemaker::resource::lsb":
-    name => "httpd",
+    name => "mysqld",
+    #ensure => "absent",
+    group => 'test-group',
+}
+
+class {"pacemaker::resource::filesystem":
+    device => "192.168.122.1:/var/www/html",
+    directory => "/mnt",
+    fstype => "nfs",
+    group => 'test-group',
 }
 

@@ -57,12 +57,26 @@ class {"pacemaker::stonith::ipmilan":
     password => "admin",
 }
 
-### Add a floating ip
+### Resources
+Any of the following resources support a group propery.
+This will create the group, if the group doesn't exist,
+and add the resource to the group. This has been demonstrated
+on the ip address example, but is not a required propery.
+
+#### Add a floating ip
 class {"pacemaker::resource::ip":
     ip_address => "192.168.122.223",
+    group => "my_group",
 }
 
-### Manage a Linux Standard Build service
+#### Manage a Linux Standard Build service
 class {"pacemaker::resource::lsb":
     name => "httpd",
+}
+
+#### Manage a shared filesystem
+class {"pacemaker::resource::filesystem":
+    device => "192.168.122.1:/var/www/html",
+    directory => "/mnt",
+    fstype => "nfs",
 }
