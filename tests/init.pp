@@ -10,7 +10,7 @@
 #
 include pacemaker
 
-Installs Pacemaker and corosync and creates a cluster
+### Installs Pacemaker and corosync and creates a cluster
 class {"pacemaker::corosync":
     cluster_name => "cluster_name",
     cluster_members => "192.168.122.3 192.168.122.7",
@@ -28,6 +28,7 @@ class {"pacemaker::stonith::ipmilan":
     password => "admin",
 }
 
+### Add resources
 class {"pacemaker::resource::ip":
     ip_address => "192.168.122.223",
     #ensure => "absent",
@@ -35,9 +36,16 @@ class {"pacemaker::resource::ip":
 }
 
 class {"pacemaker::resource::lsb":
-    name => "mysqld",
+    name => "httpd",
     #ensure => "absent",
     group => 'test-group',
+}
+
+class {"pacemaker::resource::mysql":
+    name => "my-mysqld",
+    group => 'test-group',
+    #ensure => "absent",
+    #enable_creation => false,
 }
 
 class {"pacemaker::resource::filesystem":

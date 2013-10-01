@@ -38,6 +38,7 @@ This module is based on work by Dan Radez
 
 ### pacemaker
 Installs Pacemaker and corosync and creates a cluster
+
     class {"pacemaker::corosync":
         cluster_name => "cluster_name",
         cluster_members => "192.168.122.3 192.168.122.7",
@@ -72,6 +73,11 @@ on the ip address example, but is not a required propery.
 #### Manage a Linux Standard Build service
     class {"pacemaker::resource::lsb":
         name => "httpd",
+    }
+
+#### Manage a MySQL server
+    class {"pacemaker::resource::mysql":
+        name => "my-mysql",
     }
 
 #### Manage a shared filesystem
