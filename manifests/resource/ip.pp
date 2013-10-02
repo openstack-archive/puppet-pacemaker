@@ -12,7 +12,7 @@ class pacemaker::resource::ip($ip_address, $cidr_netmask=32, $nic=nil,
         }
     } else {
         if($nic != nil){
-            $nic_option = ' nic=$nic'
+            $nic_option = " nic=$nic"
         } else {
             $nic_option = ''
         } 
