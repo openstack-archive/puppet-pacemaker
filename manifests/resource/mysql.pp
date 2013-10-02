@@ -13,12 +13,12 @@ class pacemaker::resource::mysql($name, $group=nil, $interval="30s", $stickiness
         }
     } else {
         if($replication_user) {
-            $replication_options = ",replication_user=$replication_user,replication_passwd=$replication_passwd,max_slave_lag=$max_slave_lag,evict_outdated_slaves=$evict_outdated_slaves"
+            $replication_options = " replication_user=$replication_user replication_passwd=$replication_passwd max_slave_lag=$max_slave_lag evict_outdated_slaves=$evict_outdated_slaves"
         } else {
             $replication_options = ''
         }
         exec { "Creating MySQL ${name}":
-    	command => "/usr/sbin/pcs resource create ${resource_id} mysql enable_creation=true$replication_options op monitor interval=${interval}",
+    	command => "/usr/sbin/pcs resource create ${resource_id} mysql enable_creation=true${replication_options} op monitor interval=${interval}",
         unless  => "/usr/sbin/pcs resource show ${resource_id} > /dev/null 2>&1",
         require => [Exec["Start Cluster $cluster_name"], Package["pcs"]]
         }
