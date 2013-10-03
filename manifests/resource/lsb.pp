@@ -10,7 +10,7 @@ class pacemaker::resource::lsb($group=nil, $interval="30s", $stickiness=0, $ensu
         require => Exec["Start Cluster $cluster_name"],
         }
     } else {
-        $group_options = $group ? {
+        $group_option = $group ? {
             ''      => '',
             default => " --group ${group}"
         }

@@ -9,7 +9,7 @@ class pacemaker::resource::filesystem($device, $directory, $fstype, $group=nil, 
         require => Exec["Start Cluster $cluster_name"],
         }
     } else {
-        $group_options = $group ? {
+        $group_option = $group ? {
             ''      => '',
             default => " --group ${group}"
         }

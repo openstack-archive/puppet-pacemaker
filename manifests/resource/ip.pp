@@ -11,7 +11,7 @@ class pacemaker::resource::ip($ip_address, $cidr_netmask=32, $nic=nil,
         require => Exec["Start Cluster $cluster_name"],
         }
     } else { 
-        $group_options = $group ? {
+        $group_option = $group ? {
             ''      => '',
             default => " --group ${group}"
         }
