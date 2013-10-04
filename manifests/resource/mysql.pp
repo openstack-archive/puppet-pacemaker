@@ -1,4 +1,4 @@
-class pacemaker::resource::mysql($name, $group=nil, $interval="30s", $stickiness=0, $ensure=present,
+class pacemaker::resource::mysql($name, $group='', $interval="30s", $stickiness=0, $ensure=present,
                                $replication_user='', $replication_passwd='', 
                                $max_slave_lag=0, $evict_outdated_slaves=false, $enable_creation=true)
   inherits pacemaker::corosync {

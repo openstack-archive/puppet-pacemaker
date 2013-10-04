@@ -1,4 +1,4 @@
-class pacemaker::resource::lsb($group=nil, $interval="30s", $stickiness=0, $ensure=present)
+class pacemaker::resource::lsb($group='', $interval="30s", $stickiness=0, $ensure=present)
   inherits pacemaker::corosync {
 
     $resource_id = "lsb-${name}"
