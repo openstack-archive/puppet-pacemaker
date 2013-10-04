@@ -1,5 +1,5 @@
-class pacemaker::resource::ip($ip_address, $cidr_netmask=32, $nic=nil,
-                              $group=nil, $interval="30s", $ensure=present) 
+class pacemaker::resource::ip($ip_address, $cidr_netmask=32, $nic='',
+                              $group='', $interval="30s", $ensure=present) 
   inherits pacemaker::corosync {
 
     $resource_id = "ip-${ip_address}"
@@ -11,7 +11,7 @@ class pacemaker::resource::ip($ip_address, $cidr_netmask=32, $nic=nil,
         require => Exec["Start Cluster $cluster_name"],
         }
     } else { 
-        $group_options = $group ? {
+        $group_option = $group ? {
             ''      => '',
             default => " --group ${group}"
         }

@@ -1,4 +1,4 @@
-class pacemaker::resource::filesystem($device, $directory, $fstype, $group=nil, $interval="30s", $ensure=present) 
+class pacemaker::resource::filesystem($device, $directory, $fstype, $group='', $interval="30s", $ensure=present) 
   inherits pacemaker::corosync {
 
     $resource_id = delete("fs-${directory}", '/')
@@ -9,7 +9,7 @@ class pacemaker::resource::filesystem($device, $directory, $fstype, $group=nil, 
         require => Exec["Start Cluster $cluster_name"],
         }
     } else {
-        $group_options = $group ? {
+        $group_option = $group ? {
             ''      => '',
             default => " --group ${group}"
         }
