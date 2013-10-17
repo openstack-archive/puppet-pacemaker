@@ -1,4 +1,5 @@
 class pacemaker::resource::lsb($group='',
+                               $clone=false,
                                $interval="30s",
                                $ensure=present) {
 

@@ -1,5 +1,6 @@
 class pacemaker::resource::mysql($name,
                                  $group='',
+                                 $clone=false,
                                  $interval="30s",
                                  $stickiness=0,
                                  $ensure=present,

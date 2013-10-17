@@ -1,6 +1,7 @@
 define pacemaker::resource::base ($resource_type,
                                   $resource_params,
                                   $group='',
+                                  $clone=false,
                                   $interval='30s',
                                   $ensure=present) {
 
@@ -11,9 +12,13 @@ define pacemaker::resource::base ($resource_type,
       require => Exec["Start Cluster ${corosync::cluster_name}"],
     }
   } else { 
-    $group_options = $group ? {
+    $group_option = $group ? {
       ''      => '',
       default => " --group ${group}"
+    }
+    $clone_option = $clone ? {
+      ''      => '',
+      default => " --clone"
     }
 
     exec { "Creating ${name}":
