@@ -4,6 +4,8 @@
 # and that the nessesary configs are inplace for
 # the qpid clustering to start using the pacemaker
 # corosync instance
+# The pacemaker resource is created as a cloned resource
+# so that pacemaker starts qpid on all the cluster's nodes
 
 class pacemaker::resource::qpid($name,
                                 $cluster_name,

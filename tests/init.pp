@@ -11,6 +11,7 @@
 include pacemaker
 
 ### Installs Pacemaker and corosync and creates a cluster
+### Should be run on all pacemaker nodes
 class {"pacemaker::corosync":
     cluster_name => "cluster_name",
     cluster_members => "192.168.122.3 192.168.122.7",
@@ -29,6 +30,9 @@ class {"pacemaker::stonith::ipmilan":
 }
 
 ### Add resources
+### each of these can generally be added to a single
+### node, though running them on multiple nodes
+### will net the same result
 class {"pacemaker::resource::ip":
     ip_address => "192.168.122.223",
     #ensure => "absent",
@@ -53,5 +57,11 @@ class {"pacemaker::resource::filesystem":
     directory => "/mnt",
     fstype => "nfs",
     group => 'test-group',
+}
+
+# this must be run on all pacemaker/qpidd nodes
+class {'pacemaker::resource::qpid':
+      name         => "My_qpidd_resource",
+      cluster_name => "qpid_cluster",
 }
 
