@@ -3,9 +3,9 @@ class pacemaker::resource::filesystem($device,
                                       $fstype,
                                       $group='',
                                       $interval="30s",
-                                      $ensure=present) 
-
-  pacemaker::resource::base { delete("fs-${directory}", '/'):
+                                      $ensure=present) {
+  $resource_id = delete("fs-${directory}", '/')
+  pacemaker::resource::base { $resource_id:
     resource_type   => "Filesystem",
     resource_params => "device=${device} directory=${directory} fstype=${fstype}",
     group           => $group,
