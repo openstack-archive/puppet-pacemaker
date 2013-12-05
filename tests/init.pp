@@ -65,3 +65,24 @@ class {'pacemaker::resource::qpid':
       cluster_name => "qpid_cluster",
 }
 
+### Add constraints
+pacemaker::constraint::base { "ip-192.168.122.223_with_fs-mnt":
+  constraint_type => 'colocation',
+  first_resource  => 'ip-192.168.122.223',
+  second_resource => 'fs-mnt',
+}
+
+pacemaker::constraint::base { "ip-192.168.122.223_before_fs-mnt":
+  constraint_type => 'order',
+  first_resource  => 'ip-192.168.122.223',
+  second_resource => 'fs-mnt',
+  first_action    => 'start',
+  second_action   => 'start',
+}
+
+pacemaker::constraint::base { "ip-192.168.122.223_on_192.168.122.3":
+  constraint_type => 'location',
+  first_resource  => 'ip-192.168.122.223',
+  location        => '192.168.122.3',
+  score           => 'INFINITY',
+}
