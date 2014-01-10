@@ -1,7 +1,7 @@
-class pacemaker::resource::lsb($group='',
-                               $clone=false,
-                               $interval="30s",
-                               $ensure=present) {
+define pacemaker::resource::lsb($group='',
+                                $clone=false,
+                                $interval="30s",
+                                $ensure=present) {
 
   pacemaker::resource::base { "lsb-${name}":
     resource_type   => "lsb:${name}",

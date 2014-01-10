@@ -7,13 +7,13 @@
 # The pacemaker resource is created as a cloned resource
 # so that pacemaker starts qpid on all the cluster's nodes
 
-class pacemaker::resource::qpid($name,
-                                $cluster_name,
-                                $clone=true,
-                                $group='',
-                                $interval="30s",
-                                $stickiness=0,
-                                $ensure=present) {
+define pacemaker::resource::qpid($name,
+                                 $cluster_name,
+                                 $clone=true,
+                                 $group='',
+                                 $interval="30s",
+                                 $stickiness=0,
+                                 $ensure=present) {
 
   package { "qpid-cpp-server-cluster":
     ensure => installed,

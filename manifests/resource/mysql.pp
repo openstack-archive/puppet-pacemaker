@@ -1,14 +1,14 @@
-class pacemaker::resource::mysql($name,
-                                 $group='',
-                                 $clone=false,
-                                 $interval="30s",
-                                 $stickiness=0,
-                                 $ensure=present,
-                                 $replication_user='',
-                                 $replication_passwd='', 
-                                 $max_slave_lag=0,
-                                 $evict_outdated_slaves=false,
-                                 $enable_creation=true) {
+define pacemaker::resource::mysql($name,
+                                  $group='',
+                                  $clone=false,
+                                  $interval="30s",
+                                  $stickiness=0,
+                                  $ensure=present,
+                                  $replication_user='',
+                                  $replication_passwd='', 
+                                  $max_slave_lag=0,
+                                  $evict_outdated_slaves=false,
+                                  $enable_creation=true) {
 
   $replication_options = $replication_user ? {
       ''      => '',

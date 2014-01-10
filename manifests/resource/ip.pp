@@ -1,9 +1,9 @@
-class pacemaker::resource::ip($ip_address,
-                              $cidr_netmask=32,
-                              $nic='',
-                              $group='',
-                              $interval="30s",
-                              $ensure=present) {
+define pacemaker::resource::ip($ip_address,
+                               $cidr_netmask=32,
+                               $nic='',
+                               $group='',
+                               $interval="30s",
+                               $ensure=present) {
 
   $nic_option = $nic ? {
       ''      => '',

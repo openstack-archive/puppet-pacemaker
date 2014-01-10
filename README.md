@@ -65,23 +65,22 @@ and add the resource to the group. This has been demonstrated
 on the ip address example, but is not a required propery.
 
 #### Add a floating ip
-    class {"pacemaker::resource::ip":
+    pacemaker::resource::ip { "192.168.122.223":
         ip_address => "192.168.122.223",
         group => "my_group",
     }
 
 #### Manage a Linux Standard Build service
-    class {"pacemaker::resource::lsb":
-        name => "httpd",
+#### That will get created after the floating ip
+    pacemaker::resource::lsb { "http":
+        require => Pacemaker::Resource::Ip['192.168.122.223'],
     }
 
 #### Manage a MySQL server
-    class {"pacemaker::resource::mysql":
-        name => "my-mysql",
-    }
+    pacemaker::resource::mysql { "da-database": }
 
 #### Manage a shared filesystem
-    class {"pacemaker::resource::filesystem":
+    pacemaker::resource::filesystem { "apache share":
         device => "192.168.122.1:/var/www/html",
         directory => "/mnt",
         fstype => "nfs",
