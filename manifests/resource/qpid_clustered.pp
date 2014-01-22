@@ -7,13 +7,13 @@
 # The pacemaker resource is created as a cloned resource
 # so that pacemaker starts qpid on all the cluster's nodes
 
-define pacemaker::resource::qpid($name,
+define pacemaker::resource::qpid_clustered($name,
                                  $cluster_name,
                                  $clone=true,
                                  $group='',
-                                 $interval="30s",
+                                 $interval='30s',
                                  $stickiness=0,
-                                 $ensure=present) {
+                                 $ensure='present') {
 
   package { "qpid-cpp-server-cluster":
     ensure => installed,
@@ -38,12 +38,12 @@ define pacemaker::resource::qpid($name,
     require => Package['qpid-cpp-server-cluster'],
   }
 
-  pacemaker::resource::base { "qpidd":
+  pcmk_resource { "lsb-qpidd":
     resource_type   => "lsb:qpidd",
     resource_params => "",
     group           => $group,
     clone           => $clone,
-    interval        => "30s",
+    interval        => $interval,
     ensure          => $ensure,
   }
 

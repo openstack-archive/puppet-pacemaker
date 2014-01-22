@@ -1,9 +1,9 @@
 define pacemaker::resource::mysql($name,
                                   $group='',
                                   $clone=false,
-                                  $interval="30s",
+                                  $interval='30s',
                                   $stickiness=0,
-                                  $ensure=present,
+                                  $ensure='present',
                                   $additional_params='',
                                   $replication_user='',
                                   $replication_passwd='', 
@@ -16,11 +16,11 @@ define pacemaker::resource::mysql($name,
       default => " replication_user=$replication_user replication_passwd=$replication_passwd max_slave_lag=$max_slave_lag evict_outdated_slaves=$evict_outdated_slaves"
   }
 
-  pacemaker::resource::base { "mysql-${name}":
-    resource_type   => "mysql",
+  pcmk_resource { "mysql-${name}":
+    resource_type   => 'mysql',
     resource_params => "enable_creation=${enable_creation}${replication_options} ${additional_params}",
     group           => $group,
-    interval        => "30s",
+    interval        => $interval,
     ensure          => $ensure,
   }
 
