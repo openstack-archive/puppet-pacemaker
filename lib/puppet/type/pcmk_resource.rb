@@ -10,7 +10,7 @@ Puppet::Type.newtype(:pcmk_resource) do
     newparam(:resource_type) do
         desc "the pacemaker type to create"
     end
-    newparam(:resource_params) do
+    newproperty(:resource_params) do
         desc "extra parameters to the retource group"
     end
     newproperty(:group) do
@@ -20,7 +20,7 @@ Puppet::Type.newtype(:pcmk_resource) do
         desc "set if this is a cloned resource"
         defaultto false
     end
-    newparam(:interval) do
+    newproperty(:interval) do
         desc "resource check interval"
         defaultto "30s"
     end

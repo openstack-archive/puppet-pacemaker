@@ -28,6 +28,23 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
 
 
     ### property methods
+    def resource_params
+        cmd = 'resource show ' + @resource[:name]
+        get_attrs = pcs('get interval', cmd)
+
+        # find the Attributes
+        for line in get_attrs.lines.each do
+            return (line.scan /Attributes: (.+?)$/m)[0][0].strip if line.include? 'Attributes:'
+        end
+        # return empty string if Attributes not found
+        ''
+    end
+
+    def resource_params=(value)
+        cmd = 'resource update ' + @resource[:name] + ' ' + value
+        pcs('update attributes', cmd)
+    end
+
     def group
         # get the list of groups and their resources
         cmd = 'resource --groups'
@@ -38,6 +55,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
             return group[0, /:/ =~ group] if group.include? @resource[:name]
         end
         # return empty string if a group wasn't found
+        # that includes the resource in it.
         ''
     end
 
@@ -64,6 +82,23 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
             cmd = 'resource clone ' + @resource[:name]
             pcs('clone', cmd)
         end
+    end
+
+    def interval
+        cmd = 'resource show ' + @resource[:name]
+        get_interval = pcs('get interval', cmd)
+
+        # find the interval value
+        for line in get_interval.lines.each do
+            return (line.scan /interval=(.+?) /m)[0][0] if line.include? 'interval='
+        end
+        # return empty string if an interval value wasn't found
+        ''
+    end
+
+    def interval=(value)
+        cmd = 'resource update ' + @resource[:name] + ' op monitor interval=' + value
+        pcs('update interval', cmd)
     end
 
     private
