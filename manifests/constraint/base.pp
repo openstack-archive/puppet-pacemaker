@@ -13,8 +13,8 @@ define pacemaker::constraint::base ($constraint_type,
     fail("Must provide actions when constraint type is order")
   }
 
-  if($constraint_type == 'location' and $location == undef) {
-    fail("Must provide location when constraint type is location")
+  if($constraint_type == 'location') {
+    fail("Deprecated use pacemaker::constraint::location")
   }
 
   if($constraint_type == 'location' and $score == undef) {
