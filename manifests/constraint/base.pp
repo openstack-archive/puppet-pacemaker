@@ -13,8 +13,8 @@ define pacemaker::constraint::base ($constraint_type,
     fail("Must provide actions when constraint type is order")
   }
 
-  if($constraint_type == 'location') {
-    fail("Deprecated use pacemaker::constraint::location")
+  if($constraint_type == 'location' and $location == undef) {
+    fail("Must provide location when constraint type is location")
   }
 
   if($constraint_type == 'location' and $score == undef) {
@@ -38,6 +38,7 @@ define pacemaker::constraint::base ($constraint_type,
   } else {
     case $constraint_type {
       'colocation': {
+        fail("Deprecated use pacemaker::constraint::colocation")
         exec { "Creating colocation constraint ${name}":
           command => "/usr/sbin/pcs constraint colocation add ${first_resource} ${second_resource} ${score}",
           unless  => "/usr/sbin/pcs constraint colocation show | grep ${first_resource} | grep ${second_resource} > /dev/null 2>&1",
@@ -52,6 +53,7 @@ define pacemaker::constraint::base ($constraint_type,
         }
       }
       'location': {
+        fail("Deprecated use pacemaker::constraint::location")
         exec { "Creating location constraint ${name}":
           command => "/usr/sbin/pcs constraint location add ${name} ${first_resource} ${location} ${score}",
           unless  => "/usr/sbin/pcs constraint location show | grep ${first_resource} > /dev/null 2>&1",

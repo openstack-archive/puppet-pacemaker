@@ -3,7 +3,7 @@ define pacemaker::constraint::location ($resource,
                                         $score,
                                         $ensure='present') {
     pcmk_constraint {"loc-$resource-$location":
-       constraint_type => 'location',
+       constraint_type => location,
        resource        => $resource,
        location        => $location,
        score           => $score,

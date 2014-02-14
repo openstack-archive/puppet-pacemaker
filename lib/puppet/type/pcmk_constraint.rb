@@ -9,7 +9,7 @@ Puppet::Type.newtype(:pcmk_constraint) do
 
     newparam(:constraint_type) do
         desc "the pacemaker type to create"
-        #newvalues("location")
+        newvalues(:location, :colocation)
     end
     newparam(:resource) do
         desc "resource list"
