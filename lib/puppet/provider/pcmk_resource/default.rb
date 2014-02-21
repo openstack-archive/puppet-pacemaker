@@ -104,11 +104,13 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     private
 
     def pcs(name, cmd)
+        Puppet.debug("/usr/sbin/pcs #{cmd}")
         pcs_out = `/usr/sbin/pcs #{cmd}`
         #puts name
         #puts $?.exitstatus
         if $?.exitstatus != 0 and pcs_out.lines.first and not name.include? 'show'
-           raise Puppet::Error, "pcs #{name} failed: #{pcs_out.lines.first.chomp!}" if $?.exitstatus
+            Puppet.debug("Error: #{pcs_out}")
+            raise Puppet::Error, "pcs #{name} failed: #{pcs_out.lines.first.chomp!}" if $?.exitstatus
         end
         # return output for good exit or false for failure.
         $?.exitstatus == 0 ? pcs_out : false
