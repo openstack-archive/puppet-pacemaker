@@ -8,6 +8,7 @@ define pacemaker::resource::lsb($group='',
     resource_type   => "lsb:${name}",
     resource_params => '',
     group           => $group,
+    clone           => $clone,
     interval        => $interval,
   }
 

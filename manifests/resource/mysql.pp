@@ -20,6 +20,7 @@ define pacemaker::resource::mysql($name,
     resource_type   => 'mysql',
     resource_params => "enable_creation=${enable_creation}${replication_options} ${additional_params}",
     group           => $group,
+    clone           => $clone,
     interval        => $interval,
     ensure          => $ensure,
   }
