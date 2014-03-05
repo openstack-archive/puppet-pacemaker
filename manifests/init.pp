@@ -1,6 +1,6 @@
 # == Class: pacemaker
 #
-# base class for pacemaker 
+# base class for pacemaker
 #
 # === Parameters
 #
@@ -32,5 +32,7 @@
 class pacemaker(
   $hacluster_pwd        = $pacemaker::params::hacluster_pwd
 ) inherits pacemaker::params {
-
+  include ::pacemaker::params
+  include ::pacemaker::install
+  include ::pacemaker::service
 }
