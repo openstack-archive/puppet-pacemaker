@@ -27,4 +27,18 @@ class pacemaker::corosync($cluster_name, $cluster_members) inherits pacemaker {
         command => "/usr/sbin/pcs cluster start",
         require => Exec["Create Cluster $cluster_name"],
     }
+
+    exec {"wait-for-settle":
+      timeout   => 3600,
+      tries     => 360,
+      try_sleep => 10,
+      command   => "/usr/sbin/pcs status | grep -q 'partition with quorum' > /dev/null 2>&1",
+      unless    => "/usr/sbin/pcs status | grep -q 'partition with quorum' > /dev/null 2>&1",
+      require   => Exec["Start Cluster $cluster_name"],
+      notify    => Notify["pacemaker settled"],
+    }
+
+    notify {"pacemaker settled":
+      message => "Pacemaker has reported quorum achieved",
+    }
 }
