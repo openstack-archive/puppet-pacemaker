@@ -6,7 +6,7 @@ class pacemaker::stonith ($disable=true) inherits pacemaker::corosync {
         require => Exec["Start Cluster $cluster_name"],
     }
   } else {
-    exec {"Disable STONITH":
+    exec {"Enable STONITH":
         command => "/usr/sbin/pcs property set stonith-enabled=true",
         onlyif => "/usr/sbin/pcs property show stonith-enabled | grep 'stonith-enabled: false'",
         require => Exec["Start Cluster $cluster_name"],
