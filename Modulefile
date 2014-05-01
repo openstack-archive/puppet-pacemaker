@@ -1,5 +1,5 @@
 name    'radez-pacemaker'
-version '0.1.0'
+version '0.2.0'
 source 'https://github.com/radez/puppet-pacemaker'
 author 'radez'
 license 'Apache License, Version 2.0'
