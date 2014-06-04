@@ -3,7 +3,11 @@ class pacemaker::params {
   $hacluster_pwd         = 'CHANGEME'
   case $::osfamily {
     redhat: {
-      $package_list = ["pacemaker", "pcs", "cman"]
+      if $::operatingsystemrelease =~ /^6\..*$/ {      
+        $package_list = ["pacemaker", "pcs", "cman"]
+      } else {
+        $package_list = ["pacemaker", "pcs"]
+      }
       $service_name = 'pacemaker'
     }
     default: {
