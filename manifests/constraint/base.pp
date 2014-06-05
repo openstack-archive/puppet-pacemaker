@@ -26,13 +26,13 @@ define pacemaker::constraint::base ($constraint_type,
       exec { "Removing location constraint ${name}":
         command => "/usr/sbin/pcs constraint location remove ${name}",
         onlyif  => "/usr/sbin/pcs constraint location show --full | grep ${name}",
-        require => Exec["Start Cluster ${corosync::cluster_name}"],
+        require => Exec["wait-for-settle"],
       }
     } else {
       exec { "Removing ${constraint_type} constraint ${name}":
         command => "/usr/sbin/pcs constraint ${constraint_type} remove ${first_resource} ${second_resource}",
         onlyif  => "/usr/sbin/pcs constraint ${constraint_type} show | grep ${first_resource} | grep ${second_resource}",
-        require => Exec["Start Cluster ${corosync::cluster_name}"],
+        require => Exec["wait-for-settle"],
       }
     }
   } else {
@@ -42,14 +42,14 @@ define pacemaker::constraint::base ($constraint_type,
         exec { "Creating colocation constraint ${name}":
           command => "/usr/sbin/pcs constraint colocation add ${first_resource} ${second_resource} ${score}",
           unless  => "/usr/sbin/pcs constraint colocation show | grep ${first_resource} | grep ${second_resource} > /dev/null 2>&1",
-          require => [Exec["Start Cluster ${corosync::cluster_name}"],Package["pcs"]],
+          require => [Exec["wait-for-settle"],Package["pcs"]],
         }
       }
       'order': {
         exec { "Creating order constraint ${name}":
           command => "/usr/sbin/pcs constraint order ${first_action} ${first_resource} then ${second_action} ${second_resource}",
           unless  => "/usr/sbin/pcs constraint order show | grep ${first_resource} | grep ${second_resource} > /dev/null 2>&1",
-          require => [Exec["Start Cluster ${corosync::cluster_name}"],Package["pcs"]],
+          require => [Exec["wait-for-settle"],Package["pcs"]],
         }
       }
       'location': {
@@ -57,7 +57,7 @@ define pacemaker::constraint::base ($constraint_type,
         exec { "Creating location constraint ${name}":
           command => "/usr/sbin/pcs constraint location add ${name} ${first_resource} ${location} ${score}",
           unless  => "/usr/sbin/pcs constraint location show | grep ${first_resource} > /dev/null 2>&1",
-          require => [Exec["Start Cluster ${corosync::cluster_name}"],Package["pcs"]],
+          require => [Exec["wait-for-settle"],Package["pcs"]],
         }
       }
     }
