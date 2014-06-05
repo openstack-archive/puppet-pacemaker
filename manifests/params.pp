@@ -3,13 +3,15 @@ class pacemaker::params {
   $hacluster_pwd         = 'CHANGEME'
   case $::osfamily {
     redhat: {
-      if $::operatingsystemrelease =~ /^6\..*$/ {      
+      if $::operatingsystemrelease =~ /^6\..*$/ {
         $package_list = ["pacemaker", "pcs", "cman"]
         # TODO in el6.6, $pcsd_mode should be true
         $pcsd_mode = false
+        $services_manager = 'lsb'
       } else {
         $package_list = ["pacemaker", "pcs"]
         $pcsd_mode = true
+        $services_manager = 'systemd'
       }
       $service_name = 'pacemaker'
     }

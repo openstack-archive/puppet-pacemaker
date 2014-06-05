@@ -1,4 +1,4 @@
-define pacemaker::resource::lsb($group='',
+define pacemaker::resource::systemd($group='',
                                 $clone=false,
                                 $interval='30s',
                                 $ensure='present',
@@ -6,7 +6,7 @@ define pacemaker::resource::lsb($group='',
 
   pcmk_resource { "${name}":
     ensure          => $ensure,
-    resource_type   => "lsb:${name}",
+    resource_type   => "systemd:${name}",
     resource_params => $options,
     group           => $group,
     clone           => $clone,
