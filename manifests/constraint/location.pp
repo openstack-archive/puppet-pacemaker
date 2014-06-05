@@ -8,7 +8,7 @@ define pacemaker::constraint::location ($resource,
        location        => $location,
        score           => $score,
        ensure          => $ensure,
-       require => Exec["Start Cluster ${corosync::cluster_name}"],
+       require => Exec["wait-for-settle"],
    }
 }
  
