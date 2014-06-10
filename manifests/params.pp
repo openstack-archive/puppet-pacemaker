@@ -4,12 +4,12 @@ class pacemaker::params {
   case $::osfamily {
     redhat: {
       if $::operatingsystemrelease =~ /^6\..*$/ {
-        $package_list = ["pacemaker", "pcs", "cman"]
+        $package_list = ["pacemaker","pcs","fence-agents","cman"]
         # TODO in el6.6, $pcsd_mode should be true
         $pcsd_mode = false
         $services_manager = 'lsb'
       } else {
-        $package_list = ["pacemaker", "pcs"]
+        $package_list = ["pacemaker","pcs","fence-agents-all"]
         $pcsd_mode = true
         $services_manager = 'systemd'
       }

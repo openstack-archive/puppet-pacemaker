@@ -22,7 +22,7 @@ class pacemaker::stonith::fence_xvm(
       default => "port=${port}",
     }
     $pcmk_host_list_chunk = $pcmk_host ? {
-      ''      => '',
+      ''      => 'pcmk_host_list=$(/usr/sbin/crm_node -n)',
       default => "pcmk_host_list=${pcmk_host}",
     }
     if $manage_key_file {
