@@ -29,7 +29,8 @@ class pacemaker::corosync(
       proto  => 'tcp',
       dport  => ['2224'],
       action => 'accept',
-    }
+    } ->
+    Service['pcsd'] ->
     # we have more fragile when-to-start pacemaker conditions with pcsd
     exec {"enable-not-start-$cluster_name":
       command => "/usr/sbin/pcs cluster enable"
