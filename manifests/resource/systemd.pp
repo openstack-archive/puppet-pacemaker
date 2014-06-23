@@ -1,6 +1,7 @@
 define pacemaker::resource::systemd($group='',
                                 $clone=false,
                                 $interval='30s',
+                                $monitor_params=undef,
                                 $ensure='present',
                                 $options='') {
 
@@ -11,6 +12,7 @@ define pacemaker::resource::systemd($group='',
     group           => $group,
     clone           => $clone,
     interval        => $interval,
+    monitor_params  => $monitor_params,
   }
 
 }

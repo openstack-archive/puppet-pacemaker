@@ -5,6 +5,7 @@ define pacemaker::resource::filesystem($device,
                                        $group='',
                                        $clone=false,
                                        $interval='30s',
+                                       $monitor_params=undef,
                                        $ensure='present') {
   $resource_id = delete("fs-${directory}", '/')
 
@@ -19,6 +20,7 @@ define pacemaker::resource::filesystem($device,
     group           => $group,
     clone           => $clone,
     interval        => $interval,
+    monitor_params  => $monitor_params,
     ensure          => $ensure,
   }
 }

@@ -3,6 +3,7 @@ define pacemaker::resource::ip($ip_address,
                                $nic='',
                                $group='',
                                $interval='30s',
+                               $monitor_params=undef,
                                $ensure='present') {
 
   $nic_option = $nic ? {
@@ -16,6 +17,7 @@ define pacemaker::resource::ip($ip_address,
     resource_params => "ip=${ip_address} cidr_netmask=${cidr_netmask}${nic_option}",
     group           => $group,
     interval        => $interval,
+    monitor_params  => $monitor_params,
   }
 
 }

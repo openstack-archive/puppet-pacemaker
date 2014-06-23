@@ -12,6 +12,7 @@ define pacemaker::resource::qpid_clustered($name,
                                  $clone=true,
                                  $group='',
                                  $interval='30s',
+                                 $monitor_params=undef,
                                  $stickiness=0,
                                  $ensure='present') {
 
@@ -44,6 +45,7 @@ define pacemaker::resource::qpid_clustered($name,
     group           => $group,
     clone           => $clone,
     interval        => $interval,
+    monitor_params  => $monitor_params,
     ensure          => $ensure,
   }
 

@@ -4,6 +4,9 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     ### overloaded methods
     def create
         cmd = 'resource create ' + @resource[:name] + ' ' + @resource[:resource_type] + ' ' + @resource[:resource_params] + ' op monitor interval=' + @resource[:interval]
+        if @resource[:monitor_params] and not @resource[:monitor_params].empty?
+            cmd += hash_to_params(@resource[:monitor_params])
+        end
         # group defaults to empty
         if not @resource[:group].empty?
             cmd += ' --group ' + @resource[:group]
@@ -101,6 +104,25 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
         pcs('update interval', cmd)
     end
 
+    def monitor_params
+        cmd = 'resource show ' + @resource[:name]
+        pcs_output = pcs('get monitor params', cmd)
+
+        pcs_output.each_line do |line|
+            line.strip.match(/(Operations: )?monitor ([^(]+)/) do |match|
+                Puppet.debug(match.inspect)
+                return params_to_hash(match[2])
+            end
+        end
+        # return empty string if monitor params not found
+        ''
+    end
+
+    def monitor_params=(value)
+        cmd = 'resource update ' + @resource[:name] + ' op monitor ' + hash_to_params(value)
+        pcs('update interval', cmd)
+    end
+
     private
 
     def pcs(name, cmd)
@@ -114,5 +136,21 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
         end
         # return output for good exit or false for failure.
         $?.exitstatus == 0 ? pcs_out : false
+    end
+
+    def params_to_hash(str)
+        str.split.reduce({}) do |hash, param|
+            k,v = param.split '='
+            hash[k] = v
+            hash
+        end
+    end
+
+    def hash_to_params(hash)
+        params = ''
+        hash.each_pair do |k,v|
+            params += " #{k}=#{v}"
+        end
+        params
     end
 end

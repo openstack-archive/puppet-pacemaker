@@ -4,6 +4,8 @@ define pacemaker::resource::route($src='',
                                $nic='',
                                $clone= false,
                                $group='',
+                               $interval='30s',
+                               $monitor_params=undef,
                                $ensure='present') {
 
   $nic_option = $nic ? {
@@ -32,6 +34,7 @@ define pacemaker::resource::route($src='',
     resource_params => "${dest_option} ${src_option} ${nic_option} ${gw_option}",
     group           => $group,
     interval        => $interval,
+    monitor_params  => $monitor_params,
     clone           => $clone,
   }
 
