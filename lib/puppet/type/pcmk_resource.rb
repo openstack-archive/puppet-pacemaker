@@ -24,5 +24,21 @@ Puppet::Type.newtype(:pcmk_resource) do
         desc "resource check interval"
         defaultto "30s"
     end
+    newproperty(:monitor_params) do
+        desc "extra parameters for monitor operation"
 
+        validate do |value|
+            unless value.is_a? Hash
+                raise ArgumentError, "monitor_params must be a hash, not #{value.inspect}"
+            end
+        end
+
+        munge do |value|
+            if resource.parameters[:interval].value
+                value.merge!({'interval' => resource.parameters[:interval].value})
+            else
+                value
+            end
+        end
+    end
 end
