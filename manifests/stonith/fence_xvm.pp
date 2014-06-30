@@ -9,6 +9,7 @@ class pacemaker::stonith::fence_xvm(
   $ensure=present,
   $port=undef,       # the name of the vm
   $pcmk_host=undef,  # the hostname or IP that pacemaker uses
+  $manage_fw = true,
   ) {
   if($ensure == absent) {
     exec { "Removing stonith::fence_xvm ${name}":
@@ -30,19 +31,21 @@ class pacemaker::stonith::fence_xvm(
         content => "$key_file_password",
       }
     }
-    firewall { "003 fence_xvm":
-      proto    => 'igmp',
-      action   => 'accept',
-    }
-    firewall { "004 fence_xvm":
-      proto    => 'udp',
-      dport     => '1229',
-      action   => 'accept',
-    }
-    firewall { "005 fence_xvm":
-      proto    => 'tcp',
-      dport     => '1229',
-      action   => 'accept',
+    if $manage_fw {
+      firewall { "003 fence_xvm":
+        proto    => 'igmp',
+        action   => 'accept',
+      }
+      firewall { "004 fence_xvm":
+        proto    => 'udp',
+        dport     => '1229',
+        action   => 'accept',
+      }
+      firewall { "005 fence_xvm":
+        proto    => 'tcp',
+        dport     => '1229',
+        action   => 'accept',
+      }
     }
 
     exec { "Creating stonith::fence_xvm ${name}":

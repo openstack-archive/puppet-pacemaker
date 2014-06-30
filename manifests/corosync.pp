@@ -10,26 +10,33 @@
 # [*setup_cluster*]
 #   If your cluster includes pcsd, this should be set to true for just
 #    one node in cluster.  Else set to true for all nodes.
+# [*manage_fw*]
+#   Manage or not IPtables rules.
 
 class pacemaker::corosync(
   $cluster_name = 'clustername',
   $cluster_members,
   $setup_cluster = true,
+  $manage_fw     = true,
 ) inherits pacemaker {
   include ::pacemaker::params
 
-  firewall { '001 corosync mcast':
-    proto  => 'udp',
-    dport  => ['5404', '5405'],
-    action => 'accept',
+  if $manage_fw {
+    firewall { '001 corosync mcast':
+      proto  => 'udp',
+      dport  => ['5404', '5405'],
+      action => 'accept',
+    }
   }
 
-  if $pcsd_mode {
-    firewall { '001 pcsd':
-      proto  => 'tcp',
-      dport  => ['2224'],
-      action => 'accept',
-    } ->
+  if $::params::pcsd_mode {
+    if $manage_fw {
+      firewall { '001 pcsd':
+        proto  => 'tcp',
+        dport  => ['2224'],
+        action => 'accept',
+      }
+    }
     Service['pcsd'] ->
     # we have more fragile when-to-start pacemaker conditions with pcsd
     exec {"enable-not-start-$cluster_name":
