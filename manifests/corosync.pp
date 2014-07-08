@@ -12,12 +12,21 @@
 #    one node in cluster.  Else set to true for all nodes.
 # [*manage_fw*]
 #   Manage or not IPtables rules.
+# [*settle_timeout*]
+#   Timeout to wait for settle.
+# [*settle_tries*]
+#   Number of tries for settle.
+# [*settle_try_sleep*]
+#   Time to sleep after each seetle try.
 
 class pacemaker::corosync(
-  $cluster_name = 'clustername',
   $cluster_members,
-  $setup_cluster = true,
-  $manage_fw     = true,
+  $cluster_name     = 'clustername',
+  $setup_cluster    = true,
+  $manage_fw        = true,
+  $settle_timeout   = '3600',
+  $settle_tries     = '360',
+  $settle_try_sleep = '10',
 ) inherits pacemaker {
   include ::pacemaker::params
 
@@ -29,7 +38,7 @@ class pacemaker::corosync(
     }
   }
 
-  if $::params::pcsd_mode {
+  if $pcsd_mode {
     if $manage_fw {
       firewall { '001 pcsd':
         proto  => 'tcp',
@@ -81,9 +90,9 @@ class pacemaker::corosync(
   }
 
   exec {"wait-for-settle":
-    timeout   => 3600,
-    tries     => 360,
-    try_sleep => 10,
+    timeout   => $settle_timeout,
+    tries     => $settle_tries,
+    try_sleep => $settle_try_sleep,
     command   => "/usr/sbin/pcs status | grep -q 'partition with quorum' > /dev/null 2>&1",
     unless    => "/usr/sbin/pcs status | grep -q 'partition with quorum' > /dev/null 2>&1",
     notify    => Notify["pacemaker settled"],
