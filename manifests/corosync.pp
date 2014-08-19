@@ -59,10 +59,10 @@ class pacemaker::corosync(
     }
     ->
     exec {"auth-successful-across-all-nodes":
-      command => "/usr/sbin/pcs cluster auth $cluster_members -u hacluster -p ${::pacemaker::hacluster_pwd} --force",
-      timeout   => 3600,
-      tries     => 360,
-      try_sleep => 10,
+      command   => "/usr/sbin/pcs cluster auth $cluster_members -u hacluster -p ${::pacemaker::hacluster_pwd} --force",
+      timeout   => $settle_timeout,
+      tries     => $settle_tries,
+      try_sleep => $settle_try_sleep,
     }
     ->
     Exec["wait-for-settle"]
