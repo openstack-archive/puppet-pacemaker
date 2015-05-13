@@ -33,15 +33,18 @@
 # the the name of the pacemaker resource group. Optional.
 
 define pacemaker::resource::filesystem(
-  $ensure       = 'present',
-  $device       = '',
-  $directory    = '',
-  $fsoptions    = '',
-  $fstype       = '',
-  $meta_params  = undef,
-  $op_params    = '',
-  $clone_params = undef,
-  $group_params = undef,
+  $ensure             = 'present',
+  $device             = '',
+  $directory          = '',
+  $fsoptions          = '',
+  $fstype             = '',
+  $meta_params        = undef,
+  $op_params          = '',
+  $clone_params       = undef,
+  $group_params       = undef,
+  $post_success_sleep = 0,
+  $tries              = 1,
+  $try_sleep          = 0,
 ) {
   $resource_id = delete("fs-${directory}", '/')
 
@@ -51,12 +54,15 @@ define pacemaker::resource::filesystem(
   }
 
   pcmk_resource { $resource_id:
-    ensure          => $ensure,
-    resource_type   => 'Filesystem',
-    resource_params => $resource_params,
-    meta_params     => $meta_params,
-    op_params       => $op_params,
-    clone_params    => $clone_params,
-    group_params    => $group_params,
+    ensure             => $ensure,
+    resource_type      => 'Filesystem',
+    resource_params    => $resource_params,
+    meta_params        => $meta_params,
+    op_params          => $op_params,
+    clone_params       => $clone_params,
+    group_params       => $group_params,
+    post_success_sleep => $post_success_sleep,
+    tries              => $tries,
+    try_sleep          => $try_sleep,
   }
 }

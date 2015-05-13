@@ -24,11 +24,14 @@
 # the the name of the pacemaker resource group. Optional.
 #
 define pacemaker::resource::ip(
-  $ensure       = 'present',
-  $ip_address   = undef,
-  $cidr_netmask = '32',
-  $nic          = '',
-  $group_params = '',
+  $ensure             = 'present',
+  $ip_address         = undef,
+  $cidr_netmask       = '32',
+  $nic                = '',
+  $group_params       = '',
+  $post_success_sleep = 0,
+  $tries              = 1,
+  $try_sleep          = 0,
   ) {
 
   $cidr_option = $cidr_netmask ? {
@@ -41,10 +44,13 @@ define pacemaker::resource::ip(
   }
 
   pcmk_resource { "ip-${ip_address}":
-    ensure          => $ensure,
-    resource_type   => 'IPaddr2',
-    resource_params => "ip=${ip_address}${cidr_option}${nic_option}",
-    group_params    => $group_params,
+    ensure             => $ensure,
+    resource_type      => 'IPaddr2',
+    resource_params    => "ip=${ip_address}${cidr_option}${nic_option}",
+    group_params       => $group_params,
+    post_success_sleep => $post_success_sleep,
+    tries              => $tries,
+    try_sleep          => $try_sleep,
   }
 
 }

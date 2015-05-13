@@ -30,26 +30,32 @@
 # the the name of the pacemaker resource group. Optional.
 #
 define pacemaker::resource::service(
-  $ensure          = 'present',
-  $service_name    = $name,
-  $resource_params = '',
-  $meta_params     = '',
-  $op_params       = '',
-  $clone_params    = undef,
-  $group_params    = undef,
+  $ensure             = 'present',
+  $service_name       = $name,
+  $resource_params    = '',
+  $meta_params        = '',
+  $op_params          = '',
+  $clone_params       = undef,
+  $group_params       = undef,
+  $post_success_sleep = 0,
+  $tries              = 1,
+  $try_sleep          = 0,
 ) {
   include ::pacemaker::params
   $res = "pacemaker::resource::${::pacemaker::params::services_manager}"
 
   create_resources($res,
     { "${name}" => {
-      ensure          => $ensure,
-      service_name    => $service_name,
-      resource_params => $resource_params,
-      meta_params     => $meta_params,
-      op_params       => $op_params,
-      clone_params    => $clone_params,
-      group_params    => $group_params,
+      ensure             => $ensure,
+      service_name       => $service_name,
+      resource_params    => $resource_params,
+      meta_params        => $meta_params,
+      op_params          => $op_params,
+      clone_params       => $clone_params,
+      group_params       => $group_params,
+      post_success_sleep => $post_success_sleep,
+      tries              => $tries,
+      try_sleep          => $try_sleep,
     }
   })
 }
