@@ -20,6 +20,9 @@
 # [*meta_params*]
 # Additional meta parameters to pass to "pcs create".  Optional.
 #
+# [*master_params*]
+# Additional meta parameters to pass to "pcs create".  Optional.
+#
 # [*clone_params*]
 # Additional clone parameters to pass to "pcs create".  Use '' or true
 # for to pass --clone to "pcs resource create" with no addtional clone
@@ -37,6 +40,7 @@ define pacemaker::resource::ocf(
   $op_params          = '',
   $clone_params       = undef,
   $group_params       = undef,
+  $master_params      = undef,
   $post_success_sleep = 0,
   $tries              = 1,
   $try_sleep          = 0,
@@ -49,6 +53,7 @@ define pacemaker::resource::ocf(
     op_params          => $op_params,
     clone_params       => $clone_params,
     group_params       => $group_params,
+    master_params      => $master_params,
     post_success_sleep => $post_success_sleep,
     tries              => $tries,
     try_sleep          => $try_sleep,
