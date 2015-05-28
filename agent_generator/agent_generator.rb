@@ -61,29 +61,33 @@ class pacemaker::stonith::#{@parser.getAgentName} (
 ) {
   $real_address = "$(corosync-cfgtool -a $(crm_node -n))"
 
+#{getVariableValues}
+  $pcmk_host_value_chunk = $pcmk_host_list ? {
+    undef => '$(/usr/sbin/crm_node -n)',
+    default => "${pcmk_host_list}",
+  }
+
+  $resource_name = $pcmk_host_list ? {
+    undef => $::hostname,
+    default => "${pcmk_host_list}",
+  }
+
   if($ensure == absent) {
-    exec {
-      "Removing stonith::#{@parser.getAgentName}":
+    exec { "Delete stonith::#{@parser.getAgentName} for ${resource_name}":
       command => "/usr/sbin/pcs stonith delete stonith-#{@parser.getAgentName}-${real_address}",
       onlyif => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${real_address} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
-  #{getVariableValues}
-    $pcmk_host_value_chunk = $pcmk_host_list ? {
-      '' => '$(/usr/sbin/crm_node -n)',
-      default => "${pcmk_host_list}",
-    }
-
     package {
       "#{@parser.getPackageName}": ensure => installed,
-    } -> exec {
-      "Creating stonith::#{@parser.getAgentName}":
+    } ->
+    exec { "Create stonith::#{@parser.getAgentName} for ${resource_name}":
       command => "/usr/sbin/pcs stonith create stonith-#{@parser.getAgentName}-${real_address} #{@parser.getAgentName} pcmk_host_list=\\"${pcmk_host_value_chunk}\\" #{getChunks} op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${real_address} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
-    } -> exec {
-      "Adding non-local constraint stonith::#{@parser.getAgentName} ${real_address}":
+    } ->
+    exec { "Add non-local constraint stonith::#{@parser.getAgentName} for ${resource_name}":
       command => "/usr/sbin/pcs constraint location stonith-#{@parser.getAgentName}-${real_address} avoids ${pcmk_host_value_chunk}"
     }
   }
@@ -94,13 +98,13 @@ eos
   def getManifestParameters
     text = ""
     @parser.getParameters.each { |p|
-      text += "\t$#{p['name']} = undef,\n"
+      text += "  $#{p['name']} = undef,\n"
     }
 
     text += "\n"
-    text += "\t$interval = \"60s\",\n"
-    text += "\t$ensure = present,\n"
-    text += "\t$pcmk_host_value = undef,\n"
+    text += "  $interval = \"60s\",\n"
+    text += "  $ensure = present,\n"
+    text += "  $pcmk_host_list = undef,"
 
     return text
   end
@@ -108,10 +112,10 @@ eos
   def getVariableValues
     text = ""
     @parser.getParameters.each { |p|
-      text += "\t$#{p['name']}_chunk = $#{p['name']} ? {\n"
-      text += "\t\tundef => \"\",\n"
-      text += "\t\tdefault => \"#{p['name']}=\\\"${#{p['name']}}\\\"\",\n"
-      text += "\t}\n"
+      text += "  $#{p['name']}_chunk = $#{p['name']} ? {\n"
+      text += "    undef => \"\",\n"
+      text += "    default => \"#{p['name']}=\\\"${#{p['name']}}\\\"\",\n"
+      text += "  }\n"
     }
 
     return text
