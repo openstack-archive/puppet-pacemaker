@@ -30,6 +30,5 @@ cmd_pkg_map=(
     "fence_virt:fence-virt"
     "fence_vmware_soap:fence-agents-vmware-soap"
     "fence_wti:fence-agents-wti"
-    # not generating fence_xvm for now, it would overwrite the existing one
-    # "fence_xvm:fence-virt"
+    "fence_xvm:fence-virt"
 )
