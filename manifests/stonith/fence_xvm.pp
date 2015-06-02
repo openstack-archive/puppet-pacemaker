@@ -1,4 +1,4 @@
-class pacemaker::stonith::fence_xvm (
+define pacemaker::stonith::fence_xvm (
   $debug = undef,
   $ip_family = undef,
   $multicast_address = undef,
@@ -22,8 +22,6 @@ class pacemaker::stonith::fence_xvm (
   $key_file_password = "123456",
   $manage_fw = true,
 ) {
-  $real_address = "$(corosync-cfgtool -a $(crm_node -n))"
-
   $debug_chunk = $debug ? {
     undef => "",
     default => "debug=\"${debug}\"",
@@ -82,13 +80,8 @@ class pacemaker::stonith::fence_xvm (
     default => "${pcmk_host_list}",
   }
 
-  $resource_name = $pcmk_host_list ? {
-    undef => $::hostname,
-    default => "${pcmk_host_list}",
-  }
-
   if($ensure == absent) {
-    exec { "Delete stonith::fence_xvm for ${resource_name}":
+    exec { "Delete stonith::fence_xvm ${title}":
       command => "/usr/sbin/pcs stonith delete stonith-fence_xvm-${real_address}",
       onlyif => "/usr/sbin/pcs stonith show stonith-fence_xvm-${real_address} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
@@ -119,12 +112,12 @@ class pacemaker::stonith::fence_xvm (
     package {
       "fence-virt": ensure => installed,
     } ->
-    exec { "Create stonith::fence_xvm for ${resource_name}":
+    exec { "Create stonith::fence_xvm ${title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_xvm-${real_address} fence_xvm pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${ip_family_chunk} ${multicast_address_chunk} ${ipport_chunk} ${retrans_chunk} ${auth_chunk} ${hash_chunk} ${key_file_chunk} ${port_chunk} ${use_uuid_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_xvm-${real_address} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_xvm for ${resource_name}":
+    exec { "Add non-local constraint stonith::fence_xvm ${title}":
       command => "/usr/sbin/pcs constraint location stonith-fence_xvm-${real_address} avoids ${pcmk_host_value_chunk}"
     }
   }
