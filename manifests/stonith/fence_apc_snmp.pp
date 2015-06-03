@@ -132,23 +132,26 @@ define pacemaker::stonith::fence_apc_snmp (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_apc_snmp ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_apc_snmp-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_apc_snmp-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_apc_snmp-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_apc_snmp-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_apc_snmp-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "fence-agents-apc-snmp": ensure => installed,
     } ->
-    exec { "Create stonith::fence_apc_snmp ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_apc_snmp-${title} fence_apc_snmp pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_apc_snmp-${title} > /dev/null 2>&1",
+    exec { "Create stonith-fence_apc_snmp-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_apc_snmp-${safe_title} fence_apc_snmp pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_apc_snmp-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_apc_snmp ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_apc_snmp-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_apc_snmp-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_apc_snmp-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

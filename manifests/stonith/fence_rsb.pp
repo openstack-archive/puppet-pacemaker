@@ -107,23 +107,26 @@ define pacemaker::stonith::fence_rsb (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_rsb ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_rsb-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_rsb-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_rsb-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_rsb-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_rsb-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "fence-agents-rsb": ensure => installed,
     } ->
-    exec { "Create stonith::fence_rsb ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_rsb-${title} fence_rsb pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${secure_chunk} ${cmd_prompt_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${identity_file_chunk} ${ssh_options_chunk} ${verbose_chunk} ${debug_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_rsb-${title} > /dev/null 2>&1",
+    exec { "Create stonith-fence_rsb-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_rsb-${safe_title} fence_rsb pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${secure_chunk} ${cmd_prompt_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${identity_file_chunk} ${ssh_options_chunk} ${verbose_chunk} ${debug_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_rsb-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_rsb ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_rsb-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_rsb-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_rsb-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

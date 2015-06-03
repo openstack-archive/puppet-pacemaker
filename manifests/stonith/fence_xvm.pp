@@ -80,10 +80,13 @@ define pacemaker::stonith::fence_xvm (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_xvm ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_xvm-${real_address}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_xvm-${real_address} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_xvm-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_xvm-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_xvm-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
@@ -112,13 +115,13 @@ define pacemaker::stonith::fence_xvm (
     package {
       "fence-virt": ensure => installed,
     } ->
-    exec { "Create stonith::fence_xvm ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_xvm-${real_address} fence_xvm pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${ip_family_chunk} ${multicast_address_chunk} ${ipport_chunk} ${retrans_chunk} ${auth_chunk} ${hash_chunk} ${key_file_chunk} ${port_chunk} ${use_uuid_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_xvm-${real_address} > /dev/null 2>&1",
+    exec { "Create stonith-fence_xvm-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_xvm-${safe_title} fence_xvm pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${ip_family_chunk} ${multicast_address_chunk} ${ipport_chunk} ${retrans_chunk} ${auth_chunk} ${hash_chunk} ${key_file_chunk} ${port_chunk} ${use_uuid_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_xvm-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_xvm ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_xvm-${real_address} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_xvm-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_xvm-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

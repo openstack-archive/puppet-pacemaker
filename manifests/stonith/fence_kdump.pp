@@ -42,23 +42,26 @@ define pacemaker::stonith::fence_kdump (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_kdump ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_kdump-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_kdump-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_kdump-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_kdump-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_kdump-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "fence-agents-kdump": ensure => installed,
     } ->
-    exec { "Create stonith::fence_kdump ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_kdump-${title} fence_kdump pcmk_host_list=\"${pcmk_host_value_chunk}\" ${nodename_chunk} ${ipport_chunk} ${family_chunk} ${timeout_chunk} ${verbose_chunk} ${usage_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_kdump-${title} > /dev/null 2>&1",
+    exec { "Create stonith-fence_kdump-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_kdump-${safe_title} fence_kdump pcmk_host_list=\"${pcmk_host_value_chunk}\" ${nodename_chunk} ${ipport_chunk} ${family_chunk} ${timeout_chunk} ${verbose_chunk} ${usage_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_kdump-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_kdump ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_kdump-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_kdump-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_kdump-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

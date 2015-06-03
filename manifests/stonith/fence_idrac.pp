@@ -77,23 +77,26 @@ define pacemaker::stonith::fence_idrac (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_idrac ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_idrac-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_idrac-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_idrac-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_idrac-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_idrac-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "fence-agents-ipmilan": ensure => installed,
     } ->
-    exec { "Create stonith::fence_idrac ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_idrac-${title} fence_idrac pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_idrac-${title} > /dev/null 2>&1",
+    exec { "Create stonith-fence_idrac-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_idrac-${safe_title} fence_idrac pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_idrac-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_idrac ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_idrac-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_idrac-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_idrac-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

@@ -42,23 +42,26 @@ define pacemaker::stonith::fence_scsi (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_scsi ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_scsi-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_scsi-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_scsi-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_scsi-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_scsi-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "fence-agents-scsi": ensure => installed,
     } ->
-    exec { "Create stonith::fence_scsi ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_scsi-${title} fence_scsi pcmk_host_list=\"${pcmk_host_value_chunk}\" ${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${nodename_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_scsi-${title} > /dev/null 2>&1",
+    exec { "Create stonith-fence_scsi-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_scsi-${safe_title} fence_scsi pcmk_host_list=\"${pcmk_host_value_chunk}\" ${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${nodename_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_scsi-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_scsi ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_scsi-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_scsi-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_scsi-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

@@ -65,23 +65,26 @@ define pacemaker::stonith::#{@parser.getAgentName} (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::#{@parser.getAgentName} ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-#{@parser.getAgentName}-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-#{@parser.getAgentName}-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-#{@parser.getAgentName}-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "#{@parser.getPackageName}": ensure => installed,
     } ->
-    exec { "Create stonith::#{@parser.getAgentName} ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-#{@parser.getAgentName}-${title} #{@parser.getAgentName} pcmk_host_list=\\"${pcmk_host_value_chunk}\\" #{getChunks} op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${title} > /dev/null 2>&1",
+    exec { "Create stonith-#{@parser.getAgentName}-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-#{@parser.getAgentName}-${safe_title} #{@parser.getAgentName} pcmk_host_list=\\"${pcmk_host_value_chunk}\\" #{getChunks} op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::#{@parser.getAgentName} ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-#{@parser.getAgentName}-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-#{@parser.getAgentName}-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-#{@parser.getAgentName}-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }

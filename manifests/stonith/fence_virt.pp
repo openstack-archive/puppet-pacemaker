@@ -57,23 +57,26 @@ define pacemaker::stonith::fence_virt (
     default => "${pcmk_host_list}",
   }
 
+  # $title can be a mac address, remove the colons for pcmk resource name
+  $safe_title = regsubst($title, ':', '', 'G')
+
   if($ensure == absent) {
-    exec { "Delete stonith::fence_virt ${title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_virt-${title}",
-      onlyif => "/usr/sbin/pcs stonith show stonith-fence_virt-${title} > /dev/null 2>&1",
+    exec { "Delete stonith-fence_virt-${safe_title}":
+      command => "/usr/sbin/pcs stonith delete stonith-fence_virt-${safe_title}",
+      onlyif => "/usr/sbin/pcs stonith show stonith-fence_virt-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     }
   } else {
     package {
       "fence-virt": ensure => installed,
     } ->
-    exec { "Create stonith::fence_virt ${title}":
-      command => "/usr/sbin/pcs stonith create stonith-fence_virt-${title} fence_virt pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
-      unless => "/usr/sbin/pcs stonith show stonith-fence_virt-${title} > /dev/null 2>&1",
+    exec { "Create stonith-fence_virt-${safe_title}":
+      command => "/usr/sbin/pcs stonith create stonith-fence_virt-${safe_title} fence_virt pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
+      unless => "/usr/sbin/pcs stonith show stonith-fence_virt-${safe_title} > /dev/null 2>&1",
       require => Class["pacemaker::corosync"],
     } ->
-    exec { "Add non-local constraint stonith::fence_virt ${title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_virt-${title} avoids ${pcmk_host_value_chunk}"
+    exec { "Add non-local constraint for stonith-fence_virt-${safe_title}":
+      command => "/usr/sbin/pcs constraint location stonith-fence_virt-${safe_title} avoids ${pcmk_host_value_chunk}"
     }
   }
 }
