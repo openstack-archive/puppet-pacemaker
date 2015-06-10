@@ -90,12 +90,12 @@ define pacemaker::stonith::fence_xvm (
       require => Class["pacemaker::corosync"],
     }
   } else {
-    if $manage_key_file {
+    if str2bool($manage_key_file) {
       file { "$key_file":
         content => "$key_file_password",
       }
     }
-    if $manage_fw {
+    if str2bool($manage_fw) {
       firewall { "003 fence_xvm":
         proto    => 'igmp',
         action   => 'accept',
