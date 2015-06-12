@@ -11,6 +11,9 @@ define pacemaker::stonith::fence_kdump (
   $interval = "60s",
   $ensure = present,
   $pcmk_host_list = undef,
+
+  $tries = undef,
+  $try_sleep = undef,
 ) {
   $nodename_chunk = $nodename ? {
     undef => "",
@@ -58,10 +61,14 @@ define pacemaker::stonith::fence_kdump (
     exec { "Create stonith-fence_kdump-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_kdump-${safe_title} fence_kdump pcmk_host_list=\"${pcmk_host_value_chunk}\" ${nodename_chunk} ${ipport_chunk} ${family_chunk} ${timeout_chunk} ${verbose_chunk} ${usage_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_kdump-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-fence_kdump-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_kdump-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-fence_kdump-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }

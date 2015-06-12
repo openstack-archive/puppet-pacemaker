@@ -26,6 +26,9 @@ define pacemaker::stonith::fence_brocade (
   $interval = "60s",
   $ensure = present,
   $pcmk_host_list = undef,
+
+  $tries = undef,
+  $try_sleep = undef,
 ) {
   $ipaddr_chunk = $ipaddr ? {
     undef => "",
@@ -133,10 +136,14 @@ define pacemaker::stonith::fence_brocade (
     exec { "Create stonith-fence_brocade-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_brocade-${safe_title} fence_brocade pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${cmd_prompt_chunk} ${secure_chunk} ${port_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${identity_file_chunk} ${ssh_options_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_brocade-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-fence_brocade-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_brocade-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-fence_brocade-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }

@@ -14,6 +14,9 @@ define pacemaker::stonith::fence_virt (
   $interval = "60s",
   $ensure = present,
   $pcmk_host_list = undef,
+
+  $tries = undef,
+  $try_sleep = undef,
 ) {
   $debug_chunk = $debug ? {
     undef => "",
@@ -73,10 +76,14 @@ define pacemaker::stonith::fence_virt (
     exec { "Create stonith-fence_virt-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_virt-${safe_title} fence_virt pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_virt-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-fence_virt-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_virt-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-fence_virt-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }
