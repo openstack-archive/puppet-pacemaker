@@ -21,6 +21,9 @@ define pacemaker::stonith::fence_xvm (
   $key_file = "/etc/cluster/fence_xvm.key",
   $key_file_password = "123456",
   $manage_fw = true,
+
+  $tries = undef,
+  $try_sleep = undef,
 ) {
   $debug_chunk = $debug ? {
     undef => "",
@@ -118,10 +121,14 @@ define pacemaker::stonith::fence_xvm (
     exec { "Create stonith-fence_xvm-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_xvm-${safe_title} fence_xvm pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${ip_family_chunk} ${multicast_address_chunk} ${ipport_chunk} ${retrans_chunk} ${auth_chunk} ${hash_chunk} ${key_file_chunk} ${port_chunk} ${use_uuid_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_xvm-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-fence_xvm-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_xvm-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-fence_xvm-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }

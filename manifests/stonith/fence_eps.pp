@@ -23,6 +23,9 @@ define pacemaker::stonith::fence_eps (
   $interval = "60s",
   $ensure = present,
   $pcmk_host_list = undef,
+
+  $tries = undef,
+  $try_sleep = undef,
 ) {
   $ipaddr_chunk = $ipaddr ? {
     undef => "",
@@ -118,10 +121,14 @@ define pacemaker::stonith::fence_eps (
     exec { "Create stonith-fence_eps-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_eps-${safe_title} fence_eps pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${hidden_page_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_eps-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-fence_eps-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_eps-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-fence_eps-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }

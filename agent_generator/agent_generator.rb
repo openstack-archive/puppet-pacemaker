@@ -81,10 +81,14 @@ define pacemaker::stonith::#{@parser.getAgentName} (
     exec { "Create stonith-#{@parser.getAgentName}-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-#{@parser.getAgentName}-${safe_title} #{@parser.getAgentName} pcmk_host_list=\\"${pcmk_host_value_chunk}\\" #{getChunks} op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-#{@parser.getAgentName}-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-#{@parser.getAgentName}-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-#{@parser.getAgentName}-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-#{@parser.getAgentName}-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }
@@ -100,7 +104,10 @@ eos
     text += "\n"
     text += "  $interval = \"60s\",\n"
     text += "  $ensure = present,\n"
-    text += "  $pcmk_host_list = undef,"
+    text += "  $pcmk_host_list = undef,\n"
+    text += "\n"
+    text += "  $tries = undef,\n"
+    text += "  $try_sleep = undef,"
 
     return text
   end

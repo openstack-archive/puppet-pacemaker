@@ -11,6 +11,9 @@ define pacemaker::stonith::fence_scsi (
   $interval = "60s",
   $ensure = present,
   $pcmk_host_list = undef,
+
+  $tries = undef,
+  $try_sleep = undef,
 ) {
   $aptpl_chunk = $aptpl ? {
     undef => "",
@@ -58,10 +61,14 @@ define pacemaker::stonith::fence_scsi (
     exec { "Create stonith-fence_scsi-${safe_title}":
       command => "/usr/sbin/pcs stonith create stonith-fence_scsi-${safe_title} fence_scsi pcmk_host_list=\"${pcmk_host_value_chunk}\" ${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${nodename_chunk}  op monitor interval=${interval}",
       unless => "/usr/sbin/pcs stonith show stonith-fence_scsi-${safe_title} > /dev/null 2>&1",
+      tries => $tries,
+      try_sleep => $try_sleep,
       require => Class["pacemaker::corosync"],
     } ->
     exec { "Add non-local constraint for stonith-fence_scsi-${safe_title}":
-      command => "/usr/sbin/pcs constraint location stonith-fence_scsi-${safe_title} avoids ${pcmk_host_value_chunk}"
+      command => "/usr/sbin/pcs constraint location stonith-fence_scsi-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries => $tries,
+      try_sleep => $try_sleep,
     }
   }
 }
