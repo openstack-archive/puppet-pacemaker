@@ -34,8 +34,12 @@ class pacemaker::params {
     'redhat': {
       if $::operatingsystemrelease =~ /^6\..*$/ {
         $package_list = ['pacemaker','pcs','fence-agents','cman']
-        # TODO in el6.6, $pcsd_mode should be true
-        $pcsd_mode = false
+        # in el6.6, $pcsd_mode should be true
+        if $::os['release']['minor'] >= 6 {
+          $pcsd_mode = true
+        } else {
+          $pcsd_mode = false
+        }
         $services_manager = 'lsb'
       } else {
         $package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
