@@ -23,6 +23,9 @@
 #   command
 #   Defaults to ''
 #
+# [*op_params*]
+# Additional op parameters to pass to "pcs create".  Optional.
+#
 # [*group_params*]
 #   (optional) Additional group parameters to pass to "pcs create", typically
 #   just the name of the pacemaker resource group
@@ -74,6 +77,7 @@ define pacemaker::resource::ip(
   $ip_address         = undef,
   $cidr_netmask       = '32',
   $nic                = '',
+  $op_params          = '',
   $group_params       = '',
   $post_success_sleep = 0,
   $tries              = 1,
@@ -97,6 +101,7 @@ define pacemaker::resource::ip(
     ensure             => $ensure,
     resource_type      => 'IPaddr2',
     resource_params    => "ip=${ip_address}${cidr_option}${nic_option}",
+    op_params          => $op_params,
     group_params       => $group_params,
     post_success_sleep => $post_success_sleep,
     tries              => $tries,
