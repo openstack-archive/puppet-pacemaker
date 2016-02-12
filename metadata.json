@@ -10,12 +10,8 @@
   "description": "Installs and configures Pacemaker.",
   "operatingsystem_support": [
     {
-      "operatingsystem": "Fedora",
-      "operatingsystemrelease": ["21","22"]
-    },
-    {
       "operatingsystem": "RedHat",
-      "operatingsystemrelease": ["7"]
+      "operatingsystemrelease": ["6", "7"]
     }
   ],
   "dependencies": [
