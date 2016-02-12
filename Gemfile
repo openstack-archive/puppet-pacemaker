@@ -14,7 +14,6 @@ group :development, :test do
   gem 'puppet-lint-variable_contains_upcase', :require => 'false'
   gem 'puppet-lint-numericvariable',          :require => 'false'
   gem 'json',                                 :require => 'false'
-  gem 'puppet-openstack_spec_helper',         :require => 'false', :git => 'https://git.openstack.org/openstack/puppet-openstack_spec_helper'
 end
 
 group :system_tests do
