@@ -18,3 +18,8 @@ PuppetLint::RakeTask.new :lint do |config|
   config.log_format = '%{path}:%{linenumber}:%{KIND}: %{message}'
   config.disable_checks = ["80chars", "class_inherits_from_params_class", "only_variable_string"]
 end
+
+desc 'Generate the Stonith modules'
+task :generate_stonith do
+  sh './agent_generator/generate_manifests.sh'
+end
