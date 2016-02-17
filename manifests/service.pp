@@ -64,6 +64,14 @@ class pacemaker::service (
       enable     => $enable,
       require    => Class['::pacemaker::install'],
     }
+
+    # The idempotent version of pcs cluster enable, which whas enable
+    # unconditionally.
+    service { ['corosync', $::pacemaker::params::service_name]:
+      enable  => true,
+      require => Class['::pacemaker::install'],
+      tag     => 'pcsd-cluster-service'
+    }
   } else {
     service { $::pacemaker::params::service_name:
       ensure     => $ensure,
