@@ -32,6 +32,7 @@ class pacemaker::params {
   $hacluster_pwd         = 'CHANGEME'
   case $::osfamily {
     'redhat': {
+      $pcs_bin = '/sbin/pcs'
       if $::operatingsystemrelease =~ /^6\..*$/ {
         $package_list = ['pacemaker','pcs','fence-agents','cman']
         # TODO in el6.6, $pcsd_mode should be true

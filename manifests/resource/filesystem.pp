@@ -121,5 +121,6 @@ define pacemaker::resource::filesystem(
     tries              => $tries,
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
+    require            => Exec['wait-for-settle'],
   }
 }

@@ -272,11 +272,12 @@ define pacemaker::stonith::fence_cisco_mds (
       tries     => $tries,
       try_sleep => $try_sleep,
       require   => Class['pacemaker::corosync'],
-    } ->
+    } ~>
     exec { "Add non-local constraint for stonith-fence_cisco_mds-${safe_title}":
-      command   => "/usr/sbin/pcs constraint location stonith-fence_cisco_mds-${safe_title} avoids ${pcmk_host_value_chunk}",
-      tries     => $tries,
-      try_sleep => $try_sleep,
+      command     => "/usr/sbin/pcs constraint location stonith-fence_cisco_mds-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries       => $tries,
+      try_sleep   => $try_sleep,
+      refreshonly => true,
     }
   }
 }

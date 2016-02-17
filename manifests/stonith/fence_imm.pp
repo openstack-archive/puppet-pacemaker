@@ -184,11 +184,12 @@ define pacemaker::stonith::fence_imm (
       tries     => $tries,
       try_sleep => $try_sleep,
       require   => Class['pacemaker::corosync'],
-    } ->
+    } ~>
     exec { "Add non-local constraint for stonith-fence_imm-${safe_title}":
-      command   => "/usr/sbin/pcs constraint location stonith-fence_imm-${safe_title} avoids ${pcmk_host_value_chunk}",
-      tries     => $tries,
-      try_sleep => $try_sleep,
+      command     => "/usr/sbin/pcs constraint location stonith-fence_imm-${safe_title} avoids ${pcmk_host_value_chunk}",
+      tries       => $tries,
+      try_sleep   => $try_sleep,
+      refreshonly => true,
     }
   }
 }
