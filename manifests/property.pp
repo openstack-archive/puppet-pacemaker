@@ -116,7 +116,7 @@ define pacemaker::property (
       }
       exec { "Creating cluster-wide property ${property}":
         command   => $cmd,
-        unless    => "/usr/sbin/pcs property show ${property} | grep \"${property} *[:=] *${value}\"",
+        unless    => "/usr/sbin/pcs property show ${property} | grep \"${property}=${value}\"",
         require   => [Exec['wait-for-settle'],
                       Class['::pacemaker::corosync']],
         tries     => $tries,

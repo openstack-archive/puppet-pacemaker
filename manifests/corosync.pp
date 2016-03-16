@@ -113,35 +113,26 @@ class pacemaker::corosync(
         provider => 'ip6tables',
       }
     }
-    user { 'hacluster':
-      password => pw_hash($::pacemaker::hacluster_pwd, 'SHA-512', fqdn_rand_string(10)),
-      groups   => 'haclient',
-      require  => Class['::pacemaker::install'],
-      notify   => Exec['reauthenticate-across-all-nodes'],
-    }
-
-    exec { 'reauthenticate-across-all-nodes':
-      command     => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} --force",
-      refreshonly => true,
-      timeout     => $settle_timeout,
-      tries       => $settle_tries,
-      try_sleep   => $settle_try_sleep,
-      tag         => 'pacemaker-auth',
-    }
-
     Service['pcsd'] ->
-    exec { 'auth-successful-across-all-nodes':
-      command     => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd}",
-      refreshonly => true,
-      timeout     => $settle_timeout,
-      tries       => $settle_tries,
-      try_sleep   => $settle_try_sleep,
-      require     => User['hacluster'],
-      unless      => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} | grep 'Already authorized'",
-      tag         => 'pacemaker-auth',
+    # we have more fragile when-to-start pacemaker conditions with pcsd
+    exec {"enable-not-start-${cluster_name}":
+      command => '/usr/sbin/pcs cluster enable'
     }
-
-    Exec <|tag == 'pacemaker-auth'|> -> Exec['wait-for-settle']
+    ->
+    exec {"Set password for hacluster user on ${cluster_name}":
+      command => "/bin/echo ${::pacemaker::hacluster_pwd} | /usr/bin/passwd --stdin hacluster",
+      creates => '/etc/cluster/cluster.conf',
+      require => Class['::pacemaker::install'],
+    }
+    ->
+    exec {'auth-successful-across-all-nodes':
+      command   => "/usr/sbin/pcs cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} --force",
+      timeout   => $settle_timeout,
+      tries     => $settle_tries,
+      try_sleep => $settle_try_sleep,
+    }
+    ->
+    Exec['wait-for-settle']
   }
 
   if $setup_cluster {
@@ -153,29 +144,25 @@ class pacemaker::corosync(
     }
 
     $cluster_setup_extras_real = inline_template('<%= @cluster_setup_extras.flatten.join(" ") %>')
-    Exec <|tag == 'pacemaker-auth'|>
-    ->
+
     exec {"Create Cluster ${cluster_name}":
       creates => '/etc/cluster/cluster.conf',
-      command => "${::pacemaker::pcs_bin} cluster setup --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
+      command => "/usr/sbin/pcs cluster setup --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
       unless  => '/usr/bin/test -f /etc/corosync/corosync.conf',
-      require => Class['::pacemaker::install']
+      require => Class['::pacemaker::install'],
     }
     ->
     exec {"Start Cluster ${cluster_name}":
-      unless  => "${::pacemaker::pcs_bin} status >/dev/null 2>&1",
-      command => "${::pacemaker::pcs_bin} cluster start --all",
+      unless  => '/usr/sbin/pcs status >/dev/null 2>&1',
+      command => '/usr/sbin/pcs cluster start --all',
       require => Exec["Create Cluster ${cluster_name}"],
     }
     if $pacemaker::pcsd_mode {
       Exec['auth-successful-across-all-nodes'] ->
         Exec["Create Cluster ${cluster_name}"]
     }
-    Exec["Start Cluster ${cluster_name}"]
-    ->
-    Service <| tag == 'pcsd-cluster-service' |>
-    ->
-    Exec['wait-for-settle']
+    Exec["Start Cluster ${cluster_name}"] ->
+      Exec['wait-for-settle']
   }
 
   if $remote_authkey {
@@ -205,8 +192,12 @@ class pacemaker::corosync(
     timeout   => $settle_timeout,
     tries     => $settle_tries,
     try_sleep => $settle_try_sleep,
-    command   => "${::pacemaker::pcs_bin} status | grep -q 'partition with quorum' > /dev/null 2>&1",
-    unless    => "${::pacemaker::pcs_bin} status | grep -q 'partition with quorum' > /dev/null 2>&1",
+    command   => "/usr/sbin/pcs status | grep -q 'partition with quorum' > /dev/null 2>&1",
+    unless    => "/usr/sbin/pcs status | grep -q 'partition with quorum' > /dev/null 2>&1",
+    notify    => Notify['pacemaker settled'],
   }
 
+  notify {'pacemaker settled':
+    message => 'Pacemaker has reported quorum achieved',
+  }
 }

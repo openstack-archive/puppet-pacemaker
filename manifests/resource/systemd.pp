@@ -103,6 +103,5 @@ define pacemaker::resource::systemd(
     tries              => $tries,
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
-    require            => Exec['wait-for-settle'],
   }
 }
