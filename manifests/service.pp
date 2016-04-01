@@ -70,7 +70,7 @@ class pacemaker::service (
     service { ['corosync', $::pacemaker::params::service_name]:
       enable  => true,
       require => Class['::pacemaker::install'],
-      tag     => 'pcsd-cluster-service'
+      tag     => 'pcsd-cluster-service',
     }
   } else {
     service { $::pacemaker::params::service_name:

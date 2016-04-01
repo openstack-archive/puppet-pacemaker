@@ -1,30 +1,26 @@
 require 'spec_helper'
 
-describe 'pacemaker' do
+describe 'pacemaker::new', type: :class do
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) { facts }
 
-  shared_examples 'pacemaker' do
-    on_supported_os.each do |os, facts|
-      context "on #{os}" do
-        let(:facts) do
-          facts
-        end
-        it { is_expected.to compile }
+      context 'with default parameters' do
         it { is_expected.to compile.with_all_deps }
-        it { is_expected.to contain_class('pacemaker::install') }
-        it { is_expected.to contain_class('pacemaker::service') }
 
-        case facts[:operatingsystemrelease]
-        when /6\./
-          it_behaves_like 'basic_setup',
-                          ["pacemaker","pcs","fence-agents","cman"],
-                          false
-        when /7\./
-          it_behaves_like 'basic_setup',
-                          ["pacemaker","pcs","fence-agents-all","pacemaker-libs"],
-                          true
+        it { is_expected.to contain_class('pacemaker::new::params') }
 
-        end
+        it { is_expected.to contain_class('pacemaker::new') }
+
+        it { is_expected.to contain_class('pacemaker::new::firewall') }
+
+        it { is_expected.to contain_class('pacemaker::new::install') }
+
+        it { is_expected.to contain_class('pacemaker::new::setup') }
+
+        it { is_expected.to contain_class('pacemaker::new::service') }
       end
+
     end
   end
 end

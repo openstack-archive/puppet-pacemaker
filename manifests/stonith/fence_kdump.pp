@@ -8,22 +8,22 @@
 # === Parameters
 #
 # [*nodename*]
-# Name or IP address of node to be fenced
+#   Name or IP address of node to be fenced
 #
 # [*ipport*]
-# Port number
+#   Port number
 #
 # [*family*]
-# Network family
+#   Network family
 #
 # [*timeout*]
-# Timeout in seconds
+#   Timeout in seconds
 #
 # [*verbose*]
-# Print verbose output
+#   Print verbose output
 #
 # [*usage*]
-# Print usage
+#   Print usage
 #
 #  [*interval*]
 #   Interval between tries.

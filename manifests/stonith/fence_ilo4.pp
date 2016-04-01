@@ -8,43 +8,43 @@
 # === Parameters
 #
 # [*auth*]
-# IPMI Lan Auth type (md5, password, or none)
+#   IPMI Lan Auth type (md5, password, or none)
 #
 # [*ipaddr*]
-# IPMI Lan IP to talk to
+#   IPMI Lan IP to talk to
 #
 # [*passwd*]
-# Password (if required) to control power on IPMI device
+#   Password (if required) to control power on IPMI device
 #
 # [*passwd_script*]
-# Script to retrieve password (if required)
+#   Script to retrieve password (if required)
 #
 # [*lanplus*]
-# Use Lanplus to improve security of connection
+#   Use Lanplus to improve security of connection
 #
 # [*login*]
-# Username/Login (if required) to control power on IPMI device
+#   Username/Login (if required) to control power on IPMI device
 #
 # [*timeout*]
-# Timeout (sec) for IPMI operation
+#   Timeout (sec) for IPMI operation
 #
 # [*cipher*]
-# Ciphersuite to use (same as ipmitool -C parameter)
+#   Ciphersuite to use (same as ipmitool -C parameter)
 #
 # [*method*]
-# Method to fence (onoff or cycle)
+#   Method to fence (onoff or cycle)
 #
 # [*power_wait*]
-# Wait X seconds after on/off operation
+#   Wait X seconds after on/off operation
 #
 # [*delay*]
-# Wait X seconds before fencing is started
+#   Wait X seconds before fencing is started
 #
 # [*privlvl*]
-# Privilege level on IPMI device
+#   Privilege level on IPMI device
 #
 # [*verbose*]
-# Verbose mode
+#   Verbose mode
 #
 #  [*interval*]
 #   Interval between tries.

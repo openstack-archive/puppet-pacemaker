@@ -8,31 +8,31 @@
 # === Parameters
 #
 # [*debug*]
-# Specify (stdin) or increment (command line) debug level
+#   Specify (stdin) or increment (command line) debug level
 #
 # [*serial_device*]
-# Serial device (default=/dev/ttyS1)
+#   Serial device (default=/dev/ttyS1)
 #
 # [*serial_params*]
-# Serial Parameters (default=115200,8N1)
+#   Serial Parameters (default=115200,8N1)
 #
 # [*channel_address*]
-# VM Channel IP address (default=10.0.2.179)
+#   VM Channel IP address (default=10.0.2.179)
 #
 # [*ipport*]
-# Multicast or VMChannel IP port (default=1229)
+#   Multicast or VMChannel IP port (default=1229)
 #
 # [*port*]
-# Virtual Machine (domain name) to fence
+#   Virtual Machine (domain name) to fence
 #
 # [*timeout*]
-# Fencing timeout (in seconds; default=30)
+#   Fencing timeout (in seconds; default=30)
 #
 # [*delay*]
-# Fencing delay (in seconds; default=0)
+#   Fencing delay (in seconds; default=0)
 #
 # [*domain*]
-# Virtual Machine (domain name) to fence (deprecated; use port)
+#   Virtual Machine (domain name) to fence (deprecated; use port)
 #
 #  [*interval*]
 #   Interval between tries.

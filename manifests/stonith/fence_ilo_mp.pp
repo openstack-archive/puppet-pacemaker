@@ -8,61 +8,61 @@
 # === Parameters
 #
 # [*ipaddr*]
-# IP Address or Hostname
+#   IP Address or Hostname
 #
 # [*login*]
-# Login Name
+#   Login Name
 #
 # [*passwd*]
-# Login password or passphrase
+#   Login password or passphrase
 #
 # [*secure*]
-# SSH connection
+#   SSH connection
 #
 # [*cmd_prompt*]
-# Force Python regex for command prompt
+#   Force Python regex for command prompt
 #
 # [*ipport*]
-# TCP/UDP port to use for connection with device
+#   TCP/UDP port to use for connection with device
 #
 # [*inet4_only*]
-# Forces agent to use IPv4 addresses only
+#   Forces agent to use IPv4 addresses only
 #
 # [*inet6_only*]
-# Forces agent to use IPv6 addresses only
+#   Forces agent to use IPv6 addresses only
 #
 # [*passwd_script*]
-# Script to retrieve password
+#   Script to retrieve password
 #
 # [*identity_file*]
-# Identity file for ssh
+#   Identity file for ssh
 #
 # [*ssh_options*]
-# SSH options to use
+#   SSH options to use
 #
 # [*verbose*]
-# Verbose mode
+#   Verbose mode
 #
 # [*debug*]
-# Write debug information to given file
+#   Write debug information to given file
 #
 # [*power_timeout*]
-# Test X seconds for status change after ON/OFF
+#   Test X seconds for status change after ON/OFF
 #
 # [*shell_timeout*]
-# Wait X seconds for cmd prompt after issuing command
+#   Wait X seconds for cmd prompt after issuing command
 #
 # [*login_timeout*]
-# Wait X seconds for cmd prompt after login
+#   Wait X seconds for cmd prompt after login
 #
 # [*power_wait*]
-# Wait X seconds after issuing ON/OFF
+#   Wait X seconds after issuing ON/OFF
 #
 # [*delay*]
-# Wait X seconds before fencing is started
+#   Wait X seconds before fencing is started
 #
 # [*retry_on*]
-# Count of attempts to retry power on
+#   Count of attempts to retry power on
 #
 #  [*interval*]
 #   Interval between tries.

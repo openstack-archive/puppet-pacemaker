@@ -8,76 +8,76 @@
 # === Parameters
 #
 # [*ipaddr*]
-# IP Address or Hostname
+#   IP Address or Hostname
 #
 # [*login*]
-# Login Name
+#   Login Name
 #
 # [*passwd*]
-# Login password or passphrase
+#   Login password or passphrase
 #
 # [*port*]
-# Physical plug number, name of virtual machine or UUID
+#   Physical plug number, name of virtual machine or UUID
 #
 # [*snmp_version*]
-# Specifies SNMP version to use (1,2c,3)
+#   Specifies SNMP version to use (1,2c,3)
 #
 # [*community*]
-# Set the community string
+#   Set the community string
 #
 # [*ipport*]
-# TCP/UDP port to use for connection with device
+#   TCP/UDP port to use for connection with device
 #
 # [*inet4_only*]
-# Forces agent to use IPv4 addresses only
+#   Forces agent to use IPv4 addresses only
 #
 # [*inet6_only*]
-# Forces agent to use IPv6 addresses only
+#   Forces agent to use IPv6 addresses only
 #
 # [*passwd_script*]
-# Script to retrieve password
+#   Script to retrieve password
 #
 # [*snmp_auth_prot*]
-# Set authentication protocol (MD5|SHA)
+#   Set authentication protocol (MD5|SHA)
 #
 # [*snmp_sec_level*]
-# Set security level (noAuthNoPriv|authNoPriv|authPriv)
+#   Set security level (noAuthNoPriv|authNoPriv|authPriv)
 #
 # [*snmp_priv_prot*]
-# Set privacy protocol (DES|AES)
+#   Set privacy protocol (DES|AES)
 #
 # [*snmp_priv_passwd*]
-# Set privacy protocol password
+#   Set privacy protocol password
 #
 # [*snmp_priv_passwd_script*]
-# Script to run to retrieve privacy password
+#   Script to run to retrieve privacy password
 #
 # [*verbose*]
-# Verbose mode
+#   Verbose mode
 #
 # [*debug*]
-# Write debug information to given file
+#   Write debug information to given file
 #
 # [*separator*]
-# Separator for CSV created by operation list
+#   Separator for CSV created by operation list
 #
 # [*power_timeout*]
-# Test X seconds for status change after ON/OFF
+#   Test X seconds for status change after ON/OFF
 #
 # [*shell_timeout*]
-# Wait X seconds for cmd prompt after issuing command
+#   Wait X seconds for cmd prompt after issuing command
 #
 # [*login_timeout*]
-# Wait X seconds for cmd prompt after login
+#   Wait X seconds for cmd prompt after login
 #
 # [*power_wait*]
-# Wait X seconds after issuing ON/OFF
+#   Wait X seconds after issuing ON/OFF
 #
 # [*delay*]
-# Wait X seconds before fencing is started
+#   Wait X seconds before fencing is started
 #
 # [*retry_on*]
-# Count of attempts to retry power on
+#   Count of attempts to retry power on
 #
 #  [*interval*]
 #   Interval between tries.

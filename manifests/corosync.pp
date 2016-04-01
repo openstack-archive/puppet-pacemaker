@@ -159,7 +159,7 @@ class pacemaker::corosync(
       creates => '/etc/cluster/cluster.conf',
       command => "${::pacemaker::pcs_bin} cluster setup --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
       unless  => '/usr/bin/test -f /etc/corosync/corosync.conf',
-      require => Class['::pacemaker::install']
+      require => Class['::pacemaker::install'],
     }
     ->
     exec {"Start Cluster ${cluster_name}":

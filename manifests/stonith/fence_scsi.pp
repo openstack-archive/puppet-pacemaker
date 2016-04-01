@@ -8,22 +8,22 @@
 # === Parameters
 #
 # [*aptpl*]
-# Use APTPL flag for registrations
+#   Use APTPL flag for registrations
 #
 # [*devices*]
-# List of devices to be used for fencing action
+#   List of devices to be used for fencing action
 #
 # [*logfile*]
-# File to write error/debug messages
+#   File to write error/debug messages
 #
 # [*delay*]
-# Wait X seconds before fencing is started
+#   Wait X seconds before fencing is started
 #
 # [*key*]
-# Key value to be used for fencing action
+#   Key value to be used for fencing action
 #
 # [*nodename*]
-# Name of node
+#   Name of node
 #
 #  [*interval*]
 #   Interval between tries.

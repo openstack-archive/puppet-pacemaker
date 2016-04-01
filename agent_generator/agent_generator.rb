@@ -7,7 +7,6 @@
 # * fence-generator.rb ilo.xml fence_ilo2 fence-agents-ilo2
 #      [ XML metadata, name of the class, name of the package for dependency check ]
 
-
 require 'rexml/document'
 
 class FencingMetadataParser
@@ -17,33 +16,31 @@ class FencingMetadataParser
     file = File.new(filename)
     @doc = REXML::Document.new file
     @params = []
-    @params_max_len = 14        # pcmk_host_list
+    @params_max_len = 14 # pcmk_host_list
   end
 
-  def getPackageName()
-    return @packageName
+  def getPackageName
+    @packageName
   end
 
-  def getAgentName()
-    return @agentName
+  def getAgentName
+    @agentName
   end
 
-  def getParameters()
+  def getParameters
     ## result have to be array as order should be preserved
     return @params unless @params.empty?
-    @doc.elements.each("resource-agent/parameters/parameter") { |p|
-      param = Hash.new
-      param["name"] = REXML::XPath.match(p, "string(./@name)")[0]
+    @doc.elements.each('resource-agent/parameters/parameter') { |p|
+      param = {}
+      param['name'] = REXML::XPath.match(p, 'string(./@name)')[0]
       @params_max_len = param['name'].length if param['name'].length > @params_max_len
-      param["type"] = REXML::XPath.match(p, "string(./content/@type)")[0]
+      param['type'] = REXML::XPath.match(p, 'string(./content/@type)')[0]
       ## if 'default' is list then we can not enter it as parameter !!
       ## this is problem only for 'cmd_prompt'
-      param["default"] = REXML::XPath.match(p, "string(./content/@default)")[0]
+      param['default'] = REXML::XPath.match(p, 'string(./content/@default)')[0]
       param['description'] = REXML::XPath.match(p, 'string(./shortdesc)')[0]
       ## remove parameters that are not usable during automatic execution
-      if not ["help", "version", "action"].include?(param["name"])
-        @params.push(param)
-      end
+      @params.push(param) unless %w(help version action).include?(param['name'])
     }
     @params
   end
@@ -151,13 +148,13 @@ eos
     text = ''
     @parser.getParameters.each { |p|
       text += "# [*#{p['name']}*]\n"
-      text += "# #{p['description']}\n#\n"
+      text += "#   #{p['description']}\n#\n"
     }
     text
   end
 
   def getManifestParameters
-    text = ""
+    text = ''
     @parser.getParameters.each { |p|
       text += format_param(p['name'])
     }
@@ -170,11 +167,11 @@ eos
     text += format_param('tries')
     text += format_param('try_sleep')
 
-    return text
+    text
   end
 
   def getVariableValues
-    text = ""
+    text = ''
     @parser.getParameters.each { |p|
       text += "  $#{p['name']}_chunk = $#{p['name']} ? {\n"
       text += "    undef   => '',\n"
@@ -182,26 +179,26 @@ eos
       text += "  }\n"
     }
 
-    return text
+    text
   end
 
   def getChunks
-    text = ""
+    text = ''
     @parser.getParameters.each { |p|
       text += "${#{p['name']}_chunk} "
     }
-    return text
+    text
   end
 
   private
 
-  def format_param(param, value='undef')
+  def format_param(param, value = 'undef')
     "  $%-#{@parser.getMaxLen}s = %s,\n" % [param, value]
   end
 end
 
-if ARGV.length != 3 then
-  puts "You have to enter three arguments: path to metadata, name of fence agent and fence agent package"
+if ARGV.length != 3
+  puts 'You have to enter three arguments: path to metadata, name of fence agent and fence agent package'
   exit 1
 end
 
