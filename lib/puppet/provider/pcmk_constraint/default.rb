@@ -11,7 +11,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
             cmd = 'constraint location add ' + resource_name + ' '  + resource_resource + ' ' + @resource[:location] + ' ' + @resource[:score]
         when :colocation
             resource_location = @resource[:location].gsub(':', '.')
-            if @resource[:master_slave]
+            if @resource[:master_slave] == :true
               cmd = 'constraint colocation add ' + resource_resource + ' with master ' + resource_location + ' ' + @resource[:score]
             else 
               cmd = 'constraint colocation add ' + resource_resource + ' with ' + resource_location + ' ' + @resource[:score]
@@ -50,7 +50,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
             when :location
                 return true if line.include? resource_name
             when :colocation
-                if @resource[:master_slave]
+                if @resource[:master_slave] == :true
                   return true if line.include? resource_resource + ' with ' + resource_location and line.include? "with-rsc-role:Master"
                 else
                   return true if line.include? resource_resource + ' with ' + resource_location
