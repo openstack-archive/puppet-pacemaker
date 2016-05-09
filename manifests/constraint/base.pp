@@ -121,6 +121,7 @@ define pacemaker::constraint::base (
         require   => Exec['wait-for-settle'],
         tries     => $tries,
         try_sleep => $try_sleep,
+        tag       => [ 'pacemaker', 'pacemaker_constraint'],
       }
     } else {
       exec { "Removing ${constraint_type} constraint ${name}":
@@ -129,6 +130,7 @@ define pacemaker::constraint::base (
         require   => Exec['wait-for-settle'],
         tries     => $tries,
         try_sleep => $try_sleep,
+        tag       => [ 'pacemaker', 'pacemaker_constraint'],
       }
     }
   } else {
@@ -141,6 +143,7 @@ define pacemaker::constraint::base (
           require   => [Exec['wait-for-settle'],Package['pcs']],
           tries     => $tries,
           try_sleep => $try_sleep,
+          tag       => [ 'pacemaker', 'pacemaker_constraint'],
         }
       }
       'order': {
@@ -150,6 +153,7 @@ define pacemaker::constraint::base (
           require   => [Exec['wait-for-settle'],Package['pcs']],
           tries     => $tries,
           try_sleep => $try_sleep,
+          tag       => [ 'pacemaker', 'pacemaker_constraint'],
         }
       }
       'location': {
@@ -160,6 +164,7 @@ define pacemaker::constraint::base (
           require   => [Exec['wait-for-settle'],Package['pcs']],
           tries     => $tries,
           try_sleep => $try_sleep,
+          tag       => [ 'pacemaker', 'pacemaker_constraint'],
         }
       }
       default: {
