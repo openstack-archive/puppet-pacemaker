@@ -53,8 +53,8 @@ describe 'One node install' do
                       /stonith-fence_ipmilan-ipmi_fence/,
                       /start ip-192.168.201.59 then start haproxy-clone.*kind:Optional/,
                       /start ip-2001.dead..28 then start haproxy-clone.*kind:Optional/,
-                      /ip-192.168.201.59 with haproxy-clone \(score:INFINITY\) \(rsc-role:Started\) \(with-rsc-role:Master\)/,
-                      /ip-2001.dead..28 with haproxy-clone \(score:INFINITY\) \(rsc-role:Started\) \(with-rsc-role:Master\)/
+                      /ip-192.168.201.59 with haproxy-clone \(score:INFINITY\)/,
+                      /ip-2001.dead..28 with haproxy-clone \(score:INFINITY\)/
                     ]
                   )
           end
