@@ -1,5 +1,5 @@
 {
-  "name": "puppet-pacemaker",
+  "name": "openstack-pacemaker",
   "version": "0.3.0",
   "author": "OpenStack Contributors",
   "summary": "Puppet module for Pacemaker",
