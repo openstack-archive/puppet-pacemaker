@@ -25,6 +25,9 @@
 # [*login*]
 #   Username/Login (if required) to control power on IPMI device
 #
+# [*action*]
+#   Operation to perform. Valid operations: on, off, reboot, status, list, diag, monitor or metadata
+#
 # [*timeout*]
 #   Timeout (sec) for IPMI operation
 #
@@ -91,6 +94,7 @@ define pacemaker::stonith::fence_idrac (
   $passwd_script  = undef,
   $lanplus        = undef,
   $login          = undef,
+  $action         = undef,
   $timeout        = undef,
   $cipher         = undef,
   $method         = undef,
@@ -130,6 +134,10 @@ define pacemaker::stonith::fence_idrac (
   $login_chunk = $login ? {
     undef   => '',
     default => "login=\"${login}\"",
+  }
+  $action_chunk = $action ? {
+    undef   => '',
+    default => "action=\"${action}\"",
   }
   $timeout_chunk = $timeout ? {
     undef   => '',
@@ -179,7 +187,7 @@ define pacemaker::stonith::fence_idrac (
       'fence-agents-ipmilan': ensure => installed,
     } ->
     exec { "Create stonith-fence_idrac-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_idrac-${safe_title} fence_idrac pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_idrac-${safe_title} fence_idrac pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_idrac-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,

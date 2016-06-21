@@ -22,6 +22,9 @@
 # [*key*]
 #   Key value to be used for fencing action
 #
+# [*action*]
+#   Fencing action
+#
 # [*nodename*]
 #   Name of node
 #
@@ -69,6 +72,7 @@ define pacemaker::stonith::fence_scsi (
   $logfile        = undef,
   $delay          = undef,
   $key            = undef,
+  $action         = undef,
   $nodename       = undef,
 
   $interval       = '60s',
@@ -99,6 +103,10 @@ define pacemaker::stonith::fence_scsi (
     undef   => '',
     default => "key=\"${key}\"",
   }
+  $action_chunk = $action ? {
+    undef   => '',
+    default => "action=\"${action}\"",
+  }
   $nodename_chunk = $nodename ? {
     undef   => '',
     default => "nodename=\"${nodename}\"",
@@ -123,7 +131,7 @@ define pacemaker::stonith::fence_scsi (
       'fence-agents-scsi': ensure => installed,
     } ->
     exec { "Create stonith-fence_scsi-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_scsi-${safe_title} fence_scsi pcmk_host_list=\"${pcmk_host_value_chunk}\" ${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${nodename_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_scsi-${safe_title} fence_scsi pcmk_host_list=\"${pcmk_host_value_chunk}\" ${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_scsi-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,

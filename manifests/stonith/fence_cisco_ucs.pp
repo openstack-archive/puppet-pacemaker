@@ -46,6 +46,9 @@
 # [*ssl_insecure*]
 #   SSL connection without verifying fence device's certificate
 #
+# [*action*]
+#   Fencing Action
+#
 # [*verbose*]
 #   Verbose mode
 #
@@ -125,6 +128,7 @@ define pacemaker::stonith::fence_cisco_ucs (
   $passwd_script  = undef,
   $ssl_secure     = undef,
   $ssl_insecure   = undef,
+  $action         = undef,
   $verbose        = undef,
   $debug          = undef,
   $separator      = undef,
@@ -195,6 +199,10 @@ define pacemaker::stonith::fence_cisco_ucs (
     undef   => '',
     default => "ssl_insecure=\"${ssl_insecure}\"",
   }
+  $action_chunk = $action ? {
+    undef   => '',
+    default => "action=\"${action}\"",
+  }
   $verbose_chunk = $verbose ? {
     undef   => '',
     default => "verbose=\"${verbose}\"",
@@ -251,7 +259,7 @@ define pacemaker::stonith::fence_cisco_ucs (
       'fence-agents-cisco-ucs': ensure => installed,
     } ->
     exec { "Create stonith-fence_cisco_ucs-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_cisco_ucs-${safe_title} fence_cisco_ucs pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${ssl_chunk} ${notls_chunk} ${port_chunk} ${suborg_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${ssl_secure_chunk} ${ssl_insecure_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_cisco_ucs-${safe_title} fence_cisco_ucs pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${ssl_chunk} ${notls_chunk} ${port_chunk} ${suborg_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${ssl_secure_chunk} ${ssl_insecure_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_cisco_ucs-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,

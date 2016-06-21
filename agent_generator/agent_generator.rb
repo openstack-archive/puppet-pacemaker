@@ -40,7 +40,7 @@ class FencingMetadataParser
       param['default'] = REXML::XPath.match(p, 'string(./content/@default)')[0]
       param['description'] = REXML::XPath.match(p, 'string(./shortdesc)')[0]
       ## remove parameters that are not usable during automatic execution
-      @params.push(param) unless %w(help version action).include?(param['name'])
+      @params.push(param) unless %w(help version).include?(param['name'])
     }
     @params
   end

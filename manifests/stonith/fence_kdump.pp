@@ -16,6 +16,9 @@
 # [*family*]
 #   Network family
 #
+# [*action*]
+#   Fencing action
+#
 # [*timeout*]
 #   Timeout in seconds
 #
@@ -67,6 +70,7 @@ define pacemaker::stonith::fence_kdump (
   $nodename       = undef,
   $ipport         = undef,
   $family         = undef,
+  $action         = undef,
   $timeout        = undef,
   $verbose        = undef,
   $usage          = undef,
@@ -90,6 +94,10 @@ define pacemaker::stonith::fence_kdump (
   $family_chunk = $family ? {
     undef   => '',
     default => "family=\"${family}\"",
+  }
+  $action_chunk = $action ? {
+    undef   => '',
+    default => "action=\"${action}\"",
   }
   $timeout_chunk = $timeout ? {
     undef   => '',
@@ -123,7 +131,7 @@ define pacemaker::stonith::fence_kdump (
       'fence-agents-kdump': ensure => installed,
     } ->
     exec { "Create stonith-fence_kdump-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_kdump-${safe_title} fence_kdump pcmk_host_list=\"${pcmk_host_value_chunk}\" ${nodename_chunk} ${ipport_chunk} ${family_chunk} ${timeout_chunk} ${verbose_chunk} ${usage_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_kdump-${safe_title} fence_kdump pcmk_host_list=\"${pcmk_host_value_chunk}\" ${nodename_chunk} ${ipport_chunk} ${family_chunk} ${action_chunk} ${timeout_chunk} ${verbose_chunk} ${usage_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_kdump-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,
