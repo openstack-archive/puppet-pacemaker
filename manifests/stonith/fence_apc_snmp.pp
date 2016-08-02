@@ -52,6 +52,9 @@
 # [*snmp_priv_passwd_script*]
 #   Script to run to retrieve privacy password
 #
+# [*action*]
+#   Fencing Action
+#
 # [*verbose*]
 #   Verbose mode
 #
@@ -133,6 +136,7 @@ define pacemaker::stonith::fence_apc_snmp (
   $snmp_priv_prot          = undef,
   $snmp_priv_passwd        = undef,
   $snmp_priv_passwd_script = undef,
+  $action                  = undef,
   $verbose                 = undef,
   $debug                   = undef,
   $separator               = undef,
@@ -211,6 +215,10 @@ define pacemaker::stonith::fence_apc_snmp (
     undef   => '',
     default => "snmp_priv_passwd_script=\"${snmp_priv_passwd_script}\"",
   }
+  $action_chunk = $action ? {
+    undef   => '',
+    default => "action=\"${action}\"",
+  }
   $verbose_chunk = $verbose ? {
     undef   => '',
     default => "verbose=\"${verbose}\"",
@@ -267,7 +275,7 @@ define pacemaker::stonith::fence_apc_snmp (
       'fence-agents-apc-snmp': ensure => installed,
     } ->
     exec { "Create stonith-fence_apc_snmp-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_apc_snmp-${safe_title} fence_apc_snmp pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_apc_snmp-${safe_title} fence_apc_snmp pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_apc_snmp-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,

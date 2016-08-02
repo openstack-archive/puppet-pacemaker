@@ -25,6 +25,9 @@
 # [*port*]
 #   Virtual Machine (domain name) to fence
 #
+# [*action*]
+#   Fencing action (null, off, on, [reboot], status, list, monitor, metadata)
+#
 # [*timeout*]
 #   Fencing timeout (in seconds; default=30)
 #
@@ -79,6 +82,7 @@ define pacemaker::stonith::fence_virt (
   $channel_address = undef,
   $ipport          = undef,
   $port            = undef,
+  $action          = undef,
   $timeout         = undef,
   $delay           = undef,
   $domain          = undef,
@@ -115,6 +119,10 @@ define pacemaker::stonith::fence_virt (
     undef   => '',
     default => "port=\"${port}\"",
   }
+  $action_chunk = $action ? {
+    undef   => '',
+    default => "action=\"${action}\"",
+  }
   $timeout_chunk = $timeout ? {
     undef   => '',
     default => "timeout=\"${timeout}\"",
@@ -147,7 +155,7 @@ define pacemaker::stonith::fence_virt (
       'fence-virt': ensure => installed,
     } ->
     exec { "Create stonith-fence_virt-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_virt-${safe_title} fence_virt pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_virt-${safe_title} fence_virt pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${action_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_virt-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,
