@@ -35,6 +35,12 @@ module Pacemaker
         data.map! do |element|
           stringify_data element
         end
+      elsif data.is_a? Set
+        new_data = Set.new
+        data.each do |element|
+          new_data.add(stringify_data element)
+        end
+        new_data
       else
         data.to_s
       end

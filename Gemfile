@@ -13,7 +13,7 @@ end
 group :test do
   gem 'rake',                                                       :require => false
   gem 'rspec-puppet',                                               :require => false
-  gem 'puppet-lint',                                                :require => false
+  gem 'puppet-lint', '~> 1.1.0',                                    :require => false
   gem 'metadata-json-lint',                                         :require => false
   gem 'rspec-puppet-facts',                                         :require => false
   gem 'rspec',                                                      :require => false
