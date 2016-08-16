@@ -147,12 +147,6 @@ Puppet::Type.type(:service).provide(:pacemaker_xml, parent: Puppet::Provider::Pa
     cib_reset 'service_status'
     wait_for_online 'service_status'
 
-    if pacemaker_options[:cleanup_on_status]
-      if !pacemaker_options[:cleanup_only_if_failures] || primitive_has_failures?(name, hostname)
-        cleanup
-      end
-    end
-
     out = if primitive_is_master? name
             service_status_mode pacemaker_options[:status_mode_master]
           elsif primitive_is_clone? name
@@ -164,6 +158,13 @@ Puppet::Type.type(:service).provide(:pacemaker_xml, parent: Puppet::Provider::Pa
     if pacemaker_options[:add_location_constraint]
       if out == :running && (!service_location_exists? full_name, hostname)
         debug 'Location constraint is missing. Service status set to "stopped".'
+        out = :stopped
+      end
+    end
+
+    if pacemaker_options[:cleanup_on_status]
+      if out == :running and primitive_has_failures? name, hostname
+        debug "Primitive: '#{name}' has failures on the node: '#{hostname}' Service status set to 'stopped'."
         out = :stopped
       end
     end

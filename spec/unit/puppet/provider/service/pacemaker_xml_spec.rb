@@ -166,6 +166,15 @@ describe Puppet::Type.type(:service).provider(:pacemaker_xml) do
       provider.stubs(:service_location_exists?).returns(true)
       expect(provider.status).to eq :running
     end
+
+    it 'counts a service as stopped if the primitive has failures' do
+      provider.stubs(:get_primitive_puppet_status).returns(:running)
+      provider.stubs(:service_location_exists?).returns(true)
+      provider.expects(:primitive_has_failures?).with(name, hostname).returns(true)
+      expect(provider.status).to eq :stopped
+      provider.expects(:primitive_has_failures?).with(name, hostname).returns(false)
+      expect(provider.status).to eq :running
+    end
   end
 
   context '#start' do

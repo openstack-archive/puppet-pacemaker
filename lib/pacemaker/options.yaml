@@ -19,6 +19,9 @@
 - symmetric-cluster
 - no-quorum-policy
 
+# Show the debug messages for the resource operations status calculation
+:debug_show_operations: false
+
 # don't actually do any changes to the system
 # only show what command would have been run
 :debug_enabled: false
@@ -48,9 +51,13 @@
 :status_mode_simple: :global
 
 # cleanup the primitive during these actions?
-:cleanup_on_status: false
 :cleanup_on_start: true
 :cleanup_on_stop: true
+
+# set the primitive status to stopped if there are failures
+# forcing the primitive to be started again and cleaned up
+# on this node
+:cleanup_on_status: true
 
 # try to stop and disable the basic service on these provider actions
 # the basic service is the service managed by the system

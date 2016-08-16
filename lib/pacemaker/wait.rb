@@ -31,7 +31,10 @@ module Pacemaker
       message = "Waiting #{max_wait_time} seconds for Pacemaker to become online"
       message += " (#{comment})" if comment
       debug message
-      retry_block { online? }
+      retry_block do
+        cib_reset 'wait_for_online'
+        online?
+      end
       debug 'Pacemaker is online'
     end
 

@@ -102,7 +102,7 @@ module Pacemaker
           node_status_string = '?' unless node_status_string.is_a? String
           node_status_string = node_status_string.upcase
           node_block = "#{node_name}: #{node_status_string}"
-          node_block += ' (F)' if primitive_has_failures?(primitive, node_name) && (!primitive_is_running? primitive, node_name)
+          node_block += ' (F)' if primitive_has_failures? primitive, node_name
           node_block += ' (L)' if service_location_exists? primitive_full_name(primitive), node_name
           nodes << node_block
         end
@@ -115,5 +115,24 @@ module Pacemaker
       report += " at '#{tag}'" if tag
       report + "\n"
     end
+
+    # Generate the report message for the operation status calculation
+    # @param [Array<Hash>] operations
+    # @param [Hash<String => String>] resource
+    # @param [String] node_name
+    # @return [String]
+    def resource_operations_report(operations, resource, node_name)
+      report = "Operations status debug start for the node: '#{node_name}'\n"
+      report += "Resource: '#{resource['id']}'\n"
+      operations.each do |operation|
+        type = operation.fetch('operation', '?').capitalize
+        rc_code = operation.fetch('rc-code', '?')
+        op_code = operation.fetch('op-status', '?')
+        report += "* #{type.ljust 7}: rc:#{rc_code} op:#{op_code}\n"
+      end
+      report += "Status: #{resource['status']} Failed: #{resource['failed']}\n"
+      report + "Operations status debug end for the node: '#{node_name}'\n"
+    end
+
   end
 end

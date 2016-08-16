@@ -75,13 +75,13 @@ describe Puppet::Provider::PacemakerXML do
             'then' => 'p_neutron-dhcp-agent',
         },
         'order-test1-test2-Mandatory' => {
-            'first'=>'test1',
-            'first-action'=>'promote',
-            'id'=>'order-test1-test2-Mandatory',
-            'kind'=>'Mandatory',
-            'symmetrical'=>'true',
-            'then'=>'test2',
-            'then-action'=>'start',
+            'first' => 'test1',
+            'first-action' => 'promote',
+            'id' => 'order-test1-test2-Mandatory',
+            'kind' => 'Mandatory',
+            'symmetrical' => 'true',
+            'then' => 'test2',
+            'then-action' => 'start',
         },
     }
   end
@@ -278,7 +278,7 @@ Pacemaker debug block start at 'test'
 -> Simple primitive: 'p_ceilometer-alarm-evaluator'
    node-1: STOP | node-2: STOP (F) | node-3: STOP (F)
 -> Simple primitive: 'p_heat-engine'
-   node-1: START (L) | node-2: STOP | node-3: STOP
+   node-1: START (F) (L) | node-2: STOP | node-3: STOP
 -> Simple primitive: 'p_ceilometer-agent-central' (M)
    node-1: STOP | node-2: STOP (F) | node-3: STOP (F)
 -> Simple primitive: 'vip__management'
@@ -292,7 +292,7 @@ Pacemaker debug block start at 'test'
 -> Clone primitive: 'p_mysql-clone'
    node-1: START (L) | node-2: START (L) | node-3: STOP
 -> Simple primitive: 'p_neutron-dhcp-agent'
-   node-1: START (L) | node-2: STOP | node-3: STOP
+   node-1: START (F) (L) | node-2: STOP | node-3: STOP
 -> Simple primitive: 'vip__public'
    node-1: START (L) | node-2: STOP (L) | node-3: STOP (L)
 -> Clone primitive: 'p_haproxy-clone'
@@ -354,14 +354,14 @@ Pacemaker debug block end at 'test'
 
     it 'can determine if primitive is failed or not globally' do
       expect(subject.primitive_has_failures? 'p_ceilometer-agent-central').to eq true
-      expect(subject.primitive_has_failures? 'p_heat-engine').to eq false
+      expect(subject.primitive_has_failures? 'p_heat-engine').to eq true
       expect(subject.primitive_has_failures? 'UNKNOWN').to eq nil
     end
 
     it 'can determine if primitive is failed or not locally' do
       expect(subject.primitive_has_failures? 'p_ceilometer-agent-central', 'node-1').to eq false
       expect(subject.primitive_has_failures? 'p_ceilometer-agent-central', 'node-2').to eq true
-      expect(subject.primitive_has_failures? 'p_heat-engine', 'node-1').to eq false
+      expect(subject.primitive_has_failures? 'p_heat-engine', 'node-1').to eq true
       expect(subject.primitive_has_failures? 'p_heat-engine', 'node-2').to eq false
       expect(subject.primitive_has_failures? 'UNKNOWN', 'node-1').to eq nil
     end
