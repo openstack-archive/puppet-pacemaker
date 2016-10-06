@@ -42,7 +42,9 @@ group :system_tests do
   if beaker_version = ENV['BEAKER_VERSION']
     gem 'beaker', *location_for(beaker_version)
   else
-    gem 'beaker',                        :require => false
+    #NOTE(aschultz): beaker > 3.1.0 requires ruby 2.2.x and 3.0.0 had a bad
+    # serverspec reference. So pin to less than 3.0.0
+    gem 'beaker', '< 3.0.0', :require => false
   end
   if beaker_rspec_version = ENV['BEAKER_RSPEC_VERSION']
     gem 'beaker-rspec', *location_for(beaker_rspec_version)
