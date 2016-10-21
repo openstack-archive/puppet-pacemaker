@@ -19,7 +19,7 @@ Apache 2.0
 
 # Pacemaker types
 
-These types are used to configure Pacemaker object and are the core of 
+These types are used to configure Pacemaker object and are the core of
 this module. You can find some "interactive examples" of their usage in
 the *examples* folder.
 
@@ -314,7 +314,7 @@ Default: false
 
 ## pacemaker_operation_default
 
-This little type controls the default operation properties of the 
+This little type controls the default operation properties of the
 cluster resources. For example, you can set the default *timeout*
 for every operation without it's own configured *timeout* value.
 
@@ -400,7 +400,7 @@ pacemaker_property { 'no-quorum-policy' :
 
 This little resource can wait until the cluster have settled and ready
 to be configured. It can be useful in some cases, perhaps as an anchor,
-but most other type's *xml* providers can wait for cluster on their own. 
+but most other type's *xml* providers can wait for cluster on their own.
 
 Example:
 
@@ -457,7 +457,7 @@ Each *pacemaker_* type may have up to three different providers:
   on every system.
 
 - *pcs* provider. These provides are designed around the *pcs* cluster
-  management tool usually found on Red Hat family systems. They should 
+  management tool usually found on Red Hat family systems. They should
   not be as complex as *xml* providers, but *pcs* may not be available
   on you distribution. Currently it's implemented only for few types
   and they disabled because there is no reason to actually use them.
@@ -620,7 +620,7 @@ class { "pacemaker::stonith::ipmilan" :
 
 You can find these folders inside the **lib**:
 
-- *facter* contains the fact **pacemaker_node_name**. It is equal to the 
+- *facter* contains the fact **pacemaker_node_name**. It is equal to the
   node name from the Pacemaker point of view. May be equal to either
   $::hostname of $::fqdn.
 
@@ -628,10 +628,10 @@ You can find these folders inside the **lib**:
   module functions are split to submodules according to their role.
   There are also *xml* and *pcs* groups of files related to either
   *pcs* or *xml* provider and several common files.
-  
+
 - *puppet* contains Puppet types and provider. They are using the
   functions from the Pacemaker library.
-  
+
 - *serverspec* contains the custom ServerSpec types to work with
   Pacemaker. They are using the same library Puppet types and providers
   do. These types are used in the Acceptance tests to validate that
@@ -651,7 +651,7 @@ be created and properties and parameters values will be assigned.
 
 At this stage the values can be validated. If the property has
 the *validate* function it will be called to check if the value is
-correct or the exception can be raised. After tha validation the 
+correct or the exception can be raised. After tha validation the
 *munge* function will be called if the values need to be changed or
 converted somehow. If the property accepts the array value every
 elements will be validated and then munged separately.
@@ -715,7 +715,7 @@ The main data structures are formed by functions and their values are
 memorised and returned from the cache every time they are called again.
 Sometimes, when the new values should be acquired from the system this
 memoization can be dropped by calling the *cib_reset* function.
- 
+
 Every data structure get its values by parsing the CIB XML. This xml
 is got by calling the *cibaqmin -Q* command. Then the *REXML* document
 is created with this data and saved too. It can be accessed by the
@@ -772,7 +772,7 @@ If the retrieved data for the property was different from the desired
 one or if the resource doesn't exist at all the type will try to sync
 the values.
 
-If the resource was found not to exist the *create* method will be 
+If the resource was found not to exist the *create* method will be
 called. It should create the new resource with all parameters or fill
 the property hash with them. If the resource should be removed the
 *destroy* function will be called. If should either actually destroy
@@ -796,13 +796,13 @@ the flush function to modify the pacemaker configuration.
 When the *property_hash* is formed by using the *create* function or
 setter function the *flush* method should convert the values from the
 property hash to the library friendly data structure. Then the XML
-generator function can be called to convert this structure to the 
-XML patch that can be applied to the CIB, and the the *cibadmin --patch*
+generator function can be called to convert this structure to the
+XML patch that can be applied to the CIB, and the *cibadmin --patch*
 command will be called to apply it. If the resource should be removed
 the small XML patch can be applied by the remove function directly.
 
 All command calls that are changing the system should be run as their
-safe versions. They will not be executed if the debug parameter is 
+safe versions. They will not be executed if the debug parameter is
 enabled and will be just shown in the log.
 
 #### Simple providers
@@ -827,7 +827,7 @@ control their status. It will use the library to get the status of the
 service's primitive, try to start or stop it, and then will wait
 for this action to succeed. It is also capable of adding the service
 location constraints using the special library function and stopping
-and disabling the basic service using another provider instance. 
+and disabling the basic service using another provider instance.
 
 Pcmk_nodes provider uses the *nodes* structure but work mostly
 with corosync nodes using the *corosync-cmapctl* of the Corosync2
@@ -857,7 +857,7 @@ types and providers.
 
 - *unit/serverspec* Contains the specs for the ServerSpec types. They
   are used to check that these types are working correctly as well
-  as indirectly checking the library too. 
+  as indirectly checking the library too.
 
 - *classes* and *defined* have rspec-puppet tests for
   the classes and definitions.
@@ -867,10 +867,10 @@ types and providers.
   virtual system. First, the corosync and pacemaker is being installed
   on the newly created system, then the test manifests in the *examples*
   folder are applied to check if the resources can be successfully
-  created, updated and removed. Every time the specs look into the 
+  created, updated and removed. Every time the specs look into the
   pacemaker configuration to ensure that the resources are present
   and have the correct properties.
-  
+
 ### ServerSpec types
 
 - Pcmk_resource
@@ -888,7 +888,7 @@ and examples in the *spec/serverspec* and *spec/acceptance*.
 
 The library provides debug checkpoints for a lot of function calls and
 their output can be seen in the Puppet debug log.
- 
+
 Service provider uses the *cluster_debug_report* function to output
 the formatted report of the current cluster state.
 
