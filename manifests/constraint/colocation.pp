@@ -53,6 +53,10 @@ define pacemaker::constraint::colocation (
   $master_slave = false,
   $ensure       = present,
 ) {
+  # We do not want to require Exec['wait-for-settle'] when we run this
+  # from a pacemaker remote node
+  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
+
   pcmk_constraint {"colo-${source}-${target}":
     ensure          => $ensure,
     constraint_type => colocation,
@@ -60,7 +64,7 @@ define pacemaker::constraint::colocation (
     location        => $target,
     score           => $score,
     master_slave    => $master_slave,
-    require         => Exec['wait-for-settle'],
+    require         => $pcmk_require,
   }
 }
 

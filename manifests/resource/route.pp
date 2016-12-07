@@ -125,6 +125,9 @@ define pacemaker::resource::route(
       default => " gateway=${gateway}"
   }
 
+  # We do not want to require Exec['wait-for-settle'] when we run this
+  # from a pacemaker remote node
+  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   pcmk_resource { "route-${name}":
     ensure             => $ensure,
     resource_type      => 'Route',
@@ -136,7 +139,7 @@ define pacemaker::resource::route(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
-    require            => Exec['wait-for-settle'],
+    require            => $pcmk_require,
   }
 
 }

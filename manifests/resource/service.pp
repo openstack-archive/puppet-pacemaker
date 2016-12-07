@@ -107,6 +107,9 @@ define pacemaker::resource::service(
 ) {
   include ::pacemaker::params
   $res = "pacemaker::resource::${::pacemaker::params::services_manager}"
+  # We do not want to require Exec['wait-for-settle'] when we run this
+  # from a pacemaker remote node
+  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
 
   create_resources($res,
     { "${name}" => {
@@ -124,7 +127,7 @@ define pacemaker::resource::service(
       location_rule      => $location_rule,
       # https://github.com/voxpupuli/puppet-lint-absolute_classname-check/issues/9
       # lint:ignore:relative_classname_inclusion
-      require            => Exec['wait-for-settle'],
+      require            => $pcmk_require,
       # lint:endignore
     }
   })

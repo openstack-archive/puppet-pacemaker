@@ -105,6 +105,9 @@ define pacemaker::resource::systemd(
   $verify_on_create   = false,
   $location_rule      = undef,
 ) {
+  # We do not want to require Exec['wait-for-settle'] when we run this
+  # from a pacemaker remote node
+  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   pcmk_resource { $name:
     ensure             => $ensure,
     resource_type      => "systemd:${service_name}",
@@ -118,6 +121,6 @@ define pacemaker::resource::systemd(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
-    require            => Exec['wait-for-settle'],
+    require            => $pcmk_require,
   }
 }

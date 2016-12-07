@@ -71,6 +71,10 @@ define pacemaker::property (
     fail('When present, must provide value')
   }
 
+  # We do not want to require Exec['wait-for-settle'] when we run this
+  # from a pacemaker remote node
+  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
+
   # Special-casing node branches due to https://bugzilla.redhat.com/show_bug.cgi?id=1302010
   # (Basically pcs property show <property> will show all node properties anyway)
   if $node {
@@ -78,8 +82,7 @@ define pacemaker::property (
       exec { "Removing node-property ${property} on ${node}":
         command   => "/usr/sbin/pcs property unset --node ${node} ${property}",
         onlyif    => "/usr/sbin/pcs property show | grep ${property}= | grep ${node}",
-        require   => [Exec['wait-for-settle'],
-                      Class['::pacemaker::corosync']],
+        require   => $pcmk_require,
         tries     => $tries,
         try_sleep => $try_sleep,
       }
@@ -92,8 +95,7 @@ define pacemaker::property (
       exec { "Creating node-property ${property} on ${node}":
         command   => $cmd,
         unless    => "/usr/sbin/pcs property show ${property} | grep \"${property}=${value}\" | grep ${node}",
-        require   => [Exec['wait-for-settle'],
-                      Class['::pacemaker::corosync']],
+        require   => $pcmk_require,
         tries     => $tries,
         try_sleep => $try_sleep,
       }
@@ -103,8 +105,7 @@ define pacemaker::property (
       exec { "Removing cluster-wide property ${property}":
         command   => "/usr/sbin/pcs property unset ${property}",
         onlyif    => "/usr/sbin/pcs property show | grep ${property}: ",
-        require   => [Exec['wait-for-settle'],
-                      Class['::pacemaker::corosync']],
+        require   => $pcmk_require,
         tries     => $tries,
         try_sleep => $try_sleep,
       }
@@ -117,8 +118,7 @@ define pacemaker::property (
       exec { "Creating cluster-wide property ${property}":
         command   => $cmd,
         unless    => "/usr/sbin/pcs property show ${property} | grep \"${property} *[:=] *${value}\"",
-        require   => [Exec['wait-for-settle'],
-                      Class['::pacemaker::corosync']],
+        require   => $pcmk_require,
         tries     => $tries,
         try_sleep => $try_sleep,
       }
