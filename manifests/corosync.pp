@@ -196,9 +196,6 @@ class pacemaker::corosync(
     if $setup_cluster {
       File['etc-pacemaker-authkey'] -> Exec["Create Cluster ${cluster_name}"]
     }
-    if $pacemaker::pcsd_mode {
-      File['etc-pacemaker-authkey'] -> Service['pcsd']
-    }
   }
 
   exec {'wait-for-settle':
