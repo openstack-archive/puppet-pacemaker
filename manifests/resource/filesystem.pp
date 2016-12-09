@@ -62,6 +62,19 @@
 #   (optional) Verify creation of resource
 #   Defaults to false
 #
+# [*location_rule*]
+#   (optional) Add a location constraint before actually enabling
+#   the resource. Must be a hash like the following example:
+#   location_rule => {
+#     resource_discovery => 'exclusive',    # optional
+#     role               => 'master|slave', # optional
+#     score              => 0,              # optional
+#     score_attribute    => foo,            # optional
+#     # Multiple expressions can be used
+#     expression         => ['opsrole eq controller']
+#   }
+#   Defaults to undef
+#
 # === Dependencies
 #
 #  None
@@ -101,6 +114,7 @@ define pacemaker::resource::filesystem(
   $tries              = 1,
   $try_sleep          = 0,
   $verify_on_create   = false,
+  $location_rule      = undef,
 ) {
   $resource_id = delete("fs-${directory}", '/')
 
@@ -121,6 +135,7 @@ define pacemaker::resource::filesystem(
     tries              => $tries,
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
+    location_rule      => $location_rule,
     require            => Exec['wait-for-settle'],
   }
 }

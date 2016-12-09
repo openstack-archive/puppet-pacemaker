@@ -95,5 +95,7 @@ Puppet::Type.newtype(:pcmk_resource) do
   newproperty(:master_params) do
     desc "set if this is a cloned resource"
   end
-
+  newproperty(:location_rule) do
+    desc "A location rule constraint hash"
+  end
 end
