@@ -11,6 +11,7 @@ def location_for(place, fake_version = nil)
 end
 
 group :test do
+  gem 'nokogiri', '~> 1.6.0',                                       :require => false
   gem 'rake',                                                       :require => false
   gem 'rspec-puppet',                                               :require => false
   gem 'puppet-lint', '~> 1.1.0',                                    :require => false
