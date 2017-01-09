@@ -1,3 +1,5 @@
+require_relative '../pcmk_common'
+
 Puppet::Type.type(:pcmk_resource).provide(:default) do
   desc 'A base resource definition for a pacemaker resource'
 
@@ -58,15 +60,19 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     # if a location_rule is specified otherwise only the resource
     if not did_location_exist and not did_resource_exist
       if location_rule
-        pcs('create', "#{cmd} --disabled")
+        pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
+            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
         location_rule_create(location_rule)
-        pcs('create', "resource enable #{@resource[:name]}")
+        pcs('create', @resource[:name], "resource enable #{@resource[:name]}", @resource[:tries],
+            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
       else
-        pcs('create', cmd)
+        pcs('create', @resource[:name], cmd, @resource[:tries],
+            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
       end
     # If the location_rule already existed, we only create the resource
     elsif did_location_exist and not did_resource_exist
-      pcs('create', cmd)
+      pcs('create', @resource[:name], cmd, @resource[:tries],
+          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
     # The location_rule does not exist and the resource does exist
     elsif not did_location_exist and did_resource_exist
       if location_rule
@@ -82,7 +88,8 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     # Any corresponding location rules will be deleted by
     # pcs automatically, if present
     cmd = 'resource delete ' + @resource[:name]
-    pcs('delete', cmd)
+    pcs('delete', @resource[:name], cmd, @resource[:tries],
+        @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
   end
 
   def exists?
@@ -97,7 +104,8 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
 
   def resource_exists?
     cmd = 'resource show ' + @resource[:name] + ' > /dev/null 2>&1'
-    ret = pcs('show', cmd)
+    ret = pcs('show', @resource[:name], cmd, @resource[:tries],
+              @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
     return ret == false ? false : true
   end
 
@@ -114,7 +122,8 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
       constraint_name += '-master'
     end
     cmd = "constraint list | grep #{constraint_name} > /dev/null 2>&1"
-    ret = pcs('show', cmd)
+    ret = pcs('show', @resource[:name], cmd, @resource[:tries],
+              @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
     return ret == false ? false : true
   end
 
@@ -139,7 +148,9 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     if location_rule['expression']
       location_cmd += " " + location_rule['expression'].join(' ')
     end
-    pcs('create', location_cmd)
+    Puppet.debug("location_rule_create: #{location_cmd}")
+    pcs('create', @resource[:name], location_cmd, @resource[:tries],
+        @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
   end
 
 
@@ -195,68 +206,6 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
   end
 
   def location_rule=(value)
-  end
-
-  def not_empty_string(p)
-    p && p.kind_of?(String) && ! p.empty?
-  end
-
-  def pcs(name, cmd)
-    if name.start_with?("create") && @resource[:verify_on_create]
-      return pcs_create_with_verify(name, cmd)
-    end
-    try_sleep =  @resource[:try_sleep]
-    max_tries = name.include?('show') ? 1 : @resource[:tries]
-    max_tries.times do |try|
-      try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
-      Puppet.debug("#{try_text}/usr/sbin/pcs #{cmd}")
-      pcs_out = `/usr/sbin/pcs #{cmd} 2>&1`
-      if name.include?('show')
-        # return output for good exit or false for failure.
-        return $?.exitstatus == 0 ? pcs_out : false
-      end
-      if $?.exitstatus == 0
-        sleep @resource[:post_success_sleep]
-        return pcs_out
-      end
-      Puppet.debug("Error: #{pcs_out}")
-      if try == max_tries-1
-        pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
-        raise Puppet::Error, "pcs #{name} failed: #{pcs_out_line}"
-      end
-      if try_sleep > 0
-        Puppet.debug("Sleeping for #{try_sleep} seconds between tries")
-        sleep try_sleep
-      end
-    end
-  end
-
-  def pcs_create_with_verify(name, cmd)
-    try_sleep = @resource[:try_sleep]
-    max_tries = @resource[:tries]
-    max_tries.times do |try|
-      try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
-      Puppet.debug("#{try_text}/usr/sbin/pcs #{cmd}")
-      pcs_out = `/usr/sbin/pcs #{cmd} 2>&1`
-      if $?.exitstatus == 0
-        sleep try_sleep
-        cmd_show = "/usr/sbin/pcs resource show "+ @resource[:name]
-        Puppet.debug("Verifying with: "+cmd_show)
-        `#{cmd_show}`
-        if $?.exitstatus == 0
-          return pcs_out
-        else
-          Puppet.debug("Warning: verification of pcs resource creation failed")
-        end
-      else
-        Puppet.debug("Error: #{pcs_out}")
-        sleep try_sleep
-      end
-      if try == max_tries-1
-        pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
-        raise Puppet::Error, "pcs #{name} failed: #{pcs_out_line}"
-      end
-    end
   end
 
 end

@@ -1,3 +1,5 @@
+require_relative '../pcmk_common'
+
 Puppet::Type.type(:pcmk_constraint).provide(:default) do
     desc 'A base constraint definition for a pacemaker constraint'
 
@@ -21,7 +23,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
         end
 
         # do pcs create
-        pcs('create constraint', cmd)
+        pcs('create constraint', resource_name, cmd)
     end
 
     def destroy
@@ -35,7 +37,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
             cmd = 'constraint colocation remove ' + resource_resource + ' ' + resource_location
         end
 
-        pcs('constraint delete', cmd)
+        pcs('constraint delete', resource_name, cmd)
     end
 
     def exists?
@@ -43,7 +45,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
         resource_resource = @resource[:resource].gsub(':', '.')
         resource_location = @resource[:location].gsub(':', '.')
         cmd = 'constraint ' + String(@resource[:constraint_type]) + ' show --full'
-        pcs_out = pcs('show', cmd)
+        pcs_out = pcs('show', resource_name, cmd)
         # find the constraint
         for line in pcs_out.lines.each do
             case @resource[:constraint_type]
@@ -59,23 +61,5 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
         end
         # return false if constraint not found
         false
-    end
-
-    private
-
-    def pcs(name, cmd)
-        pcs_out = `/usr/sbin/pcs #{cmd}`
-        #puts name
-        #puts $?.exitstatus
-        #puts pcs_out
-        if $?.exitstatus != 0 and not name.include? 'show'
-            if pcs_out.lines.first 
-                raise Puppet::Error, "pcs #{name} failed: #{pcs_out.lines.first.chomp!}" if $?.exitstatus
-            else
-                raise Puppet::Error, "pcs #{name} failed" if $?.exitstatus
-            end
-        end
-        # return output for good exit or false for failure.
-        $?.exitstatus == 0 ? pcs_out : false
     end
 end

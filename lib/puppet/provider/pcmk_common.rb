@@ -49,3 +49,64 @@ def push_cib(cib)
   Puppet.debug("push_cib: #{cmd} returned #{ret.exitstatus} -> #{output}")
   return ret.exitstatus
 end
+
+def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
+        verify_on_create=false, post_success_sleep=0)
+  if name.start_with?("create") && verify_on_create
+    return pcs_create_with_verify(name, resource_name, cmd, tries, try_sleep)
+  end
+  max_tries = name.include?('show') ? 1 : tries
+  max_tries.times do |try|
+    try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
+    Puppet.debug("#{try_text}/usr/sbin/pcs #{cmd}")
+    pcs_out = `/usr/sbin/pcs #{cmd} 2>&1`
+    if name.include?('show')
+      # return output for good exit or false for failure.
+      return $?.exitstatus == 0 ? pcs_out : false
+    end
+    if $?.exitstatus == 0
+      sleep post_success_sleep
+      return pcs_out
+    end
+    Puppet.debug("Error: #{pcs_out}")
+    if try == max_tries-1
+      pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
+      raise Puppet::Error, "pcs #{name} failed: #{pcs_out_line}"
+    end
+    if try_sleep > 0
+      Puppet.debug("Sleeping for #{try_sleep} seconds between tries")
+      sleep try_sleep
+    end
+  end
+end
+
+def pcs_create_with_verify(name, resource_name, cmd, tries=1, try_sleep=0)
+  max_tries = tries
+  max_tries.times do |try|
+    try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
+    Puppet.debug("#{try_text}/usr/sbin/pcs #{cmd}")
+    pcs_out = `/usr/sbin/pcs #{cmd} 2>&1`
+    if $?.exitstatus == 0
+      sleep try_sleep
+      cmd_show = "/usr/sbin/pcs resource show " + resource_name
+      Puppet.debug("Verifying with: "+cmd_show)
+      `#{cmd_show}`
+      if $?.exitstatus == 0
+        return pcs_out
+      else
+        Puppet.debug("Warning: verification of pcs resource creation failed")
+      end
+    else
+      Puppet.debug("Error: #{pcs_out}")
+      sleep try_sleep
+    end
+    if try == max_tries-1
+      pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
+      raise Puppet::Error, "pcs #{name} failed: #{pcs_out_line}"
+    end
+  end
+end
+
+def not_empty_string(p)
+  p && p.kind_of?(String) && ! p.empty?
+end
