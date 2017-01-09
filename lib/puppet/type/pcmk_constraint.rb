@@ -11,7 +11,7 @@ Puppet::Type.newtype(:pcmk_constraint) do
 
     newparam(:constraint_type) do
         desc "the pacemaker type to create"
-        newvalues(:location, :colocation)
+        newvalues(:location, :colocation, :order)
     end
     newparam(:resource) do
         desc "resource list"
@@ -23,6 +23,21 @@ Puppet::Type.newtype(:pcmk_constraint) do
     end
     newparam(:score) do
         desc "Score"
+    end
+    newparam(:first_resource) do
+        desc "First resource in ordering constraint"
+    end
+    newparam(:second_resource) do
+        desc "Second resource in ordering constraint"
+    end
+    newparam(:first_action) do
+        desc "First action in ordering constraint"
+    end
+    newparam(:second_action) do
+        desc "Second action in ordering constraint"
+    end
+    newparam(:constraint_params) do
+        desc "Constraint parameters in ordering constraint"
     end
     newparam(:master_slave, :boolean => true, :parent => Puppet::Parameter::Boolean) do
         desc "Enable master/slave support with multistage"
