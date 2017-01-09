@@ -57,21 +57,25 @@ def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
   end
   max_tries = name.include?('show') ? 1 : tries
   max_tries.times do |try|
+    cib = backup_cib()
     try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
-    Puppet.debug("#{try_text}/usr/sbin/pcs #{cmd}")
-    pcs_out = `/usr/sbin/pcs #{cmd} 2>&1`
+    Puppet.debug("#{try_text}/usr/sbin/pcs -f #{cib} #{cmd}")
+    pcs_out = `/usr/sbin/pcs -f #{cib} #{cmd} 2>&1`
     if name.include?('show')
       # return output for good exit or false for failure.
       return $?.exitstatus == 0 ? pcs_out : false
     end
     if $?.exitstatus == 0
-      sleep post_success_sleep
-      return pcs_out
+      # If push_cib failed, we stay in the loop and keep trying
+      if push_cib(cib) == 0
+        sleep post_success_sleep
+        return pcs_out
+      end
     end
     Puppet.debug("Error: #{pcs_out}")
     if try == max_tries-1
       pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
-      raise Puppet::Error, "pcs #{name} failed: #{pcs_out_line}"
+      raise Puppet::Error, "pcs -f #{cib} #{name} failed: #{pcs_out_line}"
     end
     if try_sleep > 0
       Puppet.debug("Sleeping for #{try_sleep} seconds between tries")
