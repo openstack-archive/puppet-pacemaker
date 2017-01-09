@@ -75,53 +75,13 @@ define pacemaker::property (
   # from a pacemaker remote node
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
 
-  # Special-casing node branches due to https://bugzilla.redhat.com/show_bug.cgi?id=1302010
-  # (Basically pcs property show <property> will show all node properties anyway)
-  if $node {
-    if $ensure == absent {
-      exec { "Removing node-property ${property} on ${node}":
-        command   => "/usr/sbin/pcs property unset --node ${node} ${property}",
-        onlyif    => "/usr/sbin/pcs property show | grep ${property}= | grep ${node}",
-        require   => $pcmk_require,
-        tries     => $tries,
-        try_sleep => $try_sleep,
-      }
-    } else {
-      if $force {
-        $cmd = "/usr/sbin/pcs property set --force --node ${node} ${property}=${value}"
-      } else {
-        $cmd = "/usr/sbin/pcs property set --node ${node} ${property}=${value}"
-      }
-      exec { "Creating node-property ${property} on ${node}":
-        command   => $cmd,
-        unless    => "/usr/sbin/pcs property show ${property} | grep \"${property}=${value}\" | grep ${node}",
-        require   => $pcmk_require,
-        tries     => $tries,
-        try_sleep => $try_sleep,
-      }
-    }
-  } else {
-    if $ensure == absent {
-      exec { "Removing cluster-wide property ${property}":
-        command   => "/usr/sbin/pcs property unset ${property}",
-        onlyif    => "/usr/sbin/pcs property show | grep ${property}: ",
-        require   => $pcmk_require,
-        tries     => $tries,
-        try_sleep => $try_sleep,
-      }
-    } else {
-      if $force {
-        $cmd = "/usr/sbin/pcs property set --force ${property}=${value}"
-      } else {
-        $cmd = "/usr/sbin/pcs property set ${property}=${value}"
-      }
-      exec { "Creating cluster-wide property ${property}":
-        command   => $cmd,
-        unless    => "/usr/sbin/pcs property show ${property} | grep \"${property} *[:=] *${value}\"",
-        require   => $pcmk_require,
-        tries     => $tries,
-        try_sleep => $try_sleep,
-      }
-    }
+  pcmk_property { "property-${node}-${property}":
+    ensure    => $ensure,
+    property  => $property,
+    value     => $value,
+    node      => $node,
+    force     => $force,
+    tries     => $tries,
+    try_sleep => $try_sleep,
   }
 }
