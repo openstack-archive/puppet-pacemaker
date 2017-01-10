@@ -28,7 +28,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
         end
 
         # do pcs create
-        pcs('create constraint', resource_name, cmd)
+        pcs('create constraint', resource_name, cmd, @resource[:tries], @resource[:try_sleep])
     end
 
     def destroy
@@ -46,7 +46,7 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
             cmd = 'constraint order remove ' + first_resource + ' ' + second_resource
         end
 
-        pcs('constraint delete', resource_name, cmd)
+        pcs('constraint delete', resource_name, cmd, @resource[:tries], @resource[:try_sleep])
     end
 
     def exists?

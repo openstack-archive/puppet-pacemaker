@@ -20,6 +20,14 @@
 #   (optional) Only used for order constraints, action to take on second resource
 #   Defaults to undef
 #
+# [*tries*]
+#   (optional) How many times to attempt to create the constraint
+#   Defaults to 1
+#
+# [*try_sleep*]
+#   (optional) How long to wait between tries, in seconds
+#   Defaults to 0
+#
 # [*ensure*]
 #   (optional) Whether to make sure the constraint is present or absent
 #   Defaults to present
@@ -60,6 +68,8 @@ define pacemaker::constraint::order (
   $second_action,
   $ensure            = present,
   $constraint_params = undef,
+  $tries             = 1,
+  $try_sleep         = 0,
 ) {
   # We do not want to require Exec['wait-for-settle'] when we run this
   # from a pacemaker remote node
@@ -76,5 +86,7 @@ define pacemaker::constraint::order (
     second_action     => $second_action,
     constraint_params => $constraint_params,
     require           => $pcmk_require,
+    tries             => $tries,
+    try_sleep         => $try_sleep,
   }
 }

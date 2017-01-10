@@ -13,6 +13,14 @@
 # [*score*]
 #   (required) Numeric score to weight the importance of the constraint
 #
+# [*tries*]
+#   (optional) How many times to attempt to create the constraint
+#   Defaults to 1
+#
+# [*try_sleep*]
+#   (optional) How long to wait between tries, in seconds
+#   Defaults to 0
+#
 # [*ensure*]
 #   (optional) Whether to make sure the constraint is present or absent
 #   Defaults to present
@@ -46,7 +54,9 @@ define pacemaker::constraint::location (
   $resource,
   $location,
   $score,
-  $ensure='present'
+  $ensure    = 'present',
+  $tries     = 1,
+  $try_sleep = 0,
 ) {
   # We do not want to require Exec['wait-for-settle'] when we run this
   # from a pacemaker remote node
@@ -58,6 +68,8 @@ define pacemaker::constraint::location (
     location        => $location,
     score           => $score,
     require         => $pcmk_require,
+    tries           => $tries,
+    try_sleep       => $try_sleep,
   }
 }
 

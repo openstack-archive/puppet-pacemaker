@@ -17,6 +17,14 @@
 #   (optional) Whether to set a resource with one node as master
 #   Defaults to false
 #
+# [*tries*]
+#   (optional) How many times to attempt to create the constraint
+#   Defaults to 1
+#
+# [*try_sleep*]
+#   (optional) How long to wait between tries, in seconds
+#   Defaults to 0
+#
 # [*ensure*]
 #   (optional) Whether to make sure the constraint is present or absent
 #   Defaults to present
@@ -52,6 +60,8 @@ define pacemaker::constraint::colocation (
   $score,
   $master_slave = false,
   $ensure       = present,
+  $tries        = 1,
+  $try_sleep    = 0,
 ) {
   # We do not want to require Exec['wait-for-settle'] when we run this
   # from a pacemaker remote node
@@ -65,6 +75,8 @@ define pacemaker::constraint::colocation (
     score           => $score,
     master_slave    => $master_slave,
     require         => $pcmk_require,
+    tries           => $tries,
+    try_sleep       => $try_sleep,
   }
 }
 
