@@ -43,6 +43,12 @@ class pacemaker::params {
         $pcsd_mode = true
         $services_manager = 'systemd'
       }
+      # Starting with 7.3 we have a separate pacemaker-remote package
+      if $::operatingsystemrelease =~ /7\.[012]*$/ {
+        $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
+      } else {
+        $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs', 'pacemaker-remote']
+      }
       $service_name = 'pacemaker'
     }
     default: {
