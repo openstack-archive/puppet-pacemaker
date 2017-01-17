@@ -13,6 +13,9 @@
 # [*ipaddr*]
 #   IPMI Lan IP to talk to
 #
+# [*ipport*]
+#   IPMI LAN port to talk to
+#
 # [*passwd*]
 #   Password (if required) to control power on IPMI device
 #
@@ -90,6 +93,7 @@
 define pacemaker::stonith::fence_ipmilan (
   $auth           = undef,
   $ipaddr         = undef,
+  $ipport         = undef,
   $passwd         = undef,
   $passwd_script  = undef,
   $lanplus        = undef,
@@ -118,6 +122,10 @@ define pacemaker::stonith::fence_ipmilan (
   $ipaddr_chunk = $ipaddr ? {
     undef   => '',
     default => "ipaddr=\"${ipaddr}\"",
+  }
+  $ipport_chunk = $ipport ? {
+    undef   => '',
+    default => "ipport=\"${ipport}\""
   }
   $passwd_chunk = $passwd ? {
     undef   => '',
@@ -187,7 +195,7 @@ define pacemaker::stonith::fence_ipmilan (
       'fence-agents-ipmilan': ensure => installed,
     } ->
     exec { "Create stonith-fence_ipmilan-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_ipmilan-${safe_title} fence_ipmilan pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_ipmilan-${safe_title} fence_ipmilan pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${ipport_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_ipmilan-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,

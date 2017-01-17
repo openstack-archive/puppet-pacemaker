@@ -20,6 +20,11 @@ To use fence_ipmilan with HP iLO 3 or HP iLO 4 you have to enable lanplus option
 		<content type="string" />
 		<shortdesc lang="en">IPMI Lan IP to talk to</shortdesc>
 	</parameter>
+	<parameter name="ipport" unique="0" required="0">
+		<getopt mixed="-u" />
+		<content type="string" />
+		<shortdesc lang="en">IPMI Lan port to talk to</shortdesc>
+	</parameter>
 	<parameter name="passwd" unique="0" required="0">
 		<getopt mixed="-p" />
 		<content type="string" />
