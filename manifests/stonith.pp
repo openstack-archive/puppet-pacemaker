@@ -8,6 +8,14 @@
 #   (optional) Whether to disable stonith
 #   Defaults to true
 #
+# [*tries*]
+#   (optional) How many times to attempt to create the constraint
+#   Defaults to 1
+#
+# [*try_sleep*]
+#   (optional) How long to wait between tries, in seconds
+#   Defaults to 10
+#
 # === Dependencies
 #
 #  None
@@ -33,16 +41,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-class pacemaker::stonith ($disable=true) {
+class pacemaker::stonith (
+  $disable   = true,
+  $tries     = 1,
+  $try_sleep = 10,
+) {
   if $disable == true {
     pacemaker::property { 'Disable STONITH':
-        property => 'stonith-enabled',
-        value    => false,
+        property  => 'stonith-enabled',
+        value     => false,
+        tries     => $tries,
+        try_sleep => $try_sleep,
     }
   } else {
     pacemaker::property { 'Enable STONITH':
-        property => 'stonith-enabled',
-        value    => true,
+        property  => 'stonith-enabled',
+        value     => true,
+        tries     => $tries,
+        try_sleep => $try_sleep,
     }
   }
 }
