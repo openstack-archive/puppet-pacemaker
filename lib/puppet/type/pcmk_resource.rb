@@ -98,4 +98,22 @@ Puppet::Type.newtype(:pcmk_resource) do
   newproperty(:location_rule) do
     desc "A location rule constraint hash"
   end
+  newproperty(:remote_address) do
+    desc "Address for remote resources"
+  end
+  newproperty(:reconnect_interval) do
+    desc "reconnection interval for remote resources"
+    munge do |value|
+      if value.is_a?(String)
+        unless value =~ /^[-\d.]+$/
+          raise ArgumentError, "reconnect_interval must be a number"
+        end
+        value = Float(value)
+      end
+      raise ArgumentError, "reconnect_interval cannot be a negative number" if value < 0
+      value
+    end
+
+    defaultto 60
+  end
 end
