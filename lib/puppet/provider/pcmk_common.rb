@@ -36,8 +36,6 @@ def push_cib(cib)
   cmd = "/usr/sbin/pcs cluster cib-push #{cib}"
   if has_diffagainst
     cmd += " diff-against=#{cib}.orig"
-  else
-    cmd += " --config"
   end
   output = `#{cmd}`
   ret = $?
