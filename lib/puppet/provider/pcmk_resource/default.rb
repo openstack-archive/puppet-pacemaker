@@ -31,6 +31,10 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
 
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
     cmd = 'resource create ' + @resource[:name]+' ' +@resource[:resource_type]
+    if @resource[:resource_type] == 'remote'
+      @resource[:remote_address] ? cmd += ' server=' + @resource[:remote_address] :
+      cmd += " reconnect_interval=#{@resource[:reconnect_interval]}"
+    end
     if not_empty_string(resource_params)
       cmd += ' ' + resource_params
     end
@@ -206,6 +210,20 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
   end
 
   def location_rule=(value)
+  end
+
+  def reconnect_interval
+    @resource[:reconnect_interval]
+  end
+
+  def reconnect_interval=(value)
+  end
+
+  def remote_address
+    @resource[:remote_address]
+  end
+
+  def remote_address=(value)
   end
 
 end
