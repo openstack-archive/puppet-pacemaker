@@ -14,6 +14,7 @@ PuppetLint.configuration.send('disable_140chars')
 PuppetLint.configuration.send('disable_class_inherits_from_params_class')
 PuppetLint.configuration.send('disable_documentation')
 PuppetLint.configuration.send('disable_single_quote_string_with_variables')
+PuppetSyntax.fail_on_deprecation_notices = false
 
 exclude_paths = %w(
   pkg/**/*
