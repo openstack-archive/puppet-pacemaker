@@ -30,6 +30,8 @@ def push_cib(cib)
   cib_orig_digest = Digest::SHA2.file("#{cib}.orig")
   if cib_digest == cib_orig_digest
     Puppet.debug("push_cib: #{cib} and #{cib}.orig were identical, skipping")
+    FileUtils.rm(cib, :force => true)
+    FileUtils.rm("#{cib}.orig", :force => true)
     return 0
   end
   has_diffagainst = `/usr/sbin/pcs cluster cib-push --help`.include? 'diff-against'
@@ -62,6 +64,8 @@ def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
     Puppet.debug("#{try_text}/usr/sbin/pcs -f #{cib} #{cmd}")
     pcs_out = `/usr/sbin/pcs -f #{cib} #{cmd} 2>&1`
     if name.include?('show')
+      FileUtils.rm(cib, :force => true)
+      FileUtils.rm("#{cib}.orig", :force => true)
       # return output for good exit or false for failure.
       return $?.exitstatus == 0 ? pcs_out : false
     end
@@ -74,6 +78,8 @@ def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
     end
     Puppet.debug("Error: #{pcs_out}")
     if try == max_tries-1
+      FileUtils.rm(cib, :force => true)
+      FileUtils.rm("#{cib}.orig", :force => true)
       pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
       raise Puppet::Error, "pcs -f #{cib} #{name} failed: #{pcs_out_line}"
     end
