@@ -21,6 +21,18 @@
 #   Example : {'--token' => '10000', '--ipv6' => '', '--join' => '100' }
 #   Defaults to {}
 #
+# [*cluster_start_timeout*]
+#   (optional) Timeout to wait for cluster start.
+#   Defaults to 300
+#
+# [*cluster_start_tries*]
+#   (optional) Number of tries for cluster start.
+#   Defaults to 10
+#
+# [*cluster_start_try_sleep*]
+#   (optional) Time to sleep after each cluster start try.
+#   Defaults to 20
+#
 # [*manage_fw*]
 #   (optional) Manage or not IPtables rules.
 #   Defaults to true
@@ -73,15 +85,18 @@
 #
 class pacemaker::corosync(
   $cluster_members,
-  $cluster_members_rrp  = undef,
-  $cluster_name         = 'clustername',
-  $cluster_setup_extras = {},
-  $manage_fw            = true,
-  $remote_authkey       = undef,
-  $settle_timeout       = '3600',
-  $settle_tries         = '360',
-  $settle_try_sleep     = '10',
-  $setup_cluster        = true,
+  $cluster_members_rrp     = undef,
+  $cluster_name            = 'clustername',
+  $cluster_setup_extras    = {},
+  $cluster_start_timeout   = '300',
+  $cluster_start_tries     = '10',
+  $cluster_start_try_sleep = '20',
+  $manage_fw               = true,
+  $remote_authkey          = undef,
+  $settle_timeout          = '3600',
+  $settle_tries            = '360',
+  $settle_try_sleep        = '10',
+  $setup_cluster           = true,
 ) inherits pacemaker {
   include ::pacemaker::params
 
@@ -157,15 +172,18 @@ class pacemaker::corosync(
     ->
     exec {"Create Cluster ${cluster_name}":
       creates => '/etc/cluster/cluster.conf',
-      command => "${::pacemaker::pcs_bin} cluster setup --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
+      command => "${::pacemaker::pcs_bin} cluster setup --wait --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
       unless  => '/usr/bin/test -f /etc/corosync/corosync.conf',
       require => Class['::pacemaker::install'],
     }
     ->
     exec {"Start Cluster ${cluster_name}":
-      unless  => "${::pacemaker::pcs_bin} status >/dev/null 2>&1",
-      command => "${::pacemaker::pcs_bin} cluster start --all",
-      require => Exec["Create Cluster ${cluster_name}"],
+      unless    => "${::pacemaker::pcs_bin} status >/dev/null 2>&1",
+      command   => "${::pacemaker::pcs_bin} cluster start --all",
+      timeout   => $cluster_start_timeout,
+      tries     => $cluster_start_tries,
+      try_sleep => $cluster_start_try_sleep,
+      require   => Exec["Create Cluster ${cluster_name}"],
     }
     if $pacemaker::pcsd_mode {
       Exec['auth-successful-across-all-nodes'] ->
