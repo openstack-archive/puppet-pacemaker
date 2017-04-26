@@ -23,6 +23,11 @@
 #   command
 #   Defaults to ''
 #
+# [*ipv6_addrlabel*]
+#   (optional) The ipv6 label value to be used when creating an ipv6 ip resource
+#   It typically gets set to 99 to avoid using the VIP as a source address.
+#   Defaults to ''
+#
 # [*group_params*]
 #   (optional) Additional group parameters to pass to "pcs create", typically
 #   just the name of the pacemaker resource group
@@ -87,6 +92,7 @@ define pacemaker::resource::ip(
   $ip_address         = undef,
   $cidr_netmask       = '32',
   $nic                = '',
+  $ipv6_addrlabel     = '',
   $group_params       = '',
   $post_success_sleep = 0,
   $tries              = 1,
@@ -94,6 +100,10 @@ define pacemaker::resource::ip(
   $verify_on_create   = false,
   $location_rule      = undef,
   ) {
+  if !is_ipv6_address($ip_address) and $ipv6_addrlabel != '' {
+    fail("ipv6_addrlabel ${ipv6_addrlabel} was specified, but ${ip_address} is not an ipv6 address")
+  }
+
 
   $cidr_option = $cidr_netmask ? {
       ''      => '',
@@ -102,6 +112,10 @@ define pacemaker::resource::ip(
   $nic_option = $nic ? {
       ''      => '',
       default => " nic=${nic}"
+  }
+  $ipv6_addrlabel_option = $ipv6_addrlabel ? {
+      ''      => '',
+      default => " lvs_ipv6_addrlabel=true lvs_ipv6_ipv6_addrlabel=${ipv6_addrlabel}"
   }
 
   # pcs dislikes colons from IPv6 addresses. Replacing them with dots.
@@ -113,7 +127,7 @@ define pacemaker::resource::ip(
   pcmk_resource { "ip-${resource_name}":
     ensure             => $ensure,
     resource_type      => 'IPaddr2',
-    resource_params    => "ip=${ip_address}${cidr_option}${nic_option}",
+    resource_params    => join(['ip=', $ip_address, $cidr_option, $nic_option, $ipv6_addrlabel_option]),
     group_params       => $group_params,
     post_success_sleep => $post_success_sleep,
     tries              => $tries,
