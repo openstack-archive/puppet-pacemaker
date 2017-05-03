@@ -115,7 +115,7 @@ define pacemaker::resource::ip(
   }
   $ipv6_addrlabel_option = $ipv6_addrlabel ? {
       ''      => '',
-      default => " lvs_ipv6_addrlabel=true lvs_ipv6_ipv6_addrlabel=${ipv6_addrlabel}"
+      default => " lvs_ipv6_addrlabel=true lvs_ipv6_addrlabel_value=${ipv6_addrlabel}"
   }
 
   # pcs dislikes colons from IPv6 addresses. Replacing them with dots.
