@@ -83,5 +83,6 @@ define pacemaker::property (
     force     => $force,
     tries     => $tries,
     try_sleep => $try_sleep,
+    require   => $pcmk_require,
   }
 }
