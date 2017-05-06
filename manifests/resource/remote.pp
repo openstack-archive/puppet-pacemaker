@@ -38,6 +38,10 @@
 #   (optional) How long to wait between tries, in seconds
 #   Defaults to 0
 #
+# [*verify_on_create*]
+#   (optional) Whether to verify creation of resource
+#   Defaults to false
+#
 # [*location_rule*]
 #   (optional) Add a location constraint before actually enabling
 #   the resource. Must be a hash like the following example:
@@ -84,6 +88,7 @@ define pacemaker::resource::remote(
   $op_params          = '',
   $tries              = 1,
   $try_sleep          = 0,
+  $verify_on_create   = false,
   $location_rule      = undef,
 ) {
   # We do not want to require Exec['wait-for-settle'] when we run this
@@ -100,6 +105,7 @@ define pacemaker::resource::remote(
     op_params          => $op_params,
     tries              => $tries,
     try_sleep          => $try_sleep,
+    verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
     require            => $pcmk_require,
   }
