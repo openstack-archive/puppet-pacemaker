@@ -36,6 +36,10 @@
 #   just the name of the pacemaker resource group
 #   Defaults to undef
 #
+# [*bundle*]
+#   (optional) Bundle id that this resource should be part of
+#   Defaults to undef
+#
 # [*post_success_sleep*]
 #   (optional) How long to wait acfter successful action
 #   Defaults to 0
@@ -98,6 +102,7 @@ define pacemaker::resource::route(
   $nic                = '',
   $clone_params       = undef,
   $group_params       = undef,
+  $bundle             = undef,
   $post_success_sleep = 0,
   $tries              = 1,
   $try_sleep          = 0,
@@ -134,6 +139,7 @@ define pacemaker::resource::route(
     resource_params    => "${dest_option} ${src_option} ${nic_option} ${gw_option}",
     group_params       => $group_params,
     clone_params       => $clone_params,
+    bundle             => $bundle,
     post_success_sleep => $post_success_sleep,
     tries              => $tries,
     try_sleep          => $try_sleep,

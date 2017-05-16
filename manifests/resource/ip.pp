@@ -33,6 +33,10 @@
 #   just the name of the pacemaker resource group
 #   Defaults to ''
 #
+# [*bundle*]
+#   (optional) Bundle id that this resource should be part of
+#   Defaults to undef
+#
 # [*post_success_sleep*]
 #   (optional) How long to wait acfter successful action
 #   Defaults to 0
@@ -94,6 +98,7 @@ define pacemaker::resource::ip(
   $nic                = '',
   $ipv6_addrlabel     = '',
   $group_params       = '',
+  $bundle             = undef,
   $post_success_sleep = 0,
   $tries              = 1,
   $try_sleep          = 0,
@@ -129,6 +134,7 @@ define pacemaker::resource::ip(
     resource_type      => 'IPaddr2',
     resource_params    => join(['ip=', $ip_address, $cidr_option, $nic_option, $ipv6_addrlabel_option]),
     group_params       => $group_params,
+    bundle             => $bundle,
     post_success_sleep => $post_success_sleep,
     tries              => $tries,
     try_sleep          => $try_sleep,
