@@ -248,11 +248,14 @@ define pacemaker::stonith::fence_hpblade (
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
+  # On Pacemaker Remote nodes we don't want a full corosync
+  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
+
   if($ensure == absent) {
     exec { "Delete stonith-fence_hpblade-${safe_title}":
       command => "/usr/sbin/pcs stonith delete stonith-fence_hpblade-${safe_title}",
       onlyif  => "/usr/sbin/pcs stonith show stonith-fence_hpblade-${safe_title} > /dev/null 2>&1",
-      require => Class['pacemaker::corosync'],
+      require => $pcmk_require,
     }
   } else {
     package {
@@ -263,7 +266,7 @@ define pacemaker::stonith::fence_hpblade (
       unless    => "/usr/sbin/pcs stonith show stonith-fence_hpblade-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,
-      require   => Class['pacemaker::corosync'],
+      require   => $pcmk_require,
     } ~>
     exec { "Add non-local constraint for stonith-fence_hpblade-${safe_title}":
       command     => "/usr/sbin/pcs constraint location stonith-fence_hpblade-${safe_title} avoids ${pcmk_host_value_chunk}",
