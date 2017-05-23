@@ -171,10 +171,13 @@ class pacemaker::corosync(
     Exec <|tag == 'pacemaker-auth'|>
     ->
     exec {"Create Cluster ${cluster_name}":
-      creates => '/etc/cluster/cluster.conf',
-      command => "${::pacemaker::pcs_bin} cluster setup --wait --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
-      unless  => '/usr/bin/test -f /etc/corosync/corosync.conf',
-      require => Class['::pacemaker::install'],
+      creates   => '/etc/cluster/cluster.conf',
+      command   => "${::pacemaker::pcs_bin} cluster setup --wait --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
+      timeout   => $cluster_start_timeout,
+      tries     => $cluster_start_tries,
+      try_sleep => $cluster_start_try_sleep,
+      unless    => '/usr/bin/test -f /etc/corosync/corosync.conf',
+      require   => Class['::pacemaker::install'],
     }
     ->
     exec {"Start Cluster ${cluster_name}":
