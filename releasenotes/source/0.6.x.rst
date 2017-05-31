@@ -1,0 +1,6 @@
+===================================
+ 0.6.X Series Release Notes
+===================================
+
+.. release-notes::
+   :branch: origin/stable/0.6.x

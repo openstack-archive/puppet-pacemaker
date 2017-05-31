@@ -9,6 +9,7 @@ Contents
    :maxdepth: 2
 
    unreleased
+   0.6.x
 
 
 Indices and tables
