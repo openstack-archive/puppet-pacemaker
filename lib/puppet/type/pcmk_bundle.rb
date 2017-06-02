@@ -1,15 +1,12 @@
 require 'puppet/parameter/boolean'
 
-Puppet::Type.newtype(:pcmk_resource) do
-  @doc = "Base resource definition for a pacemaker resource"
+Puppet::Type.newtype(:pcmk_bundle) do
+  @doc = "Resource definition for a pacemaker resource bundle"
 
   ensurable
 
   newparam(:name) do
     desc "A unique name for the resource"
-  end
-  newparam(:resource_type) do
-    desc "the pacemaker type to create"
   end
 
   newparam(:post_success_sleep) do
@@ -77,46 +74,55 @@ Puppet::Type.newtype(:pcmk_resource) do
      defaultto false
    end
 
-  newproperty(:op_params) do
-    desc "op parameters"
+  newproperty(:image) do
+    desc "docker image"
   end
-  newproperty(:meta_params) do
-    desc "meta parameters"
+  newproperty(:container_options) do
+    desc "options to pcs container argument"
   end
-  newproperty(:resource_params) do
-    desc "resource parameters"
+  newproperty(:replicas) do
+    desc "number of replicas"
+
+    munge do |value|
+      if value.is_a?(String)
+        unless value =~ /^[\d]+$/
+          raise ArgumentError, "Tries must be an integer"
+        end
+        value = Integer(value)
+      end
+      raise ArgumentError, "Tries must be an integer >= 1" if value < 1
+      value
+    end
   end
-  newproperty(:clone_params) do
-    desc "clone params"
+
+  newproperty(:masters) do
+    desc "number of masters"
+
+    munge do |value|
+      if value.is_a?(String)
+        unless value =~ /^[\d]+$/
+          raise ArgumentError, "Tries must be an integer"
+        end
+        value = Integer(value)
+      end
+      raise ArgumentError, "Tries must be an integer >= 1" if value < 1
+      value
+    end
   end
-  newproperty(:group_params) do
-    desc "A resource group to put the resource in"
+
+  newproperty(:options) do
+    desc "docker options"
   end
-  newproperty(:master_params) do
-    desc "set if this is a cloned resource"
+  newproperty(:run_command) do
+    desc "dock run command"
   end
-  newproperty(:bundle) do
-    desc "set to bundle id if part of a bundle"
+  newproperty(:storage_maps) do
+    desc "storage maps"
+  end
+  newproperty(:network) do
+    desc "network options"
   end
   newproperty(:location_rule) do
     desc "A location rule constraint hash"
-  end
-  newproperty(:remote_address) do
-    desc "Address for remote resources"
-  end
-  newproperty(:reconnect_interval) do
-    desc "reconnection interval for remote resources"
-    munge do |value|
-      if value.is_a?(String)
-        unless value =~ /^[-\d.]+$/
-          raise ArgumentError, "reconnect_interval must be a number"
-        end
-        value = Float(value)
-      end
-      raise ArgumentError, "reconnect_interval cannot be a negative number" if value < 0
-      value
-    end
-
-    defaultto 60
   end
 end

@@ -30,6 +30,10 @@
 #   (optional) Additional op parameters to pass to "pcs create"
 #   Defaults to ''
 #
+# [*bundle*]
+#   (optional) Bundle id that this resource should be part of
+#   Defaults to undef
+#
 # [*tries*]
 #   (optional) How many times to attempt to create the resource
 #   Defaults to 1
@@ -86,6 +90,7 @@ define pacemaker::resource::remote(
   $resource_params    = '',
   $meta_params        = '',
   $op_params          = '',
+  $bundle             = undef,
   $tries              = 1,
   $try_sleep          = 0,
   $verify_on_create   = false,
@@ -103,6 +108,7 @@ define pacemaker::resource::remote(
     resource_params    => $resource_params,
     meta_params        => $meta_params,
     op_params          => $op_params,
+    bundle             => $bundle,
     tries              => $tries,
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
