@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added the pacemaker::resource::bundle support which supports the creation of 'pacemaker
+    bundles' which are special resources to manage containers and resources running inside
+    them. See http://wiki.clusterlabs.org/wiki/Bundle_Walk-Through for additional information.
