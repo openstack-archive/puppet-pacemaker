@@ -118,11 +118,6 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
       return true
     end
     constraint_name = 'location-' + @resource[:name]
-    if @resource[:clone_params]
-      constraint_name += '-clone'
-    elsif @resource[:master_params]
-      constraint_name += '-master'
-    end
     cmd = "constraint list | grep #{constraint_name} > /dev/null 2>&1"
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
@@ -132,11 +127,6 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
   def location_rule_create(location_rule)
     # The name that pcs will create is location-<name>[-{clone,master}]
     location_cmd = 'constraint location ' + @resource[:name]
-    if clone_params
-      location_cmd += '-clone'
-    elsif master_params
-      location_cmd += '-master'
-    end
     location_cmd += ' rule'
     if location_rule['resource_discovery']
       location_cmd += " resource-discovery=#{location_rule['resource_discovery']}"
