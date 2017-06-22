@@ -23,7 +23,7 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     Puppet.debug("Bundle create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
 
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
-    cmd = 'resource bundle create ' + @resource[:name]+' container image=' + @resource[:image]
+    cmd = 'resource bundle create ' + @resource[:name]+' container docker image=' + @resource[:image]
     if replicas
       cmd += " replicas=#{replicas}"
     end
