@@ -130,9 +130,6 @@ define pacemaker::resource::bundle(
   # target-dir=/var/log options=ro storage-map id=bar-storage-test
   # source-dir=/foo target-dir=/bar options=wr
 
-  # We do not want to require Exec['wait-for-settle'] when we run this
-  # from a pacemaker remote node
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   pcmk_bundle { $name:
     ensure             => $ensure,
     image              => $image,
@@ -148,6 +145,5 @@ define pacemaker::resource::bundle(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
-    require            => $pcmk_require,
   }
 }

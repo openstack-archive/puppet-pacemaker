@@ -58,18 +58,13 @@ define pacemaker::constraint::location (
   $tries     = 1,
   $try_sleep = 0,
 ) {
-  # We do not want to require Exec['wait-for-settle'] when we run this
-  # from a pacemaker remote node
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   pcmk_constraint {"loc-${resource}-${location}":
     ensure          => $ensure,
     constraint_type => location,
     resource        => $resource,
     location        => $location,
     score           => $score,
-    require         => $pcmk_require,
     tries           => $tries,
     try_sleep       => $try_sleep,
   }
 }
-

@@ -226,5 +226,8 @@ class pacemaker::corosync(
     command   => "${::pacemaker::pcs_bin} status | grep -q 'partition with quorum' > /dev/null 2>&1",
     unless    => "${::pacemaker::pcs_bin} status | grep -q 'partition with quorum' > /dev/null 2>&1",
   }
-
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_constraint<||>
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_resource<||>
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_property<||>
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_bundle<||>
 }

@@ -110,9 +110,6 @@ define pacemaker::resource::lsb(
   $verify_on_create   = false,
   $location_rule      = undef,
 ) {
-  # We do not want to require Exec['wait-for-settle'] when we run this
-  # from a pacemaker remote node
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   pcmk_resource { $name:
     ensure             => $ensure,
     resource_type      => "lsb:${service_name}",
@@ -127,6 +124,5 @@ define pacemaker::resource::lsb(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location           => $location_rule,
-    require            => $pcmk_require,
   }
 }

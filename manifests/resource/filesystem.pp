@@ -128,9 +128,6 @@ define pacemaker::resource::filesystem(
     default => "device=${device} directory=${directory} fstype=${fstype} options=\"${fsoptions}\"",
   }
 
-  # We do not want to require Exec['wait-for-settle'] when we run this
-  # from a pacemaker remote node
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   pcmk_resource { $resource_id:
     ensure             => $ensure,
     resource_type      => 'Filesystem',
@@ -145,6 +142,5 @@ define pacemaker::resource::filesystem(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
-    require            => $pcmk_require,
   }
 }

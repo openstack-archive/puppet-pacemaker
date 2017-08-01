@@ -71,10 +71,6 @@ define pacemaker::property (
     fail('When present, must provide value')
   }
 
-  # We do not want to require Exec['wait-for-settle'] when we run this
-  # from a pacemaker remote node
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
-
   pcmk_property { "property-${node}-${property}":
     ensure    => $ensure,
     property  => $property,
@@ -83,6 +79,5 @@ define pacemaker::property (
     force     => $force,
     tries     => $tries,
     try_sleep => $try_sleep,
-    require   => $pcmk_require,
   }
 }

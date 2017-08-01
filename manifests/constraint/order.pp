@@ -71,9 +71,6 @@ define pacemaker::constraint::order (
   $tries             = 1,
   $try_sleep         = 0,
 ) {
-  # We do not want to require Exec['wait-for-settle'] when we run this
-  # from a pacemaker remote node
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Exec['wait-for-settle'] }
   $first_resource_cleaned  = regsubst($first_resource, '(:)', '.', 'G')
   $second_resource_cleaned = regsubst($second_resource, '(:)', '.', 'G')
 
@@ -85,7 +82,6 @@ define pacemaker::constraint::order (
     first_action      => $first_action,
     second_action     => $second_action,
     constraint_params => $constraint_params,
-    require           => $pcmk_require,
     tries             => $tries,
     try_sleep         => $try_sleep,
   }
