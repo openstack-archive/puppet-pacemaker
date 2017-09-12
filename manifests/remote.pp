@@ -26,9 +26,9 @@
 #
 class pacemaker::remote ($remote_authkey) {
   include ::pacemaker::params
-  package { $::pacemaker::params::pcmk_remote_package_list:
-    ensure => installed,
-  } ->
+  ensure_resource('package', $::pacemaker::params::pcmk_remote_package_list, {
+    ensure => present
+  }) ->
   file { 'etc-pacemaker':
     ensure => directory,
     path   => '/etc/pacemaker',
