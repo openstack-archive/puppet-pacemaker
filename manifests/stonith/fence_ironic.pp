@@ -144,28 +144,21 @@ define pacemaker::stonith::fence_ironic (
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  if($ensure == absent) {
-    exec { "Delete stonith-fence_ironic-${safe_title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_ironic-${safe_title}",
-      onlyif  => "/usr/sbin/pcs stonith show stonith-fence_ironic-${safe_title} > /dev/null 2>&1",
-      require => $pcmk_require,
+  $param_string = "${auth_url_chunk} ${login_chunk} ${passwd_chunk} ${tenant_name_chunk} ${pcmk_host_map_chunk} ${debug_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}"
+
+  if $ensure != 'absent' {
+    package { 'fence-agents-ironic':
+      ensure => installed,
     }
-  } else {
-    package {
-      'fence-agents-ironic': ensure => installed,
-    } ->
-    exec { "Create stonith-fence_ironic-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_ironic-${safe_title} fence_ironic ${auth_url_chunk} ${login_chunk} ${passwd_chunk} ${tenant_name_chunk} ${pcmk_host_map_chunk} ${debug_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
-      unless    => "/usr/sbin/pcs stonith show stonith-fence_ironic-${safe_title} > /dev/null 2>&1",
-      tries     => $tries,
-      try_sleep => $try_sleep,
-      require   => $pcmk_require,
-    } ~>
-    exec { "Add non-local constraint for stonith-fence_ironic-${safe_title}":
-      command     => "/usr/sbin/pcs constraint location stonith-fence_ironic-${safe_title} avoids ${pcmk_host_value_chunk}",
-      tries       => $tries,
-      try_sleep   => $try_sleep,
-      refreshonly => true,
-    }
+    Package['fence-agents-ironic'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+  }
+  pcmk_stonith { "stonith-fence_ironic-${safe_title}":
+    ensure           => $ensure,
+    stonith_type     => 'fence_ironic',
+    pcmk_host_list   => $pcmk_host_value_chunk,
+    pcs_param_string => $param_string,
+    require          => $pcmk_require,
+    tries            => $tries,
+    try_sleep        => $try_sleep,
   }
 }

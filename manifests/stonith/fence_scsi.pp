@@ -35,7 +35,7 @@
 #   The desired state of the resource.
 #
 # [*tries*]
-#   The numbre of tries.
+#   The number of tries.
 #
 # [*try_sleep*]
 #   Time to sleep between tries.
@@ -123,28 +123,21 @@ define pacemaker::stonith::fence_scsi (
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  if($ensure == absent) {
-    exec { "Delete stonith-fence_scsi-${safe_title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_scsi-${safe_title}",
-      onlyif  => "/usr/sbin/pcs stonith show stonith-fence_scsi-${safe_title} > /dev/null 2>&1",
-      require => $pcmk_require,
+  $param_string = "${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval}"
+
+  if $ensure != 'absent' {
+    package { 'fence-agents-scsi':
+      ensure => installed,
     }
-  } else {
-    package {
-      'fence-agents-scsi': ensure => installed,
-    } ->
-    exec { "Create stonith-fence_scsi-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_scsi-${safe_title} fence_scsi pcmk_host_list=\"${pcmk_host_value_chunk}\" ${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval}",
-      unless    => "/usr/sbin/pcs stonith show stonith-fence_scsi-${safe_title} > /dev/null 2>&1",
-      tries     => $tries,
-      try_sleep => $try_sleep,
-      require   => $pcmk_require,
-    } ~>
-    exec { "Add non-local constraint for stonith-fence_scsi-${safe_title}":
-      command     => "/usr/sbin/pcs constraint location stonith-fence_scsi-${safe_title} avoids ${pcmk_host_value_chunk}",
-      tries       => $tries,
-      try_sleep   => $try_sleep,
-      refreshonly => true,
-    }
+    Package['fence-agents-scsi'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+  }
+  pcmk_stonith { "stonith-fence_scsi-${safe_title}":
+    ensure           => $ensure,
+    stonith_type     => 'fence_scsi',
+    pcmk_host_list   => $pcmk_host_value_chunk,
+    pcs_param_string => $param_string,
+    require          => $pcmk_require,
+    tries            => $tries,
+    try_sleep        => $try_sleep,
   }
 }
