@@ -37,9 +37,20 @@ Puppet::Type.type(:pcmk_property).provide(:default) do
   def exists?
     property = @resource[:property]
     node = @resource[:node]
+    # If the goal is to have the property present, we need to make sure
+    # exists? returns false in case the property exists but has a different value
+    if @resource[:ensure] == :present
+      # This forces the value to be a string (might be a bool)
+      value = "#{@resource[:value]}"
+    else
+      value = ''
+    end
     cmd = "property show | grep #{property}"
     if not_empty_string(node)
       cmd += " | grep #{node}"
+    end
+    if not_empty_string(value)
+      cmd += " | grep #{value}"
     end
     cmd += " > /dev/null 2>&1"
     ret = pcs('show', @resource[:property], cmd, @resource[:tries], @resource[:try_sleep])
