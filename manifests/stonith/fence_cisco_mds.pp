@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_cisco_mds (
     package { 'fence-agents-cisco-mds':
       ensure => installed,
     }
-    Package['fence-agents-cisco-mds'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-cisco-mds'] -> Pcmk_stonith["stonith-fence_cisco_mds-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_cisco_mds-${safe_title}":
     ensure           => $ensure,

@@ -185,7 +185,7 @@ define pacemaker::stonith::fence_imm (
     package { 'fence-agents-ipmilan':
       ensure => installed,
     }
-    Package['fence-agents-ipmilan'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ipmilan'] -> Pcmk_stonith["stonith-fence_imm-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_imm-${safe_title}":
     ensure           => $ensure,

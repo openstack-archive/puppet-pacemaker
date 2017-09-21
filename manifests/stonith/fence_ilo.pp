@@ -241,7 +241,7 @@ define pacemaker::stonith::fence_ilo (
     package { 'fence-agents-ilo2':
       ensure => installed,
     }
-    Package['fence-agents-ilo2'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ilo2'] -> Pcmk_stonith["stonith-fence_ilo-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ilo-${safe_title}":
     ensure           => $ensure,

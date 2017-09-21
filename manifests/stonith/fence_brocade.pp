@@ -249,7 +249,7 @@ define pacemaker::stonith::fence_brocade (
     package { 'fence-agents-brocade':
       ensure => installed,
     }
-    Package['fence-agents-brocade'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-brocade'] -> Pcmk_stonith["stonith-fence_brocade-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_brocade-${safe_title}":
     ensure           => $ensure,

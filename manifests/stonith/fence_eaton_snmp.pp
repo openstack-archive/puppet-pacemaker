@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_eaton_snmp (
     package { 'fence-agents-eaton-snmp':
       ensure => installed,
     }
-    Package['fence-agents-eaton-snmp'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-eaton-snmp'] -> Pcmk_stonith["stonith-fence_eaton_snmp-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_eaton_snmp-${safe_title}":
     ensure           => $ensure,

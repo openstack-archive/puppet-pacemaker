@@ -125,7 +125,7 @@ define pacemaker::stonith::#{@parser.getAgentName} (
     package { '#{@parser.getPackageName}':
       ensure => installed,
     }
-    Package['#{@parser.getPackageName}'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['#{@parser.getPackageName}'] -> Pcmk_stonith["stonith-#{@parser.getAgentName}-${safe_title}"]
   }
   pcmk_stonith { "stonith-#{@parser.getAgentName}-${safe_title}":
     ensure           => $ensure,

@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_apc_snmp (
     package { 'fence-agents-apc-snmp':
       ensure => installed,
     }
-    Package['fence-agents-apc-snmp'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-apc-snmp'] -> Pcmk_stonith["stonith-fence_apc_snmp-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_apc_snmp-${safe_title}":
     ensure           => $ensure,

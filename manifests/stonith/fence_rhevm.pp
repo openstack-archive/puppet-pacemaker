@@ -249,7 +249,7 @@ define pacemaker::stonith::fence_rhevm (
     package { 'fence-agents-rhevm':
       ensure => installed,
     }
-    Package['fence-agents-rhevm'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-rhevm'] -> Pcmk_stonith["stonith-fence_rhevm-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_rhevm-${safe_title}":
     ensure           => $ensure,

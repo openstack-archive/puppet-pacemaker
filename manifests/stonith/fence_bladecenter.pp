@@ -257,7 +257,7 @@ define pacemaker::stonith::fence_bladecenter (
     package { 'fence-agents-bladecenter':
       ensure => installed,
     }
-    Package['fence-agents-bladecenter'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-bladecenter'] -> Pcmk_stonith["stonith-fence_bladecenter-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_bladecenter-${safe_title}":
     ensure           => $ensure,

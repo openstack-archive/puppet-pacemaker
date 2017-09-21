@@ -233,7 +233,7 @@ define pacemaker::stonith::fence_rsb (
     package { 'fence-agents-rsb':
       ensure => installed,
     }
-    Package['fence-agents-rsb'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-rsb'] -> Pcmk_stonith["stonith-fence_rsb-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_rsb-${safe_title}":
     ensure           => $ensure,

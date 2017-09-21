@@ -153,7 +153,7 @@ define pacemaker::stonith::fence_virt (
     package { 'fence-virt':
       ensure => installed,
     }
-    Package['fence-virt'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-virt'] -> Pcmk_stonith["stonith-fence_virt-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_virt-${safe_title}":
     ensure           => $ensure,

@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_ipdu (
     package { 'fence-agents-ipdu':
       ensure => installed,
     }
-    Package['fence-agents-ipdu'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ipdu'] -> Pcmk_stonith["stonith-fence_ipdu-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ipdu-${safe_title}":
     ensure           => $ensure,

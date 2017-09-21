@@ -249,7 +249,7 @@ define pacemaker::stonith::fence_wti (
     package { 'fence-agents-wti':
       ensure => installed,
     }
-    Package['fence-agents-wti'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-wti'] -> Pcmk_stonith["stonith-fence_wti-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_wti-${safe_title}":
     ensure           => $ensure,

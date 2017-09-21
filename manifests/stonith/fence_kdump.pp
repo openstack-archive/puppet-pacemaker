@@ -129,7 +129,7 @@ define pacemaker::stonith::fence_kdump (
     package { 'fence-agents-kdump':
       ensure => installed,
     }
-    Package['fence-agents-kdump'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-kdump'] -> Pcmk_stonith["stonith-fence_kdump-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_kdump-${safe_title}":
     ensure           => $ensure,

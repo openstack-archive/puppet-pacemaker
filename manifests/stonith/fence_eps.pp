@@ -225,7 +225,7 @@ define pacemaker::stonith::fence_eps (
     package { 'fence-agents-eps':
       ensure => installed,
     }
-    Package['fence-agents-eps'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-eps'] -> Pcmk_stonith["stonith-fence_eps-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_eps-${safe_title}":
     ensure           => $ensure,

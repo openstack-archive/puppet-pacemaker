@@ -257,7 +257,7 @@ define pacemaker::stonith::fence_hpblade (
     package { 'fence-agents-hpblade':
       ensure => installed,
     }
-    Package['fence-agents-hpblade'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-hpblade'] -> Pcmk_stonith["stonith-fence_hpblade-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_hpblade-${safe_title}":
     ensure           => $ensure,

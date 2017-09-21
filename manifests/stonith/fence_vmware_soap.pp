@@ -249,7 +249,7 @@ define pacemaker::stonith::fence_vmware_soap (
     package { 'fence-agents-vmware-soap':
       ensure => installed,
     }
-    Package['fence-agents-vmware-soap'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-vmware-soap'] -> Pcmk_stonith["stonith-fence_vmware_soap-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_vmware_soap-${safe_title}":
     ensure           => $ensure,

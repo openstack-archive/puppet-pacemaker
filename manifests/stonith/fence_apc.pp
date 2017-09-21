@@ -257,7 +257,7 @@ define pacemaker::stonith::fence_apc (
     package { 'fence-agents-apc':
       ensure => installed,
     }
-    Package['fence-agents-apc'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-apc'] -> Pcmk_stonith["stonith-fence_apc-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_apc-${safe_title}":
     ensure           => $ensure,

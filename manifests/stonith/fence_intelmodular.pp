@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_intelmodular (
     package { 'fence-agents-intelmodular':
       ensure => installed,
     }
-    Package['fence-agents-intelmodular'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-intelmodular'] -> Pcmk_stonith["stonith-fence_intelmodular-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_intelmodular-${safe_title}":
     ensure           => $ensure,

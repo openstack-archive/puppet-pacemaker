@@ -257,7 +257,7 @@ define pacemaker::stonith::fence_drac5 (
     package { 'fence-agents-drac5':
       ensure => installed,
     }
-    Package['fence-agents-drac5'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-drac5'] -> Pcmk_stonith["stonith-fence_drac5-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_drac5-${safe_title}":
     ensure           => $ensure,

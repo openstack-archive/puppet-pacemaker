@@ -150,7 +150,7 @@ define pacemaker::stonith::fence_ironic (
     package { 'fence-agents-ironic':
       ensure => installed,
     }
-    Package['fence-agents-ironic'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ironic'] -> Pcmk_stonith["stonith-fence_ironic-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ironic-${safe_title}":
     ensure           => $ensure,

@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_ibmblade (
     package { 'fence-agents-ibmblade':
       ensure => installed,
     }
-    Package['fence-agents-ibmblade'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ibmblade'] -> Pcmk_stonith["stonith-fence_ibmblade-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ibmblade-${safe_title}":
     ensure           => $ensure,

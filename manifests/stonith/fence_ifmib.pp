@@ -273,7 +273,7 @@ define pacemaker::stonith::fence_ifmib (
     package { 'fence-agents-ifmib':
       ensure => installed,
     }
-    Package['fence-agents-ifmib'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ifmib'] -> Pcmk_stonith["stonith-fence_ifmib-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ifmib-${safe_title}":
     ensure           => $ensure,

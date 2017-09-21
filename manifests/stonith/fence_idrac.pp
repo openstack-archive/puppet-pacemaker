@@ -185,7 +185,7 @@ define pacemaker::stonith::fence_idrac (
     package { 'fence-agents-ipmilan':
       ensure => installed,
     }
-    Package['fence-agents-ipmilan'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-ipmilan'] -> Pcmk_stonith["stonith-fence_idrac-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_idrac-${safe_title}":
     ensure           => $ensure,

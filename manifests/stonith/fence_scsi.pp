@@ -129,7 +129,7 @@ define pacemaker::stonith::fence_scsi (
     package { 'fence-agents-scsi':
       ensure => installed,
     }
-    Package['fence-agents-scsi'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+    Package['fence-agents-scsi'] -> Pcmk_stonith["stonith-fence_scsi-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_scsi-${safe_title}":
     ensure           => $ensure,
