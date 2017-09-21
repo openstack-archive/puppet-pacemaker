@@ -19,18 +19,22 @@ describe 'pacemaker::stonith::fence_ipmilan', type: :define do
 
   let(:title) { 'test' }
 
+  let(:pre_condition) { [
+    'class pacemaker::corosync {}',
+    'class { "pacemaker::corosync" : }'
+  ] }
+
+
   shared_examples_for 'pacemaker::stonith::fence_ipmilan' do
     let(:stonith_name) { "stonith-fence_ipmilan-#{title}" }
     context 'with defaults' do
       it {
         is_expected.to contain_package('fence-agents-ipmilan')
-        is_expected.to contain_exec("Create #{stonith_name}").with(
-          :command => "/usr/sbin/pcs stonith create #{stonith_name} fence_ipmilan pcmk_host_list=\"$(/usr/sbin/crm_node -n)\"                 op monitor interval=60s",
-          :unless  => "/usr/sbin/pcs stonith show #{stonith_name} > /dev/null 2>&1"
-        )
-        is_expected.to contain_exec("Add non-local constraint for #{stonith_name}").with(
-          :command => "/usr/sbin/pcs constraint location #{stonith_name} avoids $(/usr/sbin/crm_node -n)"
-        )
+        is_expected.to contain_pcmk_stonith("stonith-fence_ipmilan-#{title}").with(
+          :ensure           => 'present',
+          :pcmk_host_list   => "$(/usr/sbin/crm_node -n)",
+          :stonith_type     => 'fence_ipmilan',
+	)
       }
     end
 
@@ -39,13 +43,12 @@ describe 'pacemaker::stonith::fence_ipmilan', type: :define do
         :ensure => 'absent'
       } }
       it {
-        is_expected.to contain_exec('Delete stonith-fence_ipmilan-test').with(
-          :command => '/usr/sbin/pcs stonith delete stonith-fence_ipmilan-test',
-          :onlyif  => '/usr/sbin/pcs stonith show stonith-fence_ipmilan-test > /dev/null 2>&1'
+        is_expected.to contain_pcmk_stonith("stonith-fence_ipmilan-#{title}").with(
+          :ensure           => 'absent',
+          :pcmk_host_list   => "$(/usr/sbin/crm_node -n)",
+          :stonith_type     => 'fence_ipmilan',
         )
         is_expected.to_not contain_package('fence-agents-ipmilan')
-        is_expected.to_not contain_exec('Create stonith-fence_ipmilan-test')
-        is_expected.to_not contain_exec('Add non-local constraint for stonith-fence_ipmilan-test')
       }
     end
 
@@ -73,15 +76,14 @@ describe 'pacemaker::stonith::fence_ipmilan', type: :define do
 
       it {
         is_expected.to contain_package('fence-agents-ipmilan')
-        is_expected.to contain_exec("Create #{stonith_name}").with(
-          :command => "/usr/sbin/pcs stonith create #{stonith_name} fence_ipmilan pcmk_host_list=\"pcmk_host_list\" auth=\"auth\" ipaddr=\"ipaddr\" ipport=\"ipport\" passwd=\"passwd\" passwd_script=\"passwd_script\" lanplus=\"lanplus\" login=\"login\" action=\"action\" timeout=\"timeout\" cipher=\"cipher\" method=\"method\" power_wait=\"power_wait\" delay=\"delay\" privlvl=\"privlvl\" verbose=\"verbose\"  op monitor interval=60s",
-          :unless  => "/usr/sbin/pcs stonith show #{stonith_name} > /dev/null 2>&1"
-        )
-        is_expected.to contain_exec("Add non-local constraint for #{stonith_name}").with(
-          :command   => "/usr/sbin/pcs constraint location #{stonith_name} avoids pcmk_host_list",
-          :tries     => 1,
-          :try_sleep => 5
-        )
+        is_expected.to contain_pcmk_stonith("stonith-fence_ipmilan-#{title}").with(
+          :ensure           => 'present',
+          :pcmk_host_list   => 'pcmk_host_list',
+          :stonith_type     => 'fence_ipmilan',
+          :pcs_param_string => "auth=\"auth\" ipaddr=\"ipaddr\" ipport=\"ipport\" passwd=\"passwd\" passwd_script=\"passwd_script\" lanplus=\"lanplus\" login=\"login\" action=\"action\" timeout=\"timeout\" cipher=\"cipher\" method=\"method\" power_wait=\"power_wait\" delay=\"delay\" privlvl=\"privlvl\" verbose=\"verbose\"  op monitor interval=60s",
+          :tries            => 1,
+          :try_sleep        => 5,
+	)
       }
 
     end

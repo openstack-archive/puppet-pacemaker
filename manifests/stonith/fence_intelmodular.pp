@@ -89,7 +89,7 @@
 #   The desired state of the resource.
 #
 # [*tries*]
-#   The numbre of tries.
+#   The number of tries.
 #
 # [*try_sleep*]
 #   Time to sleep between tries.
@@ -267,28 +267,21 @@ define pacemaker::stonith::fence_intelmodular (
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  if($ensure == absent) {
-    exec { "Delete stonith-fence_intelmodular-${safe_title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_intelmodular-${safe_title}",
-      onlyif  => "/usr/sbin/pcs stonith show stonith-fence_intelmodular-${safe_title} > /dev/null 2>&1",
-      require => $pcmk_require,
+  $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}"
+
+  if $ensure != 'absent' {
+    package { 'fence-agents-intelmodular':
+      ensure => installed,
     }
-  } else {
-    package {
-      'fence-agents-intelmodular': ensure => installed,
-    } ->
-    exec { "Create stonith-fence_intelmodular-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_intelmodular-${safe_title} fence_intelmodular pcmk_host_list=\"${pcmk_host_value_chunk}\" ${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}",
-      unless    => "/usr/sbin/pcs stonith show stonith-fence_intelmodular-${safe_title} > /dev/null 2>&1",
-      tries     => $tries,
-      try_sleep => $try_sleep,
-      require   => $pcmk_require,
-    } ~>
-    exec { "Add non-local constraint for stonith-fence_intelmodular-${safe_title}":
-      command     => "/usr/sbin/pcs constraint location stonith-fence_intelmodular-${safe_title} avoids ${pcmk_host_value_chunk}",
-      tries       => $tries,
-      try_sleep   => $try_sleep,
-      refreshonly => true,
-    }
+    Package['fence-agents-intelmodular'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+  }
+  pcmk_stonith { "stonith-fence_intelmodular-${safe_title}":
+    ensure           => $ensure,
+    stonith_type     => 'fence_intelmodular',
+    pcmk_host_list   => $pcmk_host_value_chunk,
+    pcs_param_string => $param_string,
+    require          => $pcmk_require,
+    tries            => $tries,
+    try_sleep        => $try_sleep,
   }
 }

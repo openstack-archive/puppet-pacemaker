@@ -14,7 +14,7 @@
 #   IPMI Lan IP to talk to
 #
 # [*ipport*]
-#   IPMI LAN port to talk to
+#   IPMI Lan port to talk to
 #
 # [*passwd*]
 #   Password (if required) to control power on IPMI device
@@ -59,7 +59,7 @@
 #   The desired state of the resource.
 #
 # [*tries*]
-#   The numbre of tries.
+#   The number of tries.
 #
 # [*try_sleep*]
 #   Time to sleep between tries.
@@ -125,7 +125,7 @@ define pacemaker::stonith::fence_ipmilan (
   }
   $ipport_chunk = $ipport ? {
     undef   => '',
-    default => "ipport=\"${ipport}\""
+    default => "ipport=\"${ipport}\"",
   }
   $passwd_chunk = $passwd ? {
     undef   => '',
@@ -187,28 +187,21 @@ define pacemaker::stonith::fence_ipmilan (
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  if($ensure == absent) {
-    exec { "Delete stonith-fence_ipmilan-${safe_title}":
-      command => "/usr/sbin/pcs stonith delete stonith-fence_ipmilan-${safe_title}",
-      onlyif  => "/usr/sbin/pcs stonith show stonith-fence_ipmilan-${safe_title} > /dev/null 2>&1",
-      require => $pcmk_require,
+  $param_string = "${auth_chunk} ${ipaddr_chunk} ${ipport_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}"
+
+  if $ensure != 'absent' {
+    package { 'fence-agents-ipmilan':
+      ensure => installed,
     }
-  } else {
-    package {
-      'fence-agents-ipmilan': ensure => installed,
-    } ->
-    exec { "Create stonith-fence_ipmilan-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_ipmilan-${safe_title} fence_ipmilan pcmk_host_list=\"${pcmk_host_value_chunk}\" ${auth_chunk} ${ipaddr_chunk} ${ipport_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval}",
-      unless    => "/usr/sbin/pcs stonith show stonith-fence_ipmilan-${safe_title} > /dev/null 2>&1",
-      tries     => $tries,
-      try_sleep => $try_sleep,
-      require   => $pcmk_require,
-    } ~>
-    exec { "Add non-local constraint for stonith-fence_ipmilan-${safe_title}":
-      command     => "/usr/sbin/pcs constraint location stonith-fence_ipmilan-${safe_title} avoids ${pcmk_host_value_chunk}",
-      tries       => $tries,
-      try_sleep   => $try_sleep,
-      refreshonly => true,
-    }
+    Package['fence-agents-ipmilan'] -> Pcmk_stonith["stonith-fence_ipmilan-${safe_title}"]
+  }
+  pcmk_stonith { "stonith-fence_ipmilan-${safe_title}":
+    ensure           => $ensure,
+    stonith_type     => 'fence_ipmilan',
+    pcmk_host_list   => $pcmk_host_value_chunk,
+    pcs_param_string => $param_string,
+    require          => $pcmk_require,
+    tries            => $tries,
+    try_sleep        => $try_sleep,
   }
 }
