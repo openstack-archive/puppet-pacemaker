@@ -7,6 +7,22 @@
 # [*defaults*]
 #   (required) Comma separated string of key=value pairs specifying defaults.
 #
+# [*post_success_sleep*]
+#   (optional) How long to wait acfter successful action
+#   Defaults to 0
+#
+# [*tries*]
+#   (optional) How many times to attempt to create the constraint
+#   Defaults to 1
+#
+# [*try_sleep*]
+#   (optional) How long to wait between tries, in seconds
+#   Defaults to 0
+#
+# [*verify_on_create*]
+#   (optional) Whether to verify creation of resource
+#   Defaults to false
+#
 # [*ensure*]
 #   (optional) Whether to create or remove the defaults
 #   Defaults to present
@@ -38,13 +54,21 @@
 #
 class pacemaker::resource_defaults(
   $defaults,
-  $ensure = 'present',
+  $post_success_sleep = 0,
+  $tries              = 1,
+  $try_sleep          = 0,
+  $verify_on_create   = false,
+  $ensure             = 'present',
 ) {
   create_resources(
     'pcmk_resource_default',
     $defaults,
     {
-      ensure => $ensure,
+      ensure             => $ensure,
+      post_success_sleep => $post_success_sleep,
+      tries              => $tries,
+      try_sleep          => $try_sleep,
+      verify_on_create   => $verify_on_create,
     }
   )
 }

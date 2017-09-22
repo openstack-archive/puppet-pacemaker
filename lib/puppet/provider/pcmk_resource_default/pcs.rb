@@ -1,3 +1,5 @@
+require_relative '../pcmk_common'
+
 # Currently the implementation is somewhat naive (will not work great
 # with ensure => absent, unless the correct current value is also
 # specified). For more proper handling, prefetching should be
@@ -13,42 +15,26 @@ Puppet::Type.type(:pcmk_resource_default).provide(:pcs) do
 
     cmd = "resource defaults #{name}='#{value}'"
 
-    pcs(cmd)
+    pcs('create', name, cmd, @resource[:tries], @resource[:try_sleep],
+        @resource[:verify_on_create], @resource[:post_success_sleep])
   end
 
   def destroy
     name = @resource[:name]
 
-    cmd = 'resource defaults #{name}='
-    pcs(cmd)
+    cmd = "resource defaults #{name}="
+    pcs('create', name, cmd, @resource[:tries], @resource[:try_sleep],
+        @resource[:verify_on_create], @resource[:post_success_sleep])
   end
 
   def exists?
     name = @resource[:name]
     value = @resource[:value]
 
-    cmd = 'resource defaults'
-    status, _ = pcs(cmd,
-                    :grep => "^#{name}: #{value}$",
-                    :allow_failure => true)
-    status == 0
-  end
-
-  def pcs(cmd, options={})
-    full_cmd = "pcs #{cmd}"
-
-    if options[:grep]
-      full_cmd += " | grep '#{options[:grep]}'"
-    end
-
-    Puppet.debug("Running #{full_cmd}")
-    output = `#{full_cmd}`
-    status = $?.exitstatus
-
-    if status != 0 && !options[:allow_failure]
-      raise Puppet::Error("#{full_cmd} returned #{status}, output: #{output}")
-    end
-
-    [status, output]
+    cmd = "resource defaults | grep '^#{name}: #{value}\$'"
+    Puppet.debug("defaults exists #{cmd}")
+    status = pcs('show', name, cmd, @resource[:tries], @resource[:try_sleep],
+                 @resource[:verify_on_create], @resource[:post_success_sleep])
+    return status == false ? false : true
   end
 end
