@@ -16,9 +16,11 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
     did_stonith_location_exist = stonith_location_exists?
     did_stonith_resource_exist = stonith_resource_exists?
     Puppet.debug("Create: stonith exists #{did_stonith_resource_exist} location exists #{did_stonith_location_exist}")
-
-    cmd = 'stonith create ' + name + ' ' + stonith_type + ' ' \
-          'pcmk_host_list=' + pcmk_host_list + ' ' + @resource[:pcs_param_string]
+    cmd = 'stonith create ' + name + ' ' + stonith_type + ' '
+    if not_empty_string(pcmk_host_list)
+      cmd += 'pcmk_host_list=' + pcmk_host_list + ' '
+    end
+    cmd += @resource[:pcs_param_string]
 
     # If both the stonith resource and the location do not exist, we create them both
     # if a location_rule is specified otherwise only the resource
@@ -67,17 +69,26 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
   end
 
   def stonith_location_exists?
-    constraint_name = "#{@resource[:name]}"
-    cmd = "constraint location | grep #{constraint_name} > /dev/null 2>&1"
-    ret = pcs('show', @resource[:name], cmd, @resource[:tries],
-              @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-    return ret == false ? false : true
+    # We automatically create the resource location constraint only in the case when
+    # pcmk_host_list is not empty
+    if not_empty_string(@resource[:pcmk_host_list])
+      constraint_name = "#{@resource[:name]}"
+      cmd = "constraint location | grep #{constraint_name} > /dev/null 2>&1"
+      ret = pcs('show', @resource[:name], cmd, @resource[:tries],
+                @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+      return ret == false ? false : true
+    else
+      return true
+    end
   end
 
   def stonith_location_rule_create()
-    location_cmd = "constraint location #{@resource[:name]} avoids #{@resource[:pcmk_host_list]}"
-    Puppet.debug("stonith_location_rule_create: #{location_cmd}")
-    pcs('create', @resource[:name], location_cmd, @resource[:tries],
-        @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+    pcmk_host_list = @resource[:pcmk_host_list]
+    if not_empty_string(pcmk_host_list)
+      location_cmd = "constraint location #{@resource[:name]} avoids #{pcmk_host_list}"
+      Puppet.debug("stonith_location_rule_create: #{location_cmd}")
+      pcs('create', @resource[:name], location_cmd, @resource[:tries],
+          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+    end
   end
 end

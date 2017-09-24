@@ -6,19 +6,20 @@ Puppet::Type.newtype(:pcmk_stonith) do
   ensurable
 
   newparam(:name) do
-    desc "A unique name for the stonith resource"
+    desc "A unique name for the stonith resource."
   end
 
   newparam(:stonith_type) do
-    desc "the pacemaker stonith type to create"
+    desc "The pacemaker stonith type to create."
   end
 
   newparam(:pcmk_host_list) do
-    desc "the pcmk_host_list parameter for pcs"
+    desc "The pcmk_host_list parameter for pcs. When set to the empty
+	  string '', the parameter will not be used when calling pcs."
   end
 
   newparam(:pcs_param_string) do
-    desc "the pacemaker pcs string to use"
+    desc "The pacemaker pcs string to use."
   end
 
   ## borrowed from exec.rb
