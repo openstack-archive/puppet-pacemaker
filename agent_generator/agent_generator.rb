@@ -121,12 +121,7 @@ define pacemaker::stonith::#{@parser.getAgentName} (
 
   $param_string = "#{getChunks} op monitor interval=${interval}"
 
-  if $ensure != 'absent' {
-    package { '#{@parser.getPackageName}':
-      ensure => installed,
-    }
-    Package['#{@parser.getPackageName}'] -> Pcmk_stonith["stonith-#{@parser.getAgentName}-${safe_title}"]
-  }
+#{getPackageSnippet}
   pcmk_stonith { "stonith-#{@parser.getAgentName}-${safe_title}":
     ensure           => $ensure,
     stonith_type     => '#{@parser.getAgentName}',
@@ -138,6 +133,19 @@ define pacemaker::stonith::#{@parser.getAgentName} (
   }
 }
 eos
+  end
+
+  def getPackageSnippet
+    text = ''
+    if @parser.getPackageName != 'None'
+      text += "  if $ensure != 'absent' {\n"
+      text += "    package { '#{@parser.getPackageName}':\n"
+      text += "      ensure => installed,\n"
+      text += "    }\n"
+      text += "    Package['#{@parser.getPackageName}'] -> Pcmk_stonith[\"stonith-#{@parser.getAgentName}-${safe_title}\"]\n"
+      text += "  }"
+    end
+    text
   end
 
   def getManifestDocumentation

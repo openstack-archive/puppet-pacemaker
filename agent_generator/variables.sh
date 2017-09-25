@@ -23,7 +23,7 @@ cmd_pkg_map=(
     "fence_intelmodular:fence-agents-intelmodular"
     "fence_ipdu:fence-agents-ipdu"
     "fence_ipmilan:fence-agents-ipmilan"
-    "fence_ironic:fence-agents-ironic"
+    "fence_ironic:None"
     "fence_kdump:fence-agents-kdump"
     "fence_rhevm:fence-agents-rhevm"
     "fence_rsb:fence-agents-rsb"
