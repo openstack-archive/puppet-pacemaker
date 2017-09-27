@@ -81,6 +81,10 @@ class ManifestGenerator
 # [*pcmk_host_list*]
 #   List of Pacemaker hosts.
 #
+# [*meta_attr*]
+#   (optional) String of meta attributes
+#   Defaults to undef
+#
 # === Dependencies
 #  None
 #
@@ -113,13 +117,18 @@ define pacemaker::stonith::#{@parser.getAgentName} (
     default => $pcmk_host_list,
   }
 
+  $meta_attr_value_chunk = $meta_attr ? {
+    undef   => '',
+    default => "meta ${meta_attr}",
+  }
+
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  $param_string = "#{getChunks} op monitor interval=${interval}"
+  $param_string = "#{getChunks} op monitor interval=${interval} ${meta_attr_value_chunk}"
 
 #{getPackageSnippet}
   pcmk_stonith { "stonith-#{@parser.getAgentName}-${safe_title}":
@@ -164,6 +173,7 @@ eos
     }
 
     text += "\n"
+    text += format_param('meta_attr', 'undef')
     text += format_param('interval', "'60s'")
     text += format_param('ensure', 'present')
     text += format_param('pcmk_host_list')

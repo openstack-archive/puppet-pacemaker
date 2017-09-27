@@ -97,6 +97,10 @@
 # [*pcmk_host_list*]
 #   List of Pacemaker hosts.
 #
+# [*meta_attr*]
+#   (optional) String of meta attributes
+#   Defaults to undef
+#
 # === Dependencies
 #  None
 #
@@ -147,6 +151,7 @@ define pacemaker::stonith::fence_ipdu (
   $delay                   = undef,
   $retry_on                = undef,
 
+  $meta_attr               = undef,
   $interval                = '60s',
   $ensure                  = present,
   $pcmk_host_list          = undef,
@@ -261,13 +266,18 @@ define pacemaker::stonith::fence_ipdu (
     default => $pcmk_host_list,
   }
 
+  $meta_attr_value_chunk = $meta_attr ? {
+    undef   => '',
+    default => "meta ${meta_attr}",
+  }
+
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval}"
+  $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
     package { 'fence-agents-ipdu':

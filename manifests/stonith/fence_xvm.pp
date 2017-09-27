@@ -91,6 +91,10 @@
 #   (optional) How long to wait between tries
 #   Defaults to undef
 #
+# [*meta_attr*]
+#   (optional) String of meta attributes
+#   Defaults to undef
+#
 # === Dependencies
 #  None
 #
@@ -130,6 +134,7 @@ define pacemaker::stonith::fence_xvm (
   $delay             = undef,
   $domain            = undef,
 
+  $meta_attr         = undef,
   $interval          = '60s',
   $ensure            = present,
   $pcmk_host_list    = undef,
@@ -199,6 +204,11 @@ define pacemaker::stonith::fence_xvm (
     default => $pcmk_host_list,
   }
 
+  $meta_attr_value_chunk = $meta_attr ? {
+    undef   => '',
+    default => "meta ${meta_attr}",
+  }
+
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
@@ -255,7 +265,7 @@ define pacemaker::stonith::fence_xvm (
       'fence-virt': ensure => installed,
     } ->
     exec { "Create stonith-fence_xvm-${safe_title}":
-      command   => "/usr/sbin/pcs stonith create stonith-fence_xvm-${safe_title} fence_xvm pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${ip_family_chunk} ${multicast_address_chunk} ${ipport_chunk} ${retrans_chunk} ${auth_chunk} ${hash_chunk} ${key_file_chunk} ${port_chunk} ${use_uuid_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}",
+      command   => "/usr/sbin/pcs stonith create stonith-fence_xvm-${safe_title} fence_xvm pcmk_host_list=\"${pcmk_host_value_chunk}\" ${debug_chunk} ${ip_family_chunk} ${multicast_address_chunk} ${ipport_chunk} ${retrans_chunk} ${auth_chunk} ${hash_chunk} ${key_file_chunk} ${port_chunk} ${use_uuid_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}",
       unless    => "/usr/sbin/pcs stonith show stonith-fence_xvm-${safe_title} > /dev/null 2>&1",
       tries     => $tries,
       try_sleep => $try_sleep,

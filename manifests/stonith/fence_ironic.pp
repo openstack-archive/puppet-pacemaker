@@ -52,6 +52,10 @@
 # [*pcmk_host_list*]
 #   List of Pacemaker hosts.
 #
+# [*meta_attr*]
+#   (optional) String of meta attributes
+#   Defaults to undef
+#
 # === Dependencies
 #  None
 #
@@ -87,6 +91,7 @@ define pacemaker::stonith::fence_ironic (
   $delay          = undef,
   $domain         = undef,
 
+  $meta_attr      = undef,
   $interval       = '60s',
   $ensure         = present,
   $pcmk_host_list = undef,
@@ -141,13 +146,18 @@ define pacemaker::stonith::fence_ironic (
     default => $pcmk_host_list,
   }
 
+  $meta_attr_value_chunk = $meta_attr ? {
+    undef   => '',
+    default => "meta ${meta_attr}",
+  }
+
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  $param_string = "${debug_chunk} ${auth_url_chunk} ${login_chunk} ${password_chunk} ${tenant_name_chunk} ${pcmk_host_map_chunk} ${action_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval}"
+  $param_string = "${debug_chunk} ${auth_url_chunk} ${login_chunk} ${password_chunk} ${tenant_name_chunk} ${pcmk_host_map_chunk} ${action_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
 
   pcmk_stonith { "stonith-fence_ironic-${safe_title}":

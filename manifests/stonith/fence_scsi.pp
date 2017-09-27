@@ -43,6 +43,10 @@
 # [*pcmk_host_list*]
 #   List of Pacemaker hosts.
 #
+# [*meta_attr*]
+#   (optional) String of meta attributes
+#   Defaults to undef
+#
 # === Dependencies
 #  None
 #
@@ -75,6 +79,7 @@ define pacemaker::stonith::fence_scsi (
   $action         = undef,
   $nodename       = undef,
 
+  $meta_attr      = undef,
   $interval       = '60s',
   $ensure         = present,
   $pcmk_host_list = undef,
@@ -117,13 +122,18 @@ define pacemaker::stonith::fence_scsi (
     default => $pcmk_host_list,
   }
 
+  $meta_attr_value_chunk = $meta_attr ? {
+    undef   => '',
+    default => "meta ${meta_attr}",
+  }
+
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
   # On Pacemaker Remote nodes we don't want a full corosync
   $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
 
-  $param_string = "${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval}"
+  $param_string = "${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
     package { 'fence-agents-scsi':
