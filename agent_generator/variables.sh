@@ -3,6 +3,7 @@
 cmd_pkg_map=(
     "fence_apc:fence-agents-apc"
     "fence_apc_snmp:fence-agents-apc-snmp"
+    "fence_amt:None"
     "fence_bladecenter:fence-agents-bladecenter"
     "fence_brocade:fence-agents-brocade"
     "fence_cisco_mds:fence-agents-cisco-mds"
