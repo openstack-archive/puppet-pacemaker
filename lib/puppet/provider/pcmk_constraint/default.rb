@@ -22,7 +22,11 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
         when :order
             first_resource = @resource[:first_resource].gsub(':', '.')
             second_resource = @resource[:second_resource].gsub(':', '.')
-            cmd = 'constraint order ' + @resource[:first_action] + ' ' + first_resource + ' then ' + @resource[:second_action] + ' ' + second_resource + ' ' + @resource[:constraint_params]
+            constraint_params = @resource[:constraint_params]
+            cmd = 'constraint order ' + @resource[:first_action] + ' ' + first_resource + ' then ' + @resource[:second_action] + ' ' + second_resource
+            if not_empty_string(constraint_params)
+              cmd += ' ' + constraint_params
+            end
         else
             fail(String(@resource[:constraint_type]) + ' is an invalid location type')
         end
