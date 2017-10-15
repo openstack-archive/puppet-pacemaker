@@ -74,7 +74,7 @@ define pacemaker::constraint::order (
   $first_resource_cleaned  = regsubst($first_resource, '(:)', '.', 'G')
   $second_resource_cleaned = regsubst($second_resource, '(:)', '.', 'G')
 
-  pcmk_constraint {"order-${first_resource}-${first_action}-${second_resource}-${second_action}":
+  pcmk_constraint {"order-${first_resource}-${second_resource}":
     ensure            => $ensure,
     constraint_type   => order,
     first_resource    => $first_resource_cleaned,
