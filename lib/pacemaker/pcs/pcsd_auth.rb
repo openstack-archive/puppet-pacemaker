@@ -29,9 +29,9 @@ module Pacemaker
       inside_debug_block = false
       result = []
       output.split("\n").each do |line|
-        inside_debug_block = false if line == '--Debug Output End--'
+        inside_debug_block = false if line =~ /--Debug (Output|Stdout) End--/
         result << line if inside_debug_block
-        inside_debug_block = true if line == '--Debug Output Start--'
+        inside_debug_block = true if line =~ /--Debug (Output|Stdout) Start--/
       end
       return unless result.any?
       result.join("\n")

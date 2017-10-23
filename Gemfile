@@ -11,6 +11,7 @@ def location_for(place, fake_version = nil)
 end
 
 group :test do
+  gem 'jwt', '~> 1.5.6',                                            :require => false
   gem 'nokogiri', '~> 1.6.0',                                       :require => false
   gem 'rake',                                                       :require => false
   gem 'rspec-puppet',                                               :require => false
@@ -26,7 +27,7 @@ group :test do
   gem 'puppet-lint-classes_and_types_beginning_with_digits-check',  :require => false
   gem 'puppet-lint-unquoted_string-check',                          :require => false
   gem 'puppet-lint-variable_contains_upcase',                       :require => false
-  gem 'rubocop',                                                    :require => false
+  gem 'rubocop', '~> 0.50.0',                                       :require => false
   gem 'unicode-display_width',                                      :require => false
   gem 'puppetlabs_spec_helper',                                     :require => false
 end
