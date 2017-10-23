@@ -148,9 +148,7 @@ eos
     text = ''
     if @parser.getPackageName != 'None'
       text += "  if $ensure != 'absent' {\n"
-      text += "    package { '#{@parser.getPackageName}':\n"
-      text += "      ensure => installed,\n"
-      text += "    }\n"
+      text += "    ensure_resource('package', '#{@parser.getPackageName}', { ensure => 'installed' })\n"
       text += "    Package['#{@parser.getPackageName}'] -> Pcmk_stonith[\"stonith-#{@parser.getAgentName}-${safe_title}\"]\n"
       text += "  }"
     end

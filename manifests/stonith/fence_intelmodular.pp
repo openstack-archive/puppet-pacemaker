@@ -280,9 +280,7 @@ define pacemaker::stonith::fence_intelmodular (
   $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${port_chunk} ${snmp_version_chunk} ${community_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${snmp_auth_prot_chunk} ${snmp_sec_level_chunk} ${snmp_priv_prot_chunk} ${snmp_priv_passwd_chunk} ${snmp_priv_passwd_script_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    package { 'fence-agents-intelmodular':
-      ensure => installed,
-    }
+    ensure_resource('package', 'fence-agents-intelmodular', { ensure => 'installed' })
     Package['fence-agents-intelmodular'] -> Pcmk_stonith["stonith-fence_intelmodular-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_intelmodular-${safe_title}":

@@ -264,9 +264,7 @@ define pacemaker::stonith::fence_apc (
   $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${cmd_prompt_chunk} ${secure_chunk} ${port_chunk} ${switch_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${identity_file_chunk} ${ssh_options_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    package { 'fence-agents-apc':
-      ensure => installed,
-    }
+    ensure_resource('package', 'fence-agents-apc', { ensure => 'installed' })
     Package['fence-agents-apc'] -> Pcmk_stonith["stonith-fence_apc-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_apc-${safe_title}":

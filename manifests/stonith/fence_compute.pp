@@ -304,9 +304,7 @@ define pacemaker::stonith::fence_compute (
   $param_string = "${tenant_name_chunk} ${auth_url_chunk} ${port_chunk} ${passwd_script_chunk} ${region_name_chunk} ${passwd_chunk} ${endpoint_type_chunk} ${action_chunk} ${login_chunk} ${plug_chunk} ${username_chunk} ${password_chunk} ${password_script_chunk} ${insecure_chunk} ${domain_chunk} ${instance_filtering_chunk} ${no_shared_storage_chunk} ${record_only_chunk} ${verbose_chunk} ${debug_chunk} ${debug_file_chunk} ${separator_chunk} ${power_wait_chunk} ${login_timeout_chunk} ${delay_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    package { 'fence-agents-compute':
-      ensure => installed,
-    }
+    ensure_resource('package', 'fence-agents-compute', { ensure => 'installed' })
     Package['fence-agents-compute'] -> Pcmk_stonith["stonith-fence_compute-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_compute-${safe_title}":
