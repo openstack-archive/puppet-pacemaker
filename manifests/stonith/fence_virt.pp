@@ -154,8 +154,7 @@ define pacemaker::stonith::fence_virt (
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
-  # On Pacemaker Remote nodes we don't want a full corosync
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
   $param_string = "${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${action_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
@@ -168,7 +167,6 @@ define pacemaker::stonith::fence_virt (
     stonith_type     => 'fence_virt',
     pcmk_host_list   => $pcmk_host_value_chunk,
     pcs_param_string => $param_string,
-    require          => $pcmk_require,
     tries            => $tries,
     try_sleep        => $try_sleep,
   }

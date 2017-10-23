@@ -290,8 +290,7 @@ define pacemaker::stonith::fence_amt (
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
-  # On Pacemaker Remote nodes we don't want a full corosync
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
   $param_string = "${ipport_chunk} ${port_chunk} ${inet6_only_chunk} ${ipaddr_chunk} ${inet4_only_chunk} ${method_chunk} ${passwd_script_chunk} ${passwd_chunk} ${boot_option_chunk} ${action_chunk} ${plug_chunk} ${ip_chunk} ${password_chunk} ${password_script_chunk} ${verbose_chunk} ${debug_chunk} ${debug_file_chunk} ${power_wait_chunk} ${login_timeout_chunk} ${power_timeout_chunk} ${delay_chunk} ${shell_timeout_chunk} ${amttool_path_chunk} ${port_as_ip_chunk} ${retry_on_chunk} ${sudo_chunk} ${use_sudo_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
@@ -301,7 +300,6 @@ define pacemaker::stonith::fence_amt (
     stonith_type     => 'fence_amt',
     pcmk_host_list   => $pcmk_host_value_chunk,
     pcs_param_string => $param_string,
-    require          => $pcmk_require,
     tries            => $tries,
     try_sleep        => $try_sleep,
   }

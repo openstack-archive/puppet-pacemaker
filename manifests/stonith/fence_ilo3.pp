@@ -186,8 +186,7 @@ define pacemaker::stonith::fence_ilo3 (
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
-  # On Pacemaker Remote nodes we don't want a full corosync
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
   $param_string = "${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
@@ -200,7 +199,6 @@ define pacemaker::stonith::fence_ilo3 (
     stonith_type     => 'fence_ilo3',
     pcmk_host_list   => $pcmk_host_value_chunk,
     pcs_param_string => $param_string,
-    require          => $pcmk_require,
     tries            => $tries,
     try_sleep        => $try_sleep,
   }

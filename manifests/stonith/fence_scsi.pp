@@ -130,8 +130,7 @@ define pacemaker::stonith::fence_scsi (
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
-  # On Pacemaker Remote nodes we don't want a full corosync
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
   $param_string = "${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
@@ -144,7 +143,6 @@ define pacemaker::stonith::fence_scsi (
     stonith_type     => 'fence_scsi',
     pcmk_host_list   => $pcmk_host_value_chunk,
     pcs_param_string => $param_string,
-    require          => $pcmk_require,
     tries            => $tries,
     try_sleep        => $try_sleep,
   }
