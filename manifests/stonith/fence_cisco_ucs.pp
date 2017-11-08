@@ -258,8 +258,7 @@ define pacemaker::stonith::fence_cisco_ucs (
   # $title can be a mac address, remove the colons for pcmk resource name
   $safe_title = regsubst($title, ':', '', 'G')
 
-  # On Pacemaker Remote nodes we don't want a full corosync
-  $pcmk_require = str2bool($::pcmk_is_remote) ? { true => [], false => Class['pacemaker::corosync'] }
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
   $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${ssl_chunk} ${notls_chunk} ${port_chunk} ${suborg_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${ssl_secure_chunk} ${ssl_insecure_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
@@ -272,7 +271,6 @@ define pacemaker::stonith::fence_cisco_ucs (
     stonith_type     => 'fence_cisco_ucs',
     pcmk_host_list   => $pcmk_host_value_chunk,
     pcs_param_string => $param_string,
-    require          => $pcmk_require,
     tries            => $tries,
     try_sleep        => $try_sleep,
   }
