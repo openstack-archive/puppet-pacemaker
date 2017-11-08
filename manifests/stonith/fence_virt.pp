@@ -160,9 +160,7 @@ define pacemaker::stonith::fence_virt (
   $param_string = "${debug_chunk} ${serial_device_chunk} ${serial_params_chunk} ${channel_address_chunk} ${ipport_chunk} ${port_chunk} ${action_chunk} ${timeout_chunk} ${delay_chunk} ${domain_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    package { 'fence-virt':
-      ensure => installed,
-    }
+    ensure_resource('package', 'fence-virt', { ensure => 'installed' })
     Package['fence-virt'] -> Pcmk_stonith["stonith-fence_virt-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_virt-${safe_title}":
