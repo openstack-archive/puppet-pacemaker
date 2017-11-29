@@ -8,7 +8,7 @@
 # === Parameters
 #
 # [*tenant_name*]
-#   Keystone Admin Tenant
+#   Keystone Admin Tenant or v3 Project
 #
 # [*auth_url*]
 #   Keystone Admin Auth URL
@@ -51,6 +51,12 @@
 #
 # [*domain*]
 #   DNS domain in which hosts live
+#
+# [*project_domain*]
+#   Keystone v3 Project Domain
+#
+# [*user_domain*]
+#   Keystone v3 User Domain
 #
 # [*instance_filtering*]
 #   Allow instances to be evacuated
@@ -149,6 +155,8 @@ define pacemaker::stonith::fence_compute (
   $password_script    = undef,
   $insecure           = undef,
   $domain             = undef,
+  $project_domain     = undef,
+  $user_domain        = undef,
   $instance_filtering = undef,
   $no_shared_storage  = undef,
   $record_only        = undef,
@@ -232,6 +240,14 @@ define pacemaker::stonith::fence_compute (
     undef   => '',
     default => "domain=\"${domain}\"",
   }
+  $project_domain_chunk = $project_domain ? {
+    undef   => '',
+    default => "project_domain=\"${project_domain}\"",
+  }
+  $user_domain_chunk = $user_domain ? {
+    undef   => '',
+    default => "user_domain=\"${user_domain}\"",
+  }
   $instance_filtering_chunk = $instance_filtering ? {
     undef   => '',
     default => "instance_filtering=\"${instance_filtering}\"",
@@ -300,7 +316,7 @@ define pacemaker::stonith::fence_compute (
 
   Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
-  $param_string = "${tenant_name_chunk} ${auth_url_chunk} ${port_chunk} ${passwd_script_chunk} ${region_name_chunk} ${passwd_chunk} ${endpoint_type_chunk} ${action_chunk} ${login_chunk} ${plug_chunk} ${username_chunk} ${password_chunk} ${password_script_chunk} ${insecure_chunk} ${domain_chunk} ${instance_filtering_chunk} ${no_shared_storage_chunk} ${record_only_chunk} ${verbose_chunk} ${debug_chunk} ${debug_file_chunk} ${separator_chunk} ${power_wait_chunk} ${login_timeout_chunk} ${delay_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
+  $param_string = "${tenant_name_chunk} ${auth_url_chunk} ${port_chunk} ${passwd_script_chunk} ${region_name_chunk} ${passwd_chunk} ${endpoint_type_chunk} ${action_chunk} ${login_chunk} ${plug_chunk} ${username_chunk} ${password_chunk} ${password_script_chunk} ${insecure_chunk} ${domain_chunk} ${project_domain_chunk} ${user_domain_chunk} ${instance_filtering_chunk} ${no_shared_storage_chunk} ${record_only_chunk} ${verbose_chunk} ${debug_chunk} ${debug_file_chunk} ${separator_chunk} ${power_wait_chunk} ${login_timeout_chunk} ${delay_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
     ensure_resource('package', 'fence-agents-compute', { ensure => 'installed' })
