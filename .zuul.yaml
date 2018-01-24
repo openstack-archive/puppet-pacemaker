@@ -1,8 +1,18 @@
 - project:
     name: openstack/puppet-pacemaker
-    templates:
-      - puppet-openstack-check-jobs
-      - puppet-openstack-module-unit-jobs
-    check-tripleo:
+    check:
       jobs:
-        - tripleo-ci-centos-7-ovb-ha-oooq
+        - puppet-openstack-lint:
+            override-checkout: stable/ocata
+        - puppet-openstack-syntax-4:
+            override-checkout: stable/ocata
+        - puppet-openstack-unit-4.8-centos-7:
+            override-checkout: stable/ocata
+    gate:
+      jobs:
+        - puppet-openstack-lint:
+            override-checkout: stable/ocata
+        - puppet-openstack-syntax-4:
+            override-checkout: stable/ocata
+        - puppet-openstack-unit-4.8-centos-7:
+            override-checkout: stable/ocata
