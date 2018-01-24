@@ -3,6 +3,3 @@
     templates:
       - puppet-openstack-check-jobs
       - puppet-openstack-module-unit-jobs
-    check-tripleo:
-      jobs:
-        - tripleo-ci-centos-7-ovb-ha-oooq
