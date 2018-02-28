@@ -11,7 +11,6 @@ log/
 .*.sw
 
 # documentation
-doc
 .yardoc
 .yardwarns
 strings.json
