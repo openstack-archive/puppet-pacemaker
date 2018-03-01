@@ -58,6 +58,10 @@
 #   just one node in cluster.  Else set to true for all nodes.
 #   Defaults to true
 #
+# [*pcsd_debug*]
+#   (optional) Enable pcsd debugging
+#   Defaults to false
+#
 # === Dependencies
 #
 #  None
@@ -97,6 +101,7 @@ class pacemaker::corosync(
   $settle_tries            = '360',
   $settle_try_sleep        = '10',
   $setup_cluster           = true,
+  $pcsd_debug              = false,
 ) inherits pacemaker {
   include ::pacemaker::params
 
@@ -128,6 +133,17 @@ class pacemaker::corosync(
         provider => 'ip6tables',
       }
     }
+
+    $pcsd_debug_str = bool2str($pcsd_debug)
+    file_line { 'pcsd_debug_ini':
+      path    => $::pacemaker::pcsd_sysconfig,
+      line    => "PCSD_DEBUG=${pcsd_debug_str}",
+      match   => '^PCSD_DEBUG=',
+      require => Class['::pacemaker::install'],
+      before  => Service['pcsd'],
+      notify  => Service['pcsd'],
+    }
+
     user { 'hacluster':
       password => pw_hash($::pacemaker::hacluster_pwd, 'SHA-512', fqdn_rand_string(10)),
       groups   => 'haclient',
