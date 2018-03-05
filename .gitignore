@@ -12,7 +12,6 @@ log/
 .tox/
 
 # documentation
-doc
 .yardoc
 .yardwarns
 strings.json
