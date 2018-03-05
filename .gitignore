@@ -9,6 +9,7 @@ log/
 .idea/
 *.iml
 .*.sw
+.tox/
 
 # documentation
 doc
