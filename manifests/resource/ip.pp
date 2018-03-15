@@ -33,6 +33,14 @@
 #   just the name of the pacemaker resource group
 #   Defaults to ''
 #
+# [*meta_params*]
+#   (optional) Additional meta parameters to pass to "pcs create"
+#   Defaults to ''
+#
+# [*op_params*]
+#   (optional) Additional op parameters to pass to "pcs create"
+#   Defaults to ''
+#
 # [*bundle*]
 #   (optional) Bundle id that this resource should be part of
 #   Defaults to undef
@@ -98,6 +106,8 @@ define pacemaker::resource::ip(
   $nic                = '',
   $ipv6_addrlabel     = '',
   $group_params       = '',
+  $meta_params        = '',
+  $op_params          = '',
   $bundle             = undef,
   $post_success_sleep = 0,
   $tries              = 1,
@@ -131,6 +141,8 @@ define pacemaker::resource::ip(
     resource_type      => 'IPaddr2',
     resource_params    => join(['ip=', $ip_address, $cidr_option, $nic_option, $ipv6_addrlabel_option]),
     group_params       => $group_params,
+    meta_params        => $meta_params,
+    op_params          => $op_params,
     bundle             => $bundle,
     post_success_sleep => $post_success_sleep,
     tries              => $tries,
