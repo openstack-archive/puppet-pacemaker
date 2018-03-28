@@ -89,7 +89,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
         location_rule_create(location_rule)
       end
     else
-      raise Puppet::Error, "Invalid create: #{name} resource exists #{did_resource_exist} "
+      raise Puppet::Error, "Invalid create: #{@resource[:name]} resource exists #{did_resource_exist} "
                            "location exists #{did_location_exist} - location_rule #{location_rule}"
     end
   end
