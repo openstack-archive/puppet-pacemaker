@@ -3,8 +3,7 @@ require_relative '../pcmk_common'
 Puppet::Type.type(:pcmk_bundle).provide(:default) do
   desc 'A bundle resource definition for pacemaker'
 
-  ### overloaded methods
-  def create
+  def build_pcs_bundle_cmd
     image = @resource[:image]
     replicas = @resource[:replicas]
     masters = @resource[:masters]
@@ -14,13 +13,6 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     storage_maps = @resource[:storage_maps]
     network = @resource[:network]
     location_rule = @resource[:location_rule]
-
-    # We need to probe the existance of both location and resource
-    # because we do not know why we're being created (if for both or
-    # only for one)
-    did_location_exist = location_exists?
-    did_resource_exist = resource_exists?
-    Puppet.debug("Bundle create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
 
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
     cmd = 'resource bundle create ' + @resource[:name]+' container docker image=' + @resource[:image]
@@ -57,6 +49,19 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     if network
       cmd += ' network ' + network
     end
+    cmd
+  end
+
+  ### overloaded methods
+  def create
+    # We need to probe the existance of both location and resource
+    # because we do not know why we're being created (if for both or
+    # only for one)
+    did_location_exist = location_exists?
+    did_resource_exist = resource_exists?
+    Puppet.debug("Bundle create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
+
+    cmd = build_pcs_bundle_cmd()
 
     # If both the resource and the location do not exist, we create them both
     # if a location_rule is specified otherwise only the resource

@@ -3,8 +3,7 @@ require_relative '../pcmk_common'
 Puppet::Type.type(:pcmk_resource).provide(:default) do
   desc 'A base resource definition for a pacemaker resource'
 
-  ### overloaded methods
-  def create
+  def build_pcs_resource_cmd
     resource_params = @resource[:resource_params]
     meta_params = @resource[:meta_params]
     op_params = @resource[:op_params]
@@ -13,13 +12,6 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     master_params = @resource[:master_params]
     location_rule = @resource[:location_rule]
     bundle = @resource[:bundle]
-
-    # We need to probe the existance of both location and resource
-    # because we do not know why we're being created (if for both or
-    # only for one)
-    did_location_exist = location_exists?
-    did_resource_exist = resource_exists?
-    Puppet.debug("Create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
 
     suffixes = 0
     if clone_params then suffixes +=1 end
@@ -65,6 +57,19 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
         end
       end
     end
+    cmd
+  end
+
+  ### overloaded methods
+  def create
+    # We need to probe the existance of both location and resource
+    # because we do not know why we're being created (if for both or
+    # only for one)
+    did_location_exist = location_exists?
+    did_resource_exist = resource_exists?
+    Puppet.debug("Create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
+
+    cmd = build_pcs_resource_cmd()
 
     # If both the resource and the location do not exist, we create them both
     # if a location_rule is specified otherwise only the resource
