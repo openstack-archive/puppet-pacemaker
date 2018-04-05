@@ -69,7 +69,7 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
       if location_rule
         pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
             @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-        location_rule_create(location_rule)
+        location_rule_create()
         pcs('create', @resource[:name], "resource enable #{@resource[:name]}", @resource[:tries],
             @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
       else
@@ -83,7 +83,7 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     # The location_rule does not exist and the resource does exist
     elsif not did_location_exist and did_resource_exist
       if location_rule
-        location_rule_create(location_rule)
+        location_rule_create()
       end
     else
       raise Puppet::Error, "Invalid create: #{@resource[:name]} resource exists #{did_resource_exist} "
@@ -129,22 +129,8 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     return ret == false ? false : true
   end
 
-  def location_rule_create(location_rule)
-    # The name that pcs will create is location-<name>[-{clone,master}]
-    location_cmd = 'constraint location ' + @resource[:name]
-    location_cmd += ' rule'
-    if location_rule['resource_discovery']
-      location_cmd += " resource-discovery=#{location_rule['resource_discovery']}"
-    end
-    if location_rule['score']
-      location_cmd += " score=#{location_rule['score']}"
-    end
-    if location_rule['score_attribute']
-      location_cmd += " score-attribure=#{location_rule['score_attribute']}"
-    end
-    if location_rule['expression']
-      location_cmd += " " + location_rule['expression'].join(' ')
-    end
+  def location_rule_create()
+    location_cmd = build_pcs_location_rule_cmd(@resource)
     Puppet.debug("location_rule_create: #{location_cmd}")
     pcs('create', @resource[:name], location_cmd, @resource[:tries],
         @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])

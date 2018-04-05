@@ -121,3 +121,35 @@ end
 def not_empty_string(p)
   p && p.kind_of?(String) && ! p.empty?
 end
+
+# Returns the pcs command to create the location rule
+def build_pcs_location_rule_cmd(resource)
+  # The name that pcs will create is location-<name>[-{clone,master}]
+  location_rule = resource[:location_rule]
+  location_cmd = 'constraint location '
+  if resource.propertydefined?(:bundle)
+    location_cmd += resource[:bundle]
+  else
+    location_cmd += resource[:name]
+    if resource.propertydefined?(:clone_params)
+      location_cmd += '-clone'
+    elsif resource.propertydefined?(:master_params)
+      location_cmd += '-master'
+    end
+  end
+  location_cmd += ' rule'
+  if location_rule['resource_discovery']
+    location_cmd += " resource-discovery=#{location_rule['resource_discovery']}"
+  end
+  if location_rule['score']
+    location_cmd += " score=#{location_rule['score']}"
+  end
+  if location_rule['score_attribute']
+    location_cmd += " score-attribure=#{location_rule['score_attribute']}"
+  end
+  if location_rule['expression']
+    location_cmd += " " + location_rule['expression'].join(' ')
+  end
+  Puppet.debug("build_location_rule_cmd: #{location_cmd}")
+  location_cmd
+end
