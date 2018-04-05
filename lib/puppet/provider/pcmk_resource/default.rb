@@ -61,12 +61,20 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
   end
 
   ### overloaded methods
+  def initialize(*args)
+    super(*args)
+    Puppet.debug("puppet-pacemaker: initialize()")
+    # Hash to store the existance state of each resource or location
+    @resources_state = {}
+    @locations_state = {}
+  end
+
   def create
     # We need to probe the existance of both location and resource
     # because we do not know why we're being created (if for both or
     # only for one)
-    did_location_exist = location_exists?
-    did_resource_exist = resource_exists?
+    did_resource_exist = @resources_state[@resource[:name]] == PCMK_NOCHANGENEEDED
+    did_location_exist = @locations_state[@resource[:name]] == PCMK_NOCHANGENEEDED
     Puppet.debug("Create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
 
     cmd = build_pcs_resource_cmd()
@@ -108,8 +116,10 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
   end
 
   def exists?
-    did_location_exist = location_exists?
-    did_resource_exist = resource_exists?
+    @locations_state[@resource[:name]] = location_exists?
+    @resources_state[@resource[:name]] = resource_exists?
+    did_resource_exist = @resources_state[@resource[:name]] == PCMK_NOCHANGENEEDED
+    did_location_exist = @locations_state[@resource[:name]] == PCMK_NOCHANGENEEDED
     Puppet.debug("Exists: resource exists #{did_resource_exist} location exists #{did_location_exist}")
     if did_resource_exist and did_location_exist
       return true
@@ -121,7 +131,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     cmd = 'resource show ' + @resource[:name] + ' > /dev/null 2>&1'
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-    return ret == false ? false : true
+    return ret == false ? PCMK_NOTEXISTS : PCMK_NOCHANGENEEDED
   end
 
   def location_exists?
@@ -129,7 +139,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     # If no location_rule is specified then we treat it as if it
     # always exists
     if not @resource[:location_rule]
-      return true
+      return PCMK_NOCHANGENEEDED
     end
     if bundle
       constraint_name = 'location-' + bundle
@@ -144,7 +154,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     cmd = "constraint list | grep #{constraint_name} > /dev/null 2>&1"
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-    return ret == false ? false : true
+    return ret == false ? PCMK_NOTEXISTS : PCMK_NOCHANGENEEDED
   end
 
   def location_rule_create()

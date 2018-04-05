@@ -1,5 +1,10 @@
 require 'digest'
 
+# Constants that represent the state of a resource/constraint
+PCMK_NOCHANGENEEDED = 0
+PCMK_NOTEXISTS      = 1
+PCMK_CHANGENEEDED   = 2
+
 def delete_cib(cib)
   FileUtils.rm(cib, :force => true)
   FileUtils.rm("#{cib}.orig", :force => true)
