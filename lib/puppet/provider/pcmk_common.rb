@@ -5,6 +5,24 @@ PCMK_NOCHANGENEEDED = 0
 PCMK_NOTEXISTS      = 1
 PCMK_CHANGENEEDED   = 2
 
+# Base temporary CIB backup folder
+PCMK_TMP_BASE = "/var/lib/pacemaker/cib"
+
+# Ruby 2.5 has dropped Dir::Tmpname.make_tmpname
+# https://github.com/ruby/ruby/commit/25d56ea7b7b52dc81af30c92a9a0e2d2dab6ff27
+def pcmk_tmpname((prefix, suffix), n)
+  #Dir::Tmpname.make_tmpname (prefix, suffix), n
+  prefix = (String.try_convert(prefix) or
+            raise ArgumentError, "unexpected prefix: #{prefix.inspect}")
+  suffix &&= (String.try_convert(suffix) or
+              raise ArgumentError, "unexpected suffix: #{suffix.inspect}")
+  t = Time.now.strftime("%Y%m%d")
+  path = "#{prefix}#{t}-#{$$}-#{rand(0x100000000).to_s(36)}".dup
+  path << "-#{n}" if n
+  path << suffix if suffix
+  path
+end
+
 def delete_cib(cib)
   FileUtils.rm(cib, :force => true)
   FileUtils.rm("#{cib}.orig", :force => true)
@@ -15,7 +33,7 @@ end
 # called temporary file + ".orig"
 def backup_cib()
   # We use the pacemaker CIB folder because of its restricted access permissions
-  cib = Dir::Tmpname.make_tmpname "/var/lib/pacemaker/cib/puppet-cib-backup", nil
+  cib = pcmk_tmpname("#{PCMK_TMP_BASE}/puppet-cib-backup", nil)
   cmd = "/usr/sbin/pcs cluster cib #{cib}"
   output = `#{cmd}`
   ret = $?
