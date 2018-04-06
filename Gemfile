@@ -30,6 +30,7 @@ group :test do
   gem 'rubocop', '~> 0.50.0',                                       :require => false
   gem 'unicode-display_width',                                      :require => false
   gem 'puppetlabs_spec_helper',                                     :require => false
+  gem 'serverspec',                                                 :require => false
 end
 
 group :development do
