@@ -69,6 +69,20 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     @locations_state = {}
   end
 
+  def create_resource_and_location(location_rule)
+    cmd = build_pcs_resource_cmd()
+    if location_rule then
+      pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
+          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+      location_rule_create()
+      pcs('create', @resource[:name], "resource enable #{@resource[:name]}", @resource[:tries],
+          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+    else
+      pcs('create', @resource[:name], cmd, @resource[:tries],
+          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+    end
+  end
+
   def create
     # We need to probe the existance of both location and resource
     # because we do not know why we're being created (if for both or
@@ -82,20 +96,10 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     # If both the resource and the location do not exist, we create them both
     # if a location_rule is specified otherwise only the resource
     if not did_location_exist and not did_resource_exist
-      if location_rule
-        pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
-            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-        location_rule_create()
-        pcs('create', @resource[:name], "resource enable #{@resource[:name]}", @resource[:tries],
-            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-      else
-        pcs('create', @resource[:name], cmd, @resource[:tries],
-            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-      end
+      create_resource_and_location(location_rule)
     # If the location_rule already existed, we only create the resource
     elsif did_location_exist and not did_resource_exist
-      pcs('create', @resource[:name], cmd, @resource[:tries],
-          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+      create_resource_and_location(false)
     # The location_rule does not exist and the resource does exist
     elsif not did_location_exist and did_resource_exist
       if location_rule
