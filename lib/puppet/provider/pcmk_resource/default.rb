@@ -69,17 +69,21 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     @locations_state = {}
   end
 
-  def create_resource_and_location(location_rule)
+  def create_resource_and_location(location_rule, needs_update=false)
     cmd = build_pcs_resource_cmd()
-    if location_rule then
-      pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
-          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-      location_rule_create()
-      pcs('create', @resource[:name], "resource enable #{@resource[:name]}", @resource[:tries],
-          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+    if needs_update then
+      pcmk_update_resource(@resource, cmd)
     else
-      pcs('create', @resource[:name], cmd, @resource[:tries],
-          @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+      if location_rule then
+        pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
+            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+        location_rule_create()
+        pcs('create', @resource[:name], "resource enable #{@resource[:name]}", @resource[:tries],
+            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+      else
+        pcs('create', @resource[:name], cmd, @resource[:tries],
+            @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
+      end
     end
   end
 
@@ -89,17 +93,18 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     # only for one)
     did_resource_exist = @resources_state[@resource[:name]] == PCMK_NOCHANGENEEDED
     did_location_exist = @locations_state[@resource[:name]] == PCMK_NOCHANGENEEDED
-    Puppet.debug("Create: resource exists #{did_resource_exist} location exists #{did_location_exist}")
+    Puppet.debug("Create: resource exists #{@resources_state[@resource[:name]]} location exists #{@locations_state[@resource[:name]]}")
+    needs_update = @resources_state[@resource[:name]] == PCMK_CHANGENEEDED
 
     cmd = build_pcs_resource_cmd()
 
     # If both the resource and the location do not exist, we create them both
     # if a location_rule is specified otherwise only the resource
     if not did_location_exist and not did_resource_exist
-      create_resource_and_location(location_rule)
+      create_resource_and_location(location_rule, needs_update)
     # If the location_rule already existed, we only create the resource
     elsif did_location_exist and not did_resource_exist
-      create_resource_and_location(false)
+      create_resource_and_location(false, needs_update)
     # The location_rule does not exist and the resource does exist
     elsif not did_location_exist and did_resource_exist
       if location_rule
@@ -124,7 +129,10 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     @resources_state[@resource[:name]] = resource_exists?
     did_resource_exist = @resources_state[@resource[:name]] == PCMK_NOCHANGENEEDED
     did_location_exist = @locations_state[@resource[:name]] == PCMK_NOCHANGENEEDED
-    Puppet.debug("Exists: resource exists #{did_resource_exist} location exists #{did_location_exist}")
+    Puppet.debug("Exists: resource #{@resource[:name]} exists "\
+                 "#{@resources_state[@resource[:name]]} "\
+                 "location exists #{@locations_state[@resource[:name]]} "\
+                 "resource deep_compare: #{@resource[:deep_compare]}")
     if did_resource_exist and did_location_exist
       return true
     end
@@ -135,7 +143,13 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     cmd = 'resource show ' + @resource[:name] + ' > /dev/null 2>&1'
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
-    return ret == false ? PCMK_NOTEXISTS : PCMK_NOCHANGENEEDED
+    if ret == false then
+      return PCMK_NOTEXISTS
+    end
+    if pcmk_resource_has_changed?(@resource, build_pcs_resource_cmd()) and @resource[:deep_compare] then
+      return PCMK_CHANGENEEDED
+    end
+    return PCMK_NOCHANGENEEDED
   end
 
   def location_exists?
