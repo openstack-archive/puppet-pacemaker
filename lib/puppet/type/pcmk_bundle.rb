@@ -125,4 +125,13 @@ Puppet::Type.newtype(:pcmk_bundle) do
   newproperty(:location_rule) do
     desc "A location rule constraint hash"
   end
+
+  newparam(:deep_compare, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc "Whether to enable deep comparing of resource
+    When set to true a resource will be compared in full (options, meta parameters,..)
+    to the existing one and in case of difference it will be repushed to the CIB
+    Defaults to `false`."
+
+    defaultto false
+  end
 end

@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    A new 'deep_compare' parameter has been added to the pacemaker::resource::* classes (defaulting to false).
+    By default pacemaker does not update resources and will keep doing so. This happens for a number of
+    mostly historical reasons (old non HA-NG OSP releases had way too many relationships between pacemaker
+    resources and puppet-triggered restart would cause havoc on the overcloud, also lack of the code for
+    doing this in puppet-pacemaker was a factor).
+    When set to true additional code comparison logic will be triggered and we will actually update
+    pacemaker resources. We do so by modifying an offline CIB with the manifests resources and then
+    running crm_simulate on it in order to determine if pacemaker would trigger a restart of the resource
+    if the CIB was to be pushed for real on to the cluster. We currently cannot use crm_diff due to a bug
+    where it would trigger too many false positives. Using crm_simulate has one small side-effect. Namely,
+    changes in resource operation timeouts normally do not trigger a resource restart and hence they won't
+    update a resource. Also note that this is currently only supported for resources and bundles (not constraints
+    not stonith resources).

@@ -74,6 +74,11 @@
 #   }
 #   Defaults to undef
 #
+# [*deep_compare*]
+#   (optional) Enable deep comparing of resources and bundles
+#   When set to true a resource will be compared in full (options, meta parameters,..)
+#   to the existing one and in case of difference it will be repushed to the CIB
+#   Defaults to false
 #
 # === Dependencies
 #
@@ -115,6 +120,7 @@ define pacemaker::resource::ocf(
   $try_sleep          = 0,
   $verify_on_create   = false,
   $location_rule      = undef,
+  $deep_compare       = hiera('pacemaker::resource::ocf::deep_compare', false),
 ) {
   pcmk_resource { $name:
     ensure             => $ensure,
@@ -131,5 +137,6 @@ define pacemaker::resource::ocf(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
+    deep_compare       => $deep_compare,
   }
 }
