@@ -146,7 +146,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     if ret == false then
       return PCMK_NOTEXISTS
     end
-    if pcmk_resource_has_changed?(@resource, build_pcs_resource_cmd()) and @resource[:deep_compare] then
+    if @resource[:deep_compare] and pcmk_resource_has_changed?(@resource, build_pcs_resource_cmd()) then
       return PCMK_CHANGENEEDED
     end
     return PCMK_NOCHANGENEEDED
