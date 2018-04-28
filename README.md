@@ -937,7 +937,7 @@ the providers without damaging the system configuration.
 
 - [Pacemaker Explained](http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Pacemaker_Explained/)
 - [Pacemaker Cluster from Scratch](http://clusterlabs.org/doc/en-US/Pacemaker/1.1/html/Clusters_from_Scratch/)
-- [Puppet Types and Providers](https://docs.puppetlabs.com/guides/complete_resource_example.html)
+- [Puppet Types and Providers](https://puppet.com/docs/puppet/5.5/complete_resource_example.html)
 - [RSpec Puppet Test](http://rspec-puppet.com/)
 - [ServerSpec Tests](http://serverspec.org/)
 - [RSpec-Beaker Acceptance Tests](https://github.com/puppetlabs/beaker-rspec)
