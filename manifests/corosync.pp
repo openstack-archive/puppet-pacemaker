@@ -176,6 +176,34 @@ class pacemaker::corosync(
   }
 
   if $setup_cluster {
+    # Detect if we are trying to add some nodes by comparing
+    # $cluster_members and the actual running nodes in the cluster
+    $nodes_added = pcmk_nodes_added($cluster_members)
+    # If we're rerunning this puppet manifest and $cluster_members
+    # contains more nodes than the currently running cluster
+    if count($nodes_added) > 0 {
+      $nodes_added.each |$node_to_add| {
+        exec {"Adding Cluster node: ${node_to_add} to Cluster ${cluster_name}":
+          unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_to_add} .*\"",
+          command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} --wait",
+          timeout   => $cluster_start_timeout,
+          tries     => $cluster_start_tries,
+          try_sleep => $cluster_start_try_sleep,
+          notify    => Exec["node-cluster-start-${node_to_add}"],
+          tag       => 'pacemaker-scaleup',
+        }
+        exec {"node-cluster-start-${node_to_add}":
+          unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_to_add} .*\"",
+          command     => "${::pacemaker::pcs_bin} cluster start ${node_to_add} --wait",
+          timeout     => $cluster_start_timeout,
+          tries       => $cluster_start_tries,
+          try_sleep   => $cluster_start_try_sleep,
+          refreshonly => true,
+          tag         => 'pacemaker-scaleup',
+        }
+      }
+      Exec <|tag == 'pacemaker-auth'|> -> Exec <|tag == 'pacemaker-scaleup'|>
+    }
 
     if ! $cluster_members_rrp {
       $cluster_members_rrp_real = $cluster_members
