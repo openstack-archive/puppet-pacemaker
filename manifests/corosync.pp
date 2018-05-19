@@ -230,8 +230,10 @@ class pacemaker::corosync(
       mode    => '0640',
       content => $remote_authkey,
     }
+    Exec <| title == 'auth-successful-across-all-nodes' |> -> File['etc-pacemaker-authkey']
     if $setup_cluster {
-      File['etc-pacemaker-authkey'] -> Exec["Create Cluster ${cluster_name}"]
+      Exec["Create Cluster ${cluster_name}"] -> File['etc-pacemaker-authkey']
+      File['etc-pacemaker-authkey'] -> Exec["Start Cluster ${cluster_name}"]
     }
   }
 
