@@ -72,7 +72,7 @@
 #   Default: true
 #
 # [*service_override*]
-#   Should the service provider be overriden?
+#   Should the service provider be overridden?
 #   Default: true
 #
 # [*service_provider*]
