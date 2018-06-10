@@ -367,7 +367,7 @@ pacemaker_resource_default { 'resource-stickiness' : value => '100' }
 
 ## pacemaker_property
 
-This tiny type can the the cluster-wide properties.
+This tiny type can the cluster-wide properties.
 
 ### parameters
 
