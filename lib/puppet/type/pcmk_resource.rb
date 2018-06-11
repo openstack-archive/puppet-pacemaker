@@ -128,4 +128,22 @@ Puppet::Type.newtype(:pcmk_resource) do
 
     defaultto false
   end
+
+  newparam(:update_settle_secs) do
+    desc "The time in seconds to wait for the cluster to settle after resource has been updated
+          when :deep_compare kicked in.  Defaults to '600'."
+
+    munge do |value|
+      if value.is_a?(String)
+        unless value =~ /^[-\d.]+$/
+          raise ArgumentError, "update_settle_secs must be a number"
+        end
+        value = Float(value)
+      end
+      raise ArgumentError, "update_settle_secs cannot be a negative number" if value < 0
+      value
+    end
+
+    defaultto 600
+  end
 end

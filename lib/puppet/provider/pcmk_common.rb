@@ -278,6 +278,32 @@ def is_crm_diff_buggy?
   raise Puppet::Error, "#{cmd} failed with (#{ret}): #{cmd_out}"
 end
 
+# same as pcmk_restart_resource? but using crm_diff
+def pcmk_restart_resource_ng?(resource_name, cib)
+  cmd = "/usr/sbin/crm_diff --cib -o #{cib}.orig -n #{cib}"
+  cmd_out = `#{cmd}`
+  ret = $?.exitstatus
+  # crm_diff returns 0 for no differences, 1 for differences, other return codes
+  # for errors
+  if not [0, 1].include? ret
+    delete_cib(cib)
+    raise Puppet::Error, "#{cmd} failed with (#{ret}): #{cmd_out}"
+  end
+  # If crm_diff says there are no differences (ret code 0), we can just
+  # exit and state that nothing needs restarting
+  return false if ret == 0
+  # In case the return code is 1 we will need to make sure that the resource
+  # we were passed is indeed involved in the change detected by crm_diff
+  graph_doc = REXML::Document.new cmd_out
+  # crm_diff --cib -o cib-orig.xml -n cib-vip-update.xml | \
+  #   xmllint --xpath '/diff/change[@operation and contains(@path, "ip-192.168.24.6")]/change-result' -
+  xpath_query = "/diff/change[@operation and contains(@path, \"#{resource_name}\")]/change-result"
+  REXML::XPath.each(graph_doc, xpath_query) do |element|
+    return true
+  end
+  return false
+end
+
 # This given a cib and a resource name, this method returns true if pacemaker
 # will restart the resource false if no action will be taken by pacemaker
 # Note that we need to leverage crm_simulate instead of crm_diff due to:
@@ -315,8 +341,13 @@ def pcmk_resource_has_changed?(resource, cmd_create, is_bundle=false)
     delete_cib(cib)
     raise Puppet::Error, "#{cmd_create} returned error. This should never happen."
   end
-  ret = pcmk_restart_resource?(resource[:name], cib, is_bundle)
-  Puppet.debug("pcmk_resource_has_changed returned #{ret}")
+  if is_crm_diff_buggy?
+    ret = pcmk_restart_resource?(resource[:name], cib, is_bundle)
+    Puppet.debug("pcmk_resource_has_changed returned #{ret}")
+  else
+    ret = pcmk_restart_resource_ng?(resource[:name], cib)
+    Puppet.debug("pcmk_resource_has_changed (ng version) returned #{ret}")
+  end
   delete_cib(cib)
   return ret
 end
@@ -324,7 +355,7 @@ end
 # This function will update a resource by making a cib backup
 # removing the resource and readding it and the push the CIB
 # to the cluster
-def pcmk_update_resource(resource, cmd_create)
+def pcmk_update_resource(resource, cmd_create, settle_timeout_secs=600)
   cib = backup_cib()
   cmd_delete = "resource delete #{resource[:name]}"
   ret = pcs_offline(cmd_delete, cib)
@@ -346,4 +377,9 @@ def pcmk_update_resource(resource, cmd_create)
     end
   end
   push_cib_offline(cib, resource[:tries], resource[:try_sleep], resource[:post_success_sleep])
+  cmd = "/usr/bin/timeout #{settle_timeout_secs} /usr/sbin/crm_resource --wait"
+  cmd_out = `#{cmd}`
+  ret = $?.exitstatus
+  Puppet.debug("pcmk_update_resource: #{cmd} returned (#{ret}): #{cmd_out}")
+  delete_cib(cib)
 end

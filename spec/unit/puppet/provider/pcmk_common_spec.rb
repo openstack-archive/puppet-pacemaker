@@ -10,6 +10,9 @@ describe "pcmk_common functions" do
     FileUtils.cp orig_cib, "cib-noop.xml"
     FileUtils.cp orig_cib, "cib-resource.xml"
     FileUtils.cp orig_cib, "cib-bundle.xml"
+    FileUtils.cp orig_cib, "cib-noop.xml.orig"
+    FileUtils.cp orig_cib, "cib-resource.xml.orig"
+    FileUtils.cp orig_cib, "cib-bundle.xml.orig"
   end
 
   it "pcmk_graph_contain_id? raises proper exception" do
@@ -23,7 +26,6 @@ describe "pcmk_common functions" do
     expect(pcmk_restart_resource?('foo', "cib-noop.xml")).to eq false
     expect(pcmk_restart_resource?('ip-172.16.11.97', "cib-noop.xml")).to eq false
   end
-
   it "pcs_offline update to resource definition" do
     expect(pcs_offline('resource update ip-172.16.11.97 cidr_netmask=31', 'cib-resource.xml')).to eq ""
   end
@@ -55,5 +57,20 @@ describe "pcmk_common functions" do
   it "pcmk_restart_resource? bundle resource" do
     expect(pcmk_restart_resource?('foo', "cib-bundle.xml", true)).to eq false
     expect(pcmk_restart_resource?('test_bundle', "cib-bundle.xml", true)).to eq true
+  end
+
+  context 'when crm_diff is not buggy', if: is_crm_diff_buggy?() == false do
+    it "pcmk_restart_resource_ng? noop" do
+      expect(pcmk_restart_resource_ng?('foo', "cib-noop.xml")).to eq false
+      expect(pcmk_restart_resource_ng?('ip-172.16.11.97', "cib-noop.xml")).to eq false
+    end
+    it "pcmk_restart_resource_ng? vip resource" do
+      expect(pcmk_restart_resource_ng?('foo', "cib-resource.xml")).to eq false
+      expect(pcmk_restart_resource_ng?('ip-172.16.11.97', "cib-resource.xml")).to eq true
+    end
+    it "pcmk_restart_resource_ng? bundle resource" do
+      expect(pcmk_restart_resource_ng?('foo', "cib-bundle.xml")).to eq false
+      expect(pcmk_restart_resource_ng?('test_bundle', "cib-bundle.xml")).to eq true
+    end
   end
 end

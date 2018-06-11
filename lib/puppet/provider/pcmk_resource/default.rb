@@ -72,7 +72,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
   def create_resource_and_location(location_rule, needs_update=false)
     cmd = build_pcs_resource_cmd()
     if needs_update then
-      pcmk_update_resource(@resource, cmd)
+      pcmk_update_resource(@resource, cmd, @resource[:update_settle_secs])
     else
       if location_rule then
         pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
