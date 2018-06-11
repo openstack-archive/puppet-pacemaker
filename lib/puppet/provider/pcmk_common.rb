@@ -235,6 +235,49 @@ def pcmk_graph_contain_id?(resource_name, graph_file, is_bundle=false)
   return false
 end
 
+# we need to check if crm_diff is affected by rhbz#1561617
+# crm_diff --cib -o xml1 -n xml2 will return 1 (aka diff needed)
+# on broken versions. I will return 0 when crm_diff is fixed
+# (aka no changes detected)
+def is_crm_diff_buggy?
+  xml1 = '''
+<cib crm_feature_set="3.0.14" validate-with="pacemaker-2.10" epoch="86" num_updates="125" admin_epoch="0">
+  <configuration>
+    <resources>
+      <bundle id="galera-bundle">
+        <docker image="openstack-mariadb:pcmklatest"/>
+        <storage>
+          <storage-mapping target-dir="/foo" options="rw" id="mysql-foo" source-dir="/foo"/>
+          <storage-mapping target-dir="/bar" options="rw" id="mysql-bar" source-dir="/bar"/>
+        </storage>
+      </bundle>
+    </resources>
+  </configuration>
+</cib>
+'''
+  xml2 = '''
+<cib crm_feature_set="3.0.14" validate-with="pacemaker-2.10" epoch="86" num_updates="125" admin_epoch="0">
+  <configuration>
+    <resources>
+      <bundle id="galera-bundle">
+        <docker image="openstack-mariadb:pcmklatest"/>
+        <storage>
+          <storage-mapping id="mysql-foo" options="rw" source-dir="/foo" target-dir="/foo"/>
+          <storage-mapping id="mysql-bar" options="rw" source-dir="/bar" target-dir="/bar"/>
+        </storage>
+      </bundle>
+    </resources>
+  </configuration>
+</cib>
+'''
+  cmd = "/usr/sbin/crm_diff --cib --original-string='#{xml1}' --new-string='#{xml2}'"
+  cmd_out = `#{cmd}`
+  ret = $?.exitstatus
+  return false if ret == 0
+  return true if ret == 1
+  raise Puppet::Error, "#{cmd} failed with (#{ret}): #{cmd_out}"
+end
+
 # This given a cib and a resource name, this method returns true if pacemaker
 # will restart the resource false if no action will be taken by pacemaker
 # Note that we need to leverage crm_simulate instead of crm_diff due to:
