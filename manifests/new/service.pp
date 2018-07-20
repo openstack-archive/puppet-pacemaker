@@ -3,17 +3,17 @@
 # Manages the Corosync, Pacemaker and Pcsd services
 #
 class pacemaker::new::service (
-  $pcsd_manage        = $::pacemaker::new::params::pcsd_enable,
+  $pcsd_manage        = $::pacemaker::new::params::pcsd_manage,
   $pcsd_enable        = $::pacemaker::new::params::pcsd_enable,
   $pcsd_service       = $::pacemaker::new::params::pcsd_service,
   $pcsd_provider      = $::pacemaker::new::params::pcsd_provider,
   
-  $corosync_manage    = $::pacemaker::new::params::corosync_enable,
+  $corosync_manage    = $::pacemaker::new::params::corosync_manage,
   $corosync_enable    = $::pacemaker::new::params::corosync_enable,
   $corosync_service   = $::pacemaker::new::params::corosync_service,
   $corosync_provider  = $::pacemaker::new::params::corosync_provider,
   
-  $pacemaker_manage   = $::pacemaker::new::params::pacemaker_enable,
+  $pacemaker_manage   = $::pacemaker::new::params::pacemaker_manage,
   $pacemaker_enable   = $::pacemaker::new::params::pacemaker_enable,
   $pacemaker_service  = $::pacemaker::new::params::pacemaker_service,
   $pacemaker_provider = $::pacemaker::new::params::pacemaker_provider,
