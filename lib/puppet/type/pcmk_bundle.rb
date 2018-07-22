@@ -152,4 +152,8 @@ Puppet::Type.newtype(:pcmk_bundle) do
 
     defaultto 600
   end
+  newproperty(:container_backend) do
+    desc "Container backend"
+    defaultto "docker"
+  end
 end
