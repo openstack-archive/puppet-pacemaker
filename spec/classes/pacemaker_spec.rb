@@ -3,7 +3,11 @@ require 'spec_helper'
 describe 'pacemaker::new', type: :class do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
-      let(:facts) { facts }
+      # Work around a puppet-spec issue
+      # https://github.com/rodjek/rspec-puppet/issues/629
+      let(:facts) do
+        facts.merge({initsystem: 'systemd'})
+      end
 
       context 'with default parameters' do
         it { is_expected.to compile.with_all_deps }
