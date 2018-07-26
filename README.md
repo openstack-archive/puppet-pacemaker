@@ -941,4 +941,4 @@ the providers without damaging the system configuration.
 - [RSpec Puppet Test](http://rspec-puppet.com/)
 - [ServerSpec Tests](http://serverspec.org/)
 - [RSpec-Beaker Acceptance Tests](https://github.com/puppetlabs/beaker-rspec)
-
+- [source code repository](https://git.openstack.org/cgit/openstack/puppet-pacemaker)
