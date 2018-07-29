@@ -943,3 +943,4 @@ the providers without damaging the system configuration.
 - [RSpec-Beaker Acceptance Tests](https://github.com/puppetlabs/beaker-rspec)
 - [source code repository](https://git.openstack.org/cgit/openstack/puppet-pacemaker)
 - [Development](https://docs.openstack.org/puppet-openstack-guide/latest/)
+- [Release Notes](https://docs.openstack.org/releasenotes/puppet-pacemaker)
