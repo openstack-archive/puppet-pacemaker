@@ -11,6 +11,7 @@ def location_for(place, fake_version = nil)
 end
 
 group :test do
+  gem 'net-telnet', '~> 0.1.1',                                     :require => false
   gem 'jwt', '~> 1.5.6',                                            :require => false
   gem 'nokogiri', '~> 1.6.0',                                       :require => false
   gem 'rake',                                                       :require => false
