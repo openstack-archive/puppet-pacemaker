@@ -147,7 +147,7 @@ def not_empty_string(p)
 end
 
 # Returns the pcs command to create the location rule
-def build_pcs_location_rule_cmd(resource)
+def build_pcs_location_rule_cmd(resource, force=false)
   # The name that pcs will create is location-<name>[-{clone,master}]
   location_rule = resource[:location_rule]
   location_cmd = 'constraint location '
@@ -174,6 +174,9 @@ def build_pcs_location_rule_cmd(resource)
   if location_rule['expression']
     location_cmd += " " + location_rule['expression'].join(' ')
   end
+  if force
+    location_cmd += ' --force'
+  end
   Puppet.debug("build_pcs_location_rule_cmd: #{location_cmd}")
   location_cmd
 end
@@ -182,8 +185,8 @@ end
 # Much simpler logic compared to pcs()
 # return output for good exit or false for failure.
 def pcs_offline(cmd, cib)
-    Puppet.debug("pcs_offline: /usr/sbin/pcs -f #{cib} #{cmd}")
     pcs_out = `/usr/sbin/pcs -f #{cib} #{cmd}`
+    Puppet.debug("pcs_offline: /usr/sbin/pcs -f #{cib} #{cmd}. Output: #{pcs_out}")
     return $?.exitstatus == 0 ? pcs_out : false
 end
 
@@ -334,26 +337,26 @@ def pcmk_resource_has_changed?(resource, cmd_create, is_bundle=false)
   ret = pcs_offline(cmd_delete, cib)
   if ret == false
     delete_cib(cib)
-    raise Puppet::Error, "#{cmd_delete} returned error. This should never happen."
+    raise Puppet::Error, "pcmk_resource_has_changed? #{cmd_delete} returned error on #{resource[:name]}. This should never happen."
   end
   ret = pcs_offline(cmd_create, cib)
   if ret == false
     delete_cib(cib)
-    raise Puppet::Error, "#{cmd_create} returned error. This should never happen."
+    raise Puppet::Error, "pcmk_resource_has_changed? #{cmd_create} returned error #{resource[:name]}. This should never happen."
   end
   if is_crm_diff_buggy?
     ret = pcmk_restart_resource?(resource[:name], cib, is_bundle)
-    Puppet.debug("pcmk_resource_has_changed returned #{ret}")
+    Puppet.debug("pcmk_resource_has_changed returned #{ret} for resource #{resource[:name]}")
   else
     ret = pcmk_restart_resource_ng?(resource[:name], cib)
-    Puppet.debug("pcmk_resource_has_changed (ng version) returned #{ret}")
+    Puppet.debug("pcmk_resource_has_changed (ng version) returned #{ret} for resource #{resource[:name]}")
   end
   delete_cib(cib)
   return ret
 end
 
 # This function will update a resource by making a cib backup
-# removing the resource and readding it and the push the CIB
+# removing the resource and readding it and then push the CIB
 # to the cluster
 def pcmk_update_resource(resource, cmd_create, settle_timeout_secs=600)
   cib = backup_cib()
@@ -361,19 +364,22 @@ def pcmk_update_resource(resource, cmd_create, settle_timeout_secs=600)
   ret = pcs_offline(cmd_delete, cib)
   if ret == false
     delete_cib(cib)
-    raise Puppet::Error, "#{cmd_delete} returned error. This should never happen."
+    raise Puppet::Error, "pcmk_update_resource #{cmd_delete} returned error on #{resource[:name]}. This should never happen."
   end
   ret = pcs_offline(cmd_create, cib)
   if ret == false
     delete_cib(cib)
-    raise Puppet::Error, "#{cmd_create} returned error. This should never happen."
+    raise Puppet::Error, "pcmk_update_resource #{cmd_create} returned error on #{resource[:name]}. This should never happen."
   end
   if resource[:location_rule] then
-    cmd_location = build_pcs_location_rule_cmd(resource)
+    # Some versions of pcs do not automatically remove the location rule associated to a
+    # bundle. So we might end up here with the location_rule still existing
+    # Let's just force its creation and ignore the fact that it might already be there
+    cmd_location = build_pcs_location_rule_cmd(resource, force=true)
     ret = pcs_offline(cmd_location, cib)
     if ret == false
       delete_cib(cib)
-      raise Puppet::Error, "#{cmd_location} returned error. This should never happen."
+      raise Puppet::Error, "pcmk_update_resource #{cmd_location} returned error on #{resource[:location_rule]}. This should never happen."
     end
   end
   push_cib_offline(cib, resource[:tries], resource[:try_sleep], resource[:post_success_sleep])
