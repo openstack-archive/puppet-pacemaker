@@ -13,9 +13,10 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     storage_maps = @resource[:storage_maps]
     network = @resource[:network]
     location_rule = @resource[:location_rule]
+    container_backend = @resource[:container_backend]
 
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
-    cmd = 'resource bundle create ' + @resource[:name]+' container docker image=' + @resource[:image]
+    cmd = 'resource bundle create ' + @resource[:name]+' container ' + container_backend + ' image=' + @resource[:image]
     if replicas
       cmd += " replicas=#{replicas}"
     end

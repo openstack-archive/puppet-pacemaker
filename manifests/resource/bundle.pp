@@ -131,6 +131,7 @@ define pacemaker::resource::bundle(
   $try_sleep          = 0,
   $verify_on_create   = false,
   $location_rule      = undef,
+  $container_backend  = 'docker',
   $deep_compare       = hiera('pacemaker::resource::bundle::deep_compare', false),
   $update_settle_secs = hiera('pacemaker::resource::bundle::update_settle_secs', 600),
   ) {
@@ -159,6 +160,7 @@ define pacemaker::resource::bundle(
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
     location_rule      => $location_rule,
+    container_backend  => $container_backend,
     deep_compare       => $deep_compare,
     update_settle_secs => $update_settle_secs,
   }
