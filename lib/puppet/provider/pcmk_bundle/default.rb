@@ -234,4 +234,10 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
   def location_rule=(value)
   end
 
+  def container_backend
+    @resource[:container_backend]
+  end
+
+  def container_backend=(value)
+  end
 end
