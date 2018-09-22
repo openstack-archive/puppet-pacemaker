@@ -68,11 +68,11 @@
 #   Default: undef
 #
 # [*create_primitive*]
-#   (optional) Should the Pcemaker primitive be created
+#   (optional) Should the Pacemaker primitive be created
 #   Default: true
 #
 # [*service_override*]
-#   Should the service provider be overriden?
+#   Should the service provider be overridden?
 #   Default: true
 #
 # [*service_provider*]
