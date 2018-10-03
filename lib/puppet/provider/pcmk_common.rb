@@ -9,6 +9,23 @@ PCMK_CHANGENEEDED   = 2
 # Base temporary CIB backup folder
 PCMK_TMP_BASE = "/var/lib/pacemaker/cib"
 
+# Let's use pcs from PATH when it is set:
+# Useful to run pcs from a different path when using
+# containers
+if ENV.has_key?('PATH')
+  PCS_BIN = 'pcs'
+  CRMDIFF_BIN = 'crm_diff'
+  CRMSIMULATE_BIN = 'crm_simulate'
+  CRMRESOURCE_BIN = 'crm_resource'
+  TIMEOUT_BIN = 'timeout'
+else
+  PCS_BIN = '/usr/sbin/pcs'
+  CRMDIFF_BIN = '/usr/sbin/crm_diff'
+  CRMSIMULATE_BIN = '/usr/sbin/crm_simulate'
+  CRMRESOURCE_BIN = '/usr/sbin/crm_resource'
+  TIMEOUT_BIN = '/usr/bin/timeout'
+end
+
 # Ruby 2.5 has dropped Dir::Tmpname.make_tmpname
 # https://github.com/ruby/ruby/commit/25d56ea7b7b52dc81af30c92a9a0e2d2dab6ff27
 def pcmk_tmpname((prefix, suffix), n)
@@ -35,7 +52,7 @@ end
 def backup_cib()
   # We use the pacemaker CIB folder because of its restricted access permissions
   cib = pcmk_tmpname("#{PCMK_TMP_BASE}/puppet-cib-backup", nil)
-  cmd = "/usr/sbin/pcs cluster cib #{cib}"
+  cmd = "#{PCS_BIN} cluster cib #{cib}"
   output = `#{cmd}`
   ret = $?
   if not ret.success?
@@ -62,8 +79,8 @@ def push_cib(cib)
     delete_cib(cib)
     return 0
   end
-  has_diffagainst = `/usr/sbin/pcs cluster cib-push --help`.include? 'diff-against'
-  cmd = "/usr/sbin/pcs cluster cib-push #{cib}"
+  has_diffagainst = `#{PCS_BIN} cluster cib-push --help`.include? 'diff-against'
+  cmd = "#{PCS_BIN} cluster cib-push #{cib}"
   if has_diffagainst
     cmd += " diff-against=#{cib}.orig"
   end
@@ -88,8 +105,8 @@ def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
   max_tries.times do |try|
     cib = backup_cib()
     try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
-    Puppet.debug("#{try_text}/usr/sbin/pcs -f #{cib} #{cmd}")
-    pcs_out = `/usr/sbin/pcs -f #{cib} #{cmd} 2>&1`
+    Puppet.debug("#{try_text}#{PCS_BIN} -f #{cib} #{cmd}")
+    pcs_out = `#{PCS_BIN} -f #{cib} #{cmd} 2>&1`
     if name.include?('show')
       delete_cib(cib)
       # return output for good exit or false for failure.
@@ -119,11 +136,11 @@ def pcs_create_with_verify(name, resource_name, cmd, tries=1, try_sleep=0)
   max_tries = tries
   max_tries.times do |try|
     try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
-    Puppet.debug("#{try_text}/usr/sbin/pcs #{cmd}")
-    pcs_out = `/usr/sbin/pcs #{cmd} 2>&1`
+    Puppet.debug("#{try_text}#{PCS_BIN} #{cmd}")
+    pcs_out = `#{PCS_BIN} #{cmd} 2>&1`
     if $?.exitstatus == 0
       sleep try_sleep
-      cmd_show = "/usr/sbin/pcs resource show " + resource_name
+      cmd_show = "#{PCS_BIN} resource show " + resource_name
       Puppet.debug("Verifying with: "+cmd_show)
       `#{cmd_show}`
       if $?.exitstatus == 0
@@ -185,8 +202,8 @@ end
 # Much simpler logic compared to pcs()
 # return output for good exit or false for failure.
 def pcs_offline(cmd, cib)
-    pcs_out = `/usr/sbin/pcs -f #{cib} #{cmd}`
-    Puppet.debug("pcs_offline: /usr/sbin/pcs -f #{cib} #{cmd}. Output: #{pcs_out}")
+    pcs_out = `#{PCS_BIN} -f #{cib} #{cmd}`
+    Puppet.debug("pcs_offline: #{PCS_BIN} -f #{cib} #{cmd}. Output: #{pcs_out}")
     return $?.exitstatus == 0 ? pcs_out : false
 end
 
@@ -273,7 +290,7 @@ def is_crm_diff_buggy?
   </configuration>
 </cib>
 '''
-  cmd = "/usr/sbin/crm_diff --cib --original-string='#{xml1}' --new-string='#{xml2}'"
+  cmd = "#{CRMDIFF_BIN} --cib --original-string='#{xml1}' --new-string='#{xml2}'"
   cmd_out = `#{cmd}`
   ret = $?.exitstatus
   return false if ret == 0
@@ -283,7 +300,7 @@ end
 
 # same as pcmk_restart_resource? but using crm_diff
 def pcmk_restart_resource_ng?(resource_name, cib)
-  cmd = "/usr/sbin/crm_diff --cib -o #{cib}.orig -n #{cib}"
+  cmd = "#{CRMDIFF_BIN} --cib -o #{cib}.orig -n #{cib}"
   cmd_out = `#{cmd}`
   ret = $?.exitstatus
   # crm_diff returns 0 for no differences, 1 for differences, other return codes
@@ -313,7 +330,7 @@ end
 # https://bugzilla.redhat.com/show_bug.cgi?id=1561617
 def pcmk_restart_resource?(resource_name, cib, is_bundle=false)
   tmpfile = pcmk_tmpname("#{PCMK_TMP_BASE}/puppet-cib-simulate", nil)
-  cmd = "/usr/sbin/crm_simulate -x #{cib} -s -G#{tmpfile}"
+  cmd = "#{CRMSIMULATE_BIN} -x #{cib} -s -G#{tmpfile}"
   crm_out = `#{cmd}`
   if $?.exitstatus != 0
     FileUtils.rm(tmpfile, :force => true)
@@ -383,7 +400,7 @@ def pcmk_update_resource(resource, cmd_create, settle_timeout_secs=600)
     end
   end
   push_cib_offline(cib, resource[:tries], resource[:try_sleep], resource[:post_success_sleep])
-  cmd = "/usr/bin/timeout #{settle_timeout_secs} /usr/sbin/crm_resource --wait"
+  cmd = "#{TIMEOUT_BIN} #{settle_timeout_secs} #{CRMRESOURCE_BIN} --wait"
   cmd_out = `#{cmd}`
   ret = $?.exitstatus
   Puppet.debug("pcmk_update_resource: #{cmd} returned (#{ret}): #{cmd_out}")
