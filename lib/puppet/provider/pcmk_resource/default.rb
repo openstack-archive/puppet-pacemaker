@@ -25,7 +25,10 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
     cmd = 'resource create ' + @resource[:name]+' ' +@resource[:resource_type]
     if @resource[:resource_type] == 'remote'
-      @resource[:remote_address] ? cmd += ' server=' + @resource[:remote_address] :
+      if not_empty_string(@resource[:remote_address])
+        cmd += ' server=' + @resource[:remote_address]
+      end
+      # reconnect_interval always has a default
       cmd += " reconnect_interval=#{@resource[:reconnect_interval]}"
     end
     if not_empty_string(resource_params)
