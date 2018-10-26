@@ -3,7 +3,7 @@ require_relative '../pcmk_common'
 Puppet::Type.type(:pcmk_resource).provide(:default) do
   desc 'A base resource definition for a pacemaker resource'
 
-  def build_pcs_resource_cmd
+  def build_pcs_resource_cmd(update=false)
     resource_params = @resource[:resource_params]
     meta_params = @resource[:meta_params]
     op_params = @resource[:op_params]
@@ -21,9 +21,14 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
       raise(Puppet::Error, "May only define one of clone_params, "+
             "master_params and group_params")
     end
+    if update
+      create_cmd = ' update '
+    else
+      create_cmd = ' create '
+    end
 
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
-    cmd = 'resource create ' + @resource[:name]+' ' +@resource[:resource_type]
+    cmd = 'resource' + create_cmd + @resource[:name] + ' ' + @resource[:resource_type]
     if @resource[:resource_type] == 'remote'
       if not_empty_string(@resource[:remote_address])
         cmd += ' server=' + @resource[:remote_address]
@@ -73,10 +78,11 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
   end
 
   def create_resource_and_location(location_rule, needs_update=false)
-    cmd = build_pcs_resource_cmd()
     if needs_update then
-      pcmk_update_resource(@resource, cmd, @resource[:update_settle_secs])
+      cmd = build_pcs_resource_cmd(update=true)
+      pcmk_update_resource(@resource, cmd, '', @resource[:update_settle_secs])
     else
+      cmd = build_pcs_resource_cmd()
       if location_rule then
         pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
             @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
@@ -149,7 +155,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
     if ret == false then
       return PCMK_NOTEXISTS
     end
-    if @resource[:deep_compare] and pcmk_resource_has_changed?(@resource, build_pcs_resource_cmd()) then
+    if @resource[:deep_compare] and pcmk_resource_has_changed?(@resource, build_pcs_resource_cmd(update=true), '') then
       return PCMK_CHANGENEEDED
     end
     return PCMK_NOCHANGENEEDED

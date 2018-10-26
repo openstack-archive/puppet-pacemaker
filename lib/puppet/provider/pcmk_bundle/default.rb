@@ -3,7 +3,27 @@ require_relative '../pcmk_common'
 Puppet::Type.type(:pcmk_bundle).provide(:default) do
   desc 'A bundle resource definition for pacemaker'
 
-  def build_pcs_bundle_cmd
+  def _storage_maps_cmd(storage_maps, update=false)
+    return '' if storage_maps == nil or storage_maps.empty?
+    cmd = ''
+    if update
+      add = ' add '
+    else
+      add = ' '
+    end
+    storage_maps.each do | key, value |
+      cmd += ' storage-map' + add + 'id=' + key + \
+             ' source-dir=' + value['source-dir'] + \
+             ' target-dir=' + value['target-dir']
+      options = value['options']
+      if not_empty_string(options)
+        cmd += ' options=' + options
+      end
+    end
+    cmd
+  end
+
+  def build_pcs_bundle_cmd(update=false)
     image = @resource[:image]
     replicas = @resource[:replicas]
     masters = @resource[:masters]
@@ -15,8 +35,16 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     location_rule = @resource[:location_rule]
     container_backend = @resource[:container_backend]
 
+    if update
+      create_cmd = 'update'
+      docker_cmd = ''
+    else
+      create_cmd = 'create'
+      docker_cmd = 'docker'
+    end
+
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
-    cmd = 'resource bundle create ' + @resource[:name]+' container ' + container_backend + ' image=' + @resource[:image]
+    cmd = 'resource bundle ' + create_cmd + ' ' + @resource[:name] + ' container ' + docker_cmd + ' image=' + @resource[:image]
     if replicas
       cmd += " replicas=#{replicas}"
     end
@@ -33,24 +61,28 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
       cmd += ' ' + container_options
     end
 
-    # storage_maps[id] = {'source' => value, 'target' => value, 'options' => value}
-    # FIXME: need to do proper error checking here
-    if storage_maps and !storage_maps.empty?
-      storage_maps.each do | key, value |
-        cmd += ' storage-map id=' + key + \
-               ' source-dir=' + value['source-dir'] + \
-               ' target-dir=' + value['target-dir']
-        options = value['options']
-        if not_empty_string(options)
-          cmd += ' options=' + options
-        end
-      end
-    end
-
+    # When we're updating a bundle we first dump the CIB, then
+    # we remove all the *current* storage-maps for the resource
+    # and then we add back the storage-maps passed to us
+    cmd += _storage_maps_cmd(storage_maps, update)
     if network
       cmd += ' network ' + network
     end
     cmd
+  end
+
+  def build_pcs_bundle_pruning
+    cmd = 'resource bundle update ' + @resource[:name]
+    # In case of updates due to how pcs manages storage, we need to first remove all
+    # the *current* existing storage maps and then readd the puppet defined ones
+    live_storage_maps = pcmk_get_bundle_storage_map(@resource[:name])
+    if live_storage_maps and !live_storage_maps.empty?
+      live_storage_maps.each do | key, value |
+        cmd += ' storage-map remove ' + value['id']
+      end
+      return cmd
+    end
+    return ''
   end
 
   ### overloaded methods
@@ -63,10 +95,11 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
   end
 
   def create_bundle_and_location(location_rule, needs_update=false)
-    cmd = build_pcs_bundle_cmd()
     if needs_update then
-      pcmk_update_resource(@resource, cmd, @resource[:update_settle_secs])
+      cmd = build_pcs_bundle_cmd(update=true)
+      pcmk_update_resource(@resource, cmd, build_pcs_bundle_pruning(), @resource[:update_settle_secs])
     else
+      cmd = build_pcs_bundle_cmd()
       if location_rule then
         pcs('create', @resource[:name], "#{cmd} --disabled", @resource[:tries],
             @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
@@ -139,7 +172,7 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     if ret == false then
       return PCMK_NOTEXISTS
     end
-    if @resource[:deep_compare] and pcmk_resource_has_changed?(@resource, build_pcs_bundle_cmd(), true) then
+    if @resource[:deep_compare] and pcmk_resource_has_changed?(@resource, build_pcs_bundle_cmd(update=true), build_pcs_bundle_pruning(), true) then
       return PCMK_CHANGENEEDED
     end
     return PCMK_NOCHANGENEEDED
