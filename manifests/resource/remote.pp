@@ -107,7 +107,7 @@ define pacemaker::resource::remote(
   $try_sleep          = 0,
   $verify_on_create   = false,
   $location_rule      = undef,
-  $deep_compare       = false,
+  $deep_compare       = hiera('pacemaker::resource::remote::deep_compare', false),
   $update_settle_secs = hiera('pacemaker::resource::remote::update_settle_secs', 600),
 ) {
   pcmk_resource { $name:
