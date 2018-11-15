@@ -40,7 +40,7 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
       docker_cmd = ''
     else
       create_cmd = 'create'
-      docker_cmd = 'docker'
+      docker_cmd = container_backend
     end
 
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
