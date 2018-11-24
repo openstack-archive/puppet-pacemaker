@@ -13,6 +13,7 @@ Gather resource parameters and their values
         parameters.merge! key
       else
         next if key.nil?
+        next if key == ''
         next if value.nil?
         next if value == ''
         next if value == :undef

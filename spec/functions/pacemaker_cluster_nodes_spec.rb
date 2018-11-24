@@ -5,7 +5,6 @@ describe 'pacemaker_cluster_nodes' do
     it { is_expected.not_to eq(nil) }
     it { is_expected.to run.with_params.and_raise_error(ArgumentError) }
     it { is_expected.to run.with_params(1).and_raise_error(Puppet::Error, /Got unsupported nodes input data/) }
-    it { is_expected.to run.with_params(nil).and_raise_error(Puppet::Error, /Nodes are not provided/) }
   end
 
   it 'can parse the input as a node list string' do

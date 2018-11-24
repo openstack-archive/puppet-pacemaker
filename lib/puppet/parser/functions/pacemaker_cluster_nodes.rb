@@ -54,9 +54,9 @@ Output forms:
     nodes = args[0]
     form = args[1] || 'hash'
     form = form.to_s.downcase
-    fail 'Nodes are not provided!' unless nodes
+    raise(Puppet::Error, 'Nodes are not provided!') if [String, Hash, Array].include? nodes.class and nodes.empty?
     forms = %w(list array hash)
-    fail "Unknown form: '#{form}'" unless forms.include? form
+    raise(Puppet::Error, "Unknown form: '#{form}'") unless forms.include? form
 
     array_formatter = lambda do |structure|
       list = []
@@ -143,7 +143,7 @@ Output forms:
     end
 
     hash_parser = lambda do |hash|
-      fail "Data is not a hash: #{hash.inspect}" unless hash.is_a? Hash
+      raise(Puppet::Error, "Data is not a hash: #{hash.inspect}") unless hash.is_a? Hash
       node_list = []
       hash.each do |node_name, node|
         node = node.dup
@@ -174,7 +174,7 @@ Output forms:
     elsif nodes.is_a? Hash
       structure = hash_parser.call nodes
     else
-      fail "Got unsupported nodes input data: #{nodes.inspect}"
+      raise(Puppet::Error, "Got unsupported nodes input data: #{nodes.inspect}")
     end
 
     set_node_ids.call structure
