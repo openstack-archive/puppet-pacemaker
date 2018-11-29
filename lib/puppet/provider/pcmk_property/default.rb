@@ -45,12 +45,25 @@ Puppet::Type.type(:pcmk_property).provide(:default) do
     else
       value = ''
     end
-    cmd = "property show | grep #{property}"
+    cmd = "property show"
+    # We need to distinguish between per node properties and global ones as the output is
+    # different:
+    # Cluster Properties:
+    #  cluster-infrastructure: corosync
+    #  cluster-name: tripleo_cluster
+    #  dc-version: 1.1.19-8.el7-c3c624ea3d
+    #  have-watchdog: false
+    #  maintenance-mode: false
+    #  redis_REPL_INFO: controller-0
+    #  stonith-enabled: false
+    # Node Attributes:
+    #  controller-0: cinder-volume-role=true galera-role=true haproxy-role=true rabbitmq-role=true redis-role=true rmq-node-attr-last-known-rabbitmq=rabbit@controller-0
+    #  controller-1: cinder-volume-role=true galera-role=true haproxy-role=true rabbitmq-role=true redis-role=true rmq-node-attr-last-known-rabbitmq=rabbit@controller-1
+    #  controller-2: cinder-volume-role=true galera-role=true haproxy-role=true rabbitmq-role=true redis-role=true rmq-node-attr-last-known-rabbitmq=rabbit@controller-2
     if not_empty_string(node)
-      cmd += " | grep #{node}"
-    end
-    if not_empty_string(value)
-      cmd += " | grep #{value}"
+      cmd += " | grep -e '#{node}:.*#{property}=#{value}'"
+    else
+      cmd += " | grep -e '#{property}:.*#{value}'"
     end
     cmd += " > /dev/null 2>&1"
     ret = pcs('show', @resource[:property], cmd, @resource[:tries], @resource[:try_sleep])
