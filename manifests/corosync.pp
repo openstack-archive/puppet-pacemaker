@@ -148,6 +148,7 @@ class pacemaker::corosync(
       password => pw_hash($::pacemaker::hacluster_pwd, 'SHA-512', fqdn_rand_string(10)),
       groups   => 'haclient',
       require  => Class['::pacemaker::install'],
+      before   => Service['pcsd'],
       notify   => Exec['reauthenticate-across-all-nodes'],
     }
 
@@ -157,17 +158,17 @@ class pacemaker::corosync(
       timeout     => $settle_timeout,
       tries       => $settle_tries,
       try_sleep   => $settle_try_sleep,
+      require     => Service['pcsd'],
       tag         => 'pacemaker-auth',
     }
 
-    Service['pcsd'] ->
     exec { 'auth-successful-across-all-nodes':
       command     => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd}",
       refreshonly => true,
       timeout     => $settle_timeout,
       tries       => $settle_tries,
       try_sleep   => $settle_try_sleep,
-      require     => User['hacluster'],
+      require     => [Service['pcsd'], User['hacluster']],
       unless      => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} | grep 'Already authorized'",
       tag         => 'pacemaker-auth',
     }
@@ -258,11 +259,7 @@ class pacemaker::corosync(
       mode    => '0640',
       content => $remote_authkey,
     }
-    Exec <| title == 'auth-successful-across-all-nodes' |> -> File['etc-pacemaker-authkey']
-    if $setup_cluster {
-      Exec["Create Cluster ${cluster_name}"] -> File['etc-pacemaker-authkey']
-      File['etc-pacemaker-authkey'] -> Exec["Start Cluster ${cluster_name}"]
-    }
+    File['etc-pacemaker-authkey'] -> Service['pcsd']
   }
 
   exec {'wait-for-settle':
