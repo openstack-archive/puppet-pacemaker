@@ -4,8 +4,17 @@
 #
 # === Parameters
 # [*cluster_members*]
-#   (required) A space-separted list of cluster IP's or names to run the 
+#   (required) A space-separted list of cluster IP's or names to run the
 #   authentication against
+#
+# [*cluster_members_addr*]
+#   (optional) An array of arrays containing the node addresses to be used
+#   As ring addresses in corosync (as required by corosync3+knet). For example:
+#   [[10.0.0.1], [10.0.0.10], [10.0.0.20,10.0.0.21]] with nodes [n1, n2, n3]
+#   will create the cluster as follows:
+#   pcs cluster setup clustername n1 addr=10.0.0.1 n2 addr=10.0.0.10 \
+#     n3 addr=10.0.0.20 addr=10.0.0.21
+#   Defaults to []
 #
 # [*cluster_members_rrp*]
 #   (optional) A space-separated list of cluster IP's or names pair where each
@@ -89,6 +98,7 @@
 #
 class pacemaker::corosync(
   $cluster_members,
+  $cluster_members_addr    = [],
   $cluster_members_rrp     = undef,
   $cluster_name            = 'clustername',
   $cluster_setup_extras    = {},
@@ -207,7 +217,7 @@ class pacemaker::corosync(
     }
 
     if ! $cluster_members_rrp {
-      $cluster_members_rrp_real = $cluster_members
+      $cluster_members_rrp_real = pcmk_cluster_setup($cluster_members, $cluster_members_addr)
     } else {
       $cluster_members_rrp_real = $cluster_members_rrp
     }
