@@ -8,12 +8,17 @@ Puppet::Type.type(:pcmk_property).provide(:default) do
     property = @resource[:property]
     node = @resource[:node]
     value = @resource[:value]
-    cmd = "property set"
+    if not_empty_string(node)
+      if Puppet::Util::Package.versioncmp(pcs_cli_version(), '0.10.0') >= 0
+        cmd = "node attribute #{node}"
+      else
+        cmd = "property set --node #{node}"
+      end
+    else
+      cmd = "property set"
+    end
     if not_empty_string(@resource[:force])
       cmd += " --force"
-    end
-    if not_empty_string(node)
-      cmd += " --node #{node}"
     end
     cmd += " #{property}=#{value}"
     ret = pcs('create', @resource[:property], cmd, @resource[:tries], @resource[:try_sleep])
@@ -24,11 +29,15 @@ Puppet::Type.type(:pcmk_property).provide(:default) do
   def destroy
     property = @resource[:property]
     node = @resource[:node]
-    cmd = "property unset"
     if not_empty_string(node)
-      cmd += " --node #{node}"
+      if Puppet::Util::Package.versioncmp(pcs_cli_version(), '0.10.0') >= 0
+        cmd = "node attribute #{node} #{property}="
+      else
+        cmd = "property unset --node #{node} #{property}"
+      end
+    else
+      cmd = "property unset #{property}"
     end
-    cmd += " #{property}"
     ret = pcs('delete', @resource[:property], cmd, @resource[:tries], @resource[:try_sleep])
     Puppet.debug("property destroy: #{cmd} -> #{ret}")
     return ret
@@ -45,7 +54,11 @@ Puppet::Type.type(:pcmk_property).provide(:default) do
     else
       value = ''
     end
-    cmd = "property show"
+    if Puppet::Util::Package.versioncmp(pcs_cli_version(), '0.10.0') >= 0 and not_empty_string(node)
+      cmd = "node attribute #{node}"
+    else
+      cmd = "property show"
+    end
     # We need to distinguish between per node properties and global ones as the output is
     # different:
     # Cluster Properties:
