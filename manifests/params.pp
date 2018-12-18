@@ -50,6 +50,12 @@ class pacemaker::params {
       } else {
         $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs', 'pacemaker-remote']
       }
+      # Detect pcs 0.10.x versions and use different commands
+      if $::operatingsystemrelease =~ /8\..*$/ {
+        $pcs_010 = true
+      } else {
+        $pcs_010 = false
+      }
       $service_name = 'pacemaker'
     }
     default: {

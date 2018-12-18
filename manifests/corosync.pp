@@ -114,6 +114,16 @@ class pacemaker::corosync(
   $pcsd_debug              = false,
 ) inherits pacemaker {
   include ::pacemaker::params
+  if ! $cluster_members_rrp {
+    if $::pacemaker::pcs_010 {
+      $cluster_members_rrp_real = pcmk_cluster_setup($cluster_members, $cluster_members_addr, '0.10')
+    } else {
+      $cluster_members_rrp_real = pcmk_cluster_setup($cluster_members, $cluster_members_addr, '0.9')
+    }
+  } else {
+    $cluster_members_rrp_real = $cluster_members_rrp
+  }
+  $cluster_setup_extras_real = inline_template('<%= @cluster_setup_extras.flatten.join(" ") %>')
 
   if $manage_fw {
     firewall { '001 corosync mcast':
@@ -162,8 +172,22 @@ class pacemaker::corosync(
       notify   => Exec['reauthenticate-across-all-nodes'],
     }
 
+    # pcs-0.10.x has different commands to set up the cluster
+    if $::pacemaker::pcs_010 {
+      $cluster_setup_cmd = "${::pacemaker::pcs_bin} cluster setup ${cluster_name} ${cluster_members_rrp_real}"
+      $cluster_reauthenticate_cmd = "${::pacemaker::pcs_bin} host auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd}"
+      $cluster_authenticate_cmd = "${::pacemaker::pcs_bin} host auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd}"
+      $cluster_authenticate_unless = "${::pacemaker::pcs_bin} host auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} | grep 'Already authorized'"
+    } else {
+      $cluster_setup_cmd = "${::pacemaker::pcs_bin} cluster setup --wait --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}"
+      $cluster_reauthenticate_cmd = "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} --force"
+      $cluster_authenticate_cmd = "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd}"
+      $cluster_authenticate_unless = "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} | grep 'Already authorized'"
+    }
+
+
     exec { 'reauthenticate-across-all-nodes':
-      command     => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} --force",
+      command     => $cluster_reauthenticate_cmd,
       refreshonly => true,
       timeout     => $settle_timeout,
       tries       => $settle_tries,
@@ -173,13 +197,13 @@ class pacemaker::corosync(
     }
 
     exec { 'auth-successful-across-all-nodes':
-      command     => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd}",
+      command     => $cluster_authenticate_cmd,
       refreshonly => true,
       timeout     => $settle_timeout,
       tries       => $settle_tries,
       try_sleep   => $settle_try_sleep,
       require     => [Service['pcsd'], User['hacluster']],
-      unless      => "${::pacemaker::pcs_bin} cluster auth ${cluster_members} -u hacluster -p ${::pacemaker::hacluster_pwd} | grep 'Already authorized'",
+      unless      => $cluster_authenticate_unless,
       tag         => 'pacemaker-auth',
     }
 
@@ -216,18 +240,11 @@ class pacemaker::corosync(
       Exec <|tag == 'pacemaker-auth'|> -> Exec <|tag == 'pacemaker-scaleup'|>
     }
 
-    if ! $cluster_members_rrp {
-      $cluster_members_rrp_real = pcmk_cluster_setup($cluster_members, $cluster_members_addr)
-    } else {
-      $cluster_members_rrp_real = $cluster_members_rrp
-    }
-
-    $cluster_setup_extras_real = inline_template('<%= @cluster_setup_extras.flatten.join(" ") %>')
     Exec <|tag == 'pacemaker-auth'|>
     ->
     exec {"Create Cluster ${cluster_name}":
       creates   => '/etc/cluster/cluster.conf',
-      command   => "${::pacemaker::pcs_bin} cluster setup --wait --name ${cluster_name} ${cluster_members_rrp_real} ${cluster_setup_extras_real}",
+      command   => $cluster_setup_cmd,
       timeout   => $cluster_start_timeout,
       tries     => $cluster_start_tries,
       try_sleep => $cluster_start_try_sleep,

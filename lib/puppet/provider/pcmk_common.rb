@@ -26,6 +26,19 @@ else
   TIMEOUT_BIN = '/usr/bin/timeout'
 end
 
+# Use pcs_cli_version() as opposed to a facter so that if the pcs
+# package gets installed during the puppet run everything still works
+# as expected. Returns empty string if pcs command does not exist
+def pcs_cli_version()
+  begin
+    pcs_cli_version = `#{PCS_BIN} --version`
+  rescue Errno::ENOENT
+    pcs_cli_version = ''
+  end
+  return pcs_cli_version
+end
+
+
 # Ruby 2.5 has dropped Dir::Tmpname.make_tmpname
 # https://github.com/ruby/ruby/commit/25d56ea7b7b52dc81af30c92a9a0e2d2dab6ff27
 def pcmk_tmpname((prefix, suffix), n)
