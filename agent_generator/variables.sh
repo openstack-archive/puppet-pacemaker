@@ -27,6 +27,7 @@ cmd_pkg_map=(
     "fence_ipmilan:fence-agents-ipmilan"
     "fence_ironic:None"
     "fence_kdump:fence-agents-kdump"
+    "fence_redfish:fence-agents-redfish"
     "fence_rhevm:fence-agents-rhevm"
     "fence_rsb:fence-agents-rsb"
     "fence_scsi:fence-agents-scsi"
