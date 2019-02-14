@@ -236,9 +236,10 @@ define pacemaker::stonith::fence_redfish (
     undef   => '',
     default => "port=\"${port}\"",
   }
+  # Manual workaround s/_/-/ needed due to https://bugzilla.redhat.com/show_bug.cgi?id=1677020
   $redfish_uri_chunk = $redfish_uri ? {
     undef   => '',
-    default => "redfish_uri=\"${redfish_uri}\"",
+    default => "redfish-uri=\"${redfish_uri}\"",
   }
   $ssl_chunk = $ssl ? {
     undef   => '',
@@ -252,9 +253,10 @@ define pacemaker::stonith::fence_redfish (
     undef   => '',
     default => "ssl_secure=\"${ssl_secure}\"",
   }
+  # Manual workaround s/_/-/ needed due to https://bugzilla.redhat.com/show_bug.cgi?id=1677020
   $systems_uri_chunk = $systems_uri ? {
     undef   => '',
-    default => "systems_uri=\"${systems_uri}\"",
+    default => "systems-uri=\"${systems_uri}\"",
   }
   $username_chunk = $username ? {
     undef   => '',

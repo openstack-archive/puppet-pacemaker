@@ -27,7 +27,6 @@ cmd_pkg_map=(
     "fence_ipmilan:fence-agents-ipmilan"
     "fence_ironic:None"
     "fence_kdump:fence-agents-kdump"
-    "fence_redfish:fence-agents-redfish"
     "fence_rhevm:fence-agents-rhevm"
     "fence_rsb:fence-agents-rsb"
     "fence_scsi:fence-agents-scsi"
@@ -37,4 +36,7 @@ cmd_pkg_map=(
 
     # These have manual changes and need to be updated manually:
     # "fence_xvm:fence-virt"
+    # Until https://bugzilla.redhat.com/show_bug.cgi?id=1677020 is fixed properly
+    # we need to manually use deprecated parameters
+    #"fence_redfish:fence-agents-redfish"
 )
