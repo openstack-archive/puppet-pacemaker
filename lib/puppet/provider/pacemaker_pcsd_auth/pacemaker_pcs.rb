@@ -65,7 +65,6 @@ Puppet::Type.type(:pacemaker_pcsd_auth).provide(:pcs, parent: Puppet::Provider::
       success = success_node_statuses.include? status
       prefix = success ? 'OK  ' : 'FAIL'
       message += "#{prefix} #{node} (#{status})"
-      message += ' <- this node' if node_name == node
       message += "\n"
     end
     message += 'Cluster auth status debug end'
