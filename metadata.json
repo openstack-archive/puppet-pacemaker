@@ -1,6 +1,6 @@
 {
   "name": "openstack-pacemaker",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "author": "OpenStack Contributors",
   "summary": "Puppet module for Pacemaker",
   "license": "Apache-2.0",
