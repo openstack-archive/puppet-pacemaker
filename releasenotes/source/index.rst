@@ -9,6 +9,7 @@ Contents
    :maxdepth: 2
 
    unreleased
+   0.7.x
    0.6.x
 
 
