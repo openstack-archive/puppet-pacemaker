@@ -85,7 +85,7 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
   def stonith_location_rule_create()
     pcmk_host_list = @resource[:pcmk_host_list]
     if not_empty_string(pcmk_host_list)
-      location_cmd = "constraint location #{@resource[:name]} avoids #{pcmk_host_list}"
+      location_cmd = "constraint location #{@resource[:name]} avoids #{pcmk_host_list}=10000"
       Puppet.debug("stonith_location_rule_create: #{location_cmd}")
       pcs('create', @resource[:name], location_cmd, @resource[:tries],
           @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
