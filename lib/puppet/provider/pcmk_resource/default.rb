@@ -50,7 +50,12 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
       cmd += ' bundle ' + bundle
     else
       if clone_params
-        cmd += ' --clone'
+        # pcs 0.10/pcmk 2.0 removed the --clone option
+        if Puppet::Util::Package.versioncmp(pcs_cli_version(), '0.10.0') >= 0
+          cmd += ' clone'
+        else
+          cmd += ' --clone'
+        end
         if not_empty_string(clone_params)
           cmd += ' ' + clone_params
         end
