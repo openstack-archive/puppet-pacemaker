@@ -20,33 +20,95 @@
 #
 # === Parameters
 #
+# [*use_pcsd*]
+#   (optional) Should the remote use pcsd to be setup
+#   Defaults to false
+#
+# [*manage_fw*]
+#   (optional) Manage or not IPtables rules.
+#   Defaults to true
+#
 # [*remote_authkey*]
 #   (Required) Authkey for pacemaker remote nodes
 #   Defaults to undef
 #
-class pacemaker::remote ($remote_authkey) {
+# [*pcsd_debug*]
+#   (optional) Enable pcsd debugging
+#   Defaults to false
+#
+class pacemaker::remote (
+  $remote_authkey,
+  $use_pcsd        = false,
+  $pcs_user        = 'hacluster',
+  $pcs_password    = undef,
+  $manage_fw       = true,
+  $pcsd_debug      = false,
+) {
   include ::pacemaker::params
   ensure_resource('package', $::pacemaker::params::pcmk_remote_package_list, {
     ensure => present
   })
-  Package<| title == 'pacemaker-remote' |> -> File <| title == 'etc-pacemaker' |>
-
-  file { 'etc-pacemaker':
-    ensure => directory,
-    path   => '/etc/pacemaker',
-    owner  => 'hacluster',
-    group  => 'haclient',
-    mode   => '0750',
-  } ->
-  file { 'etc-pacemaker-authkey':
-    path    => '/etc/pacemaker/authkey',
-    owner   => 'hacluster',
-    group   => 'haclient',
-    mode    => '0640',
-    content => $remote_authkey,
-  } ->
-  service { 'pacemaker_remote':
-    ensure => running,
-    enable => true,
+  # pacemaker remote needs pcsd only with pcs >= 0.10
+  if $use_pcsd {
+    include ::pacemaker::install
+    if $manage_fw {
+      firewall { '001 pcsd':
+        proto  => 'tcp',
+        dport  => ['2224'],
+        action => 'accept',
+      }
+      firewall { '001 pcsd ipv6':
+        proto    => 'tcp',
+        dport    => ['2224'],
+        action   => 'accept',
+        provider => 'ip6tables',
+      }
+    }
+    $pcsd_debug_str = bool2str($pcsd_debug)
+    file_line { 'pcsd_debug_ini':
+      path    => $::pacemaker::params::pcsd_sysconfig,
+      line    => "PCSD_DEBUG=${pcsd_debug_str}",
+      match   => '^PCSD_DEBUG=',
+      require => Class['::pacemaker::install'],
+      before  => Service['pcsd'],
+      notify  => Service['pcsd'],
+    }
+    user { $pcs_user:
+      password => pw_hash($pcs_password, 'SHA-512', fqdn_rand_string(10)),
+      groups   => 'haclient',
+      require  => Class['::pacemaker::install'],
+      before   => Service['pcsd'],
+    }
+    # only set up pcsd, not the other cluster services which have
+    # very specific setup and when-to-start-up requirements
+    # that are taken care of in corosync.pp
+    service { 'pcsd':
+      ensure     => running,
+      hasstatus  => true,
+      hasrestart => true,
+      enable     => true,
+      require    => Class['::pacemaker::install'],
+    }
+  } else {
+  # This gets managed by pcsd directly when pcs is < 0.10
+    Package<| title == 'pacemaker-remote' |> -> File <| title == 'etc-pacemaker' |>
+    file { 'etc-pacemaker':
+      ensure => directory,
+      path   => '/etc/pacemaker',
+      owner  => 'hacluster',
+      group  => 'haclient',
+      mode   => '0750',
+    } ->
+    file { 'etc-pacemaker-authkey':
+      path    => '/etc/pacemaker/authkey',
+      owner   => 'hacluster',
+      group   => 'haclient',
+      mode    => '0640',
+      content => $remote_authkey,
+    } ->
+    service { 'pacemaker_remote':
+      ensure => running,
+      enable => true,
+    }
   }
 }

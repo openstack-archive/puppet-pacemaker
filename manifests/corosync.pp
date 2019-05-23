@@ -271,7 +271,8 @@ class pacemaker::corosync(
     Exec['wait-for-settle']
   }
 
-  if $remote_authkey {
+  # pcs 0.10/pcmk 2.0 take care of the authkey internally by themselves
+  if $remote_authkey and !$::pacemaker::pcs_010 {
     file { 'etc-pacemaker':
       ensure => directory,
       path   => '/etc/pacemaker',

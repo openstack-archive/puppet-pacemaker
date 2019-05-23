@@ -106,24 +106,43 @@ define pacemaker::resource::remote(
   $tries              = 1,
   $try_sleep          = 0,
   $verify_on_create   = false,
+  $pcs_user           = 'hacluster',
+  $pcs_password       = undef,
   $location_rule      = undef,
   $deep_compare       = hiera('pacemaker::resource::remote::deep_compare', false),
   $update_settle_secs = hiera('pacemaker::resource::remote::update_settle_secs', 600),
 ) {
-  pcmk_resource { $name:
-    ensure             => $ensure,
-    resource_type      => 'remote',
-    remote_address     => $remote_address,
-    reconnect_interval => $reconnect_interval,
-    resource_params    => $resource_params,
-    meta_params        => $meta_params,
-    op_params          => $op_params,
-    bundle             => $bundle,
-    tries              => $tries,
-    try_sleep          => $try_sleep,
-    verify_on_create   => $verify_on_create,
-    location_rule      => $location_rule,
-    deep_compare       => $deep_compare,
-    update_settle_secs => $update_settle_secs,
+  if $::pacemaker::params::pcs_010 {
+    pcmk_remote { $name:
+      ensure             => $ensure,
+      remote_address     => $remote_address,
+      reconnect_interval => $reconnect_interval,
+      resource_params    => $resource_params,
+      meta_params        => $meta_params,
+      op_params          => $op_params,
+      tries              => $tries,
+      try_sleep          => $try_sleep,
+      pcs_user           => $pcs_user,
+      pcs_password       => $pcs_password,
+      deep_compare       => $deep_compare,
+      update_settle_secs => $update_settle_secs,
+    }
+  } else {
+    pcmk_resource { $name:
+      ensure             => $ensure,
+      resource_type      => 'remote',
+      remote_address     => $remote_address,
+      reconnect_interval => $reconnect_interval,
+      resource_params    => $resource_params,
+      meta_params        => $meta_params,
+      op_params          => $op_params,
+      bundle             => $bundle,
+      tries              => $tries,
+      try_sleep          => $try_sleep,
+      verify_on_create   => $verify_on_create,
+      location_rule      => $location_rule,
+      deep_compare       => $deep_compare,
+      update_settle_secs => $update_settle_secs,
+    }
   }
 }
