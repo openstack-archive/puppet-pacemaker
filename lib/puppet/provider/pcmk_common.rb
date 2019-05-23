@@ -145,6 +145,26 @@ def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
   end
 end
 
+def pcs_without_push(name, resource_name, cmd, tries=1, try_sleep=0, post_success_sleep=0)
+  max_tries = tries
+  max_tries.times do |try|
+    try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
+    Puppet.debug("#{try_text}#{PCS_BIN} #{cmd}")
+    pcs_out = `#{PCS_BIN} #{cmd} 2>&1`
+    if $?.exitstatus == 0
+      sleep post_success_sleep
+      return pcs_out
+    else
+      Puppet.debug("Error: #{pcs_out}")
+      sleep try_sleep
+    end
+    if try == max_tries-1
+      pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
+      raise Puppet::Error, "pcs #{name} failed: #{pcs_out_line}"
+    end
+  end
+end
+
 def pcs_create_with_verify(name, resource_name, cmd, tries=1, try_sleep=0)
   max_tries = tries
   max_tries.times do |try|
