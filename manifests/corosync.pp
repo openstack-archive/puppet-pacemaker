@@ -67,6 +67,14 @@
 #   just one node in cluster.  Else set to true for all nodes.
 #   Defaults to true
 #
+# [*enable_sbd*]
+#   (optional) Controls whether to enable sbd or not
+#   Defaults to false
+#
+# [*sbd_watchdog_timeout*]
+#   (optional) Controls SBD_WATCHDOG_TIMEOUT value.
+#   Defaults to 10(s)
+#
 # [*pcsd_debug*]
 #   (optional) Enable pcsd debugging
 #   Defaults to false
@@ -115,6 +123,8 @@ class pacemaker::corosync(
   $settle_tries            = '360',
   $settle_try_sleep        = '10',
   $setup_cluster           = true,
+  $enable_sbd              = false,
+  $sbd_watchdog_timeout    = '10',
   $pcsd_debug              = false,
   $tls_priorities          = undef,
 ) inherits pacemaker {
@@ -281,6 +291,18 @@ class pacemaker::corosync(
       try_sleep => $cluster_start_try_sleep,
       require   => Exec["Create Cluster ${cluster_name}"],
     }
+    if $enable_sbd {
+      ensure_resource('package', 'sbd', { ensure => present })
+      exec {'Enable SBD':
+        unless  => "${::pacemaker::pcs_bin} status | grep -q 'sbd: active/enabled' > /dev/null 2>&1",
+        command => "${::pacemaker::pcs_bin} stonith sbd enable SBD_WATCHDOG_TIMEOUT=${sbd_watchdog_timeout}",
+      }
+      Package<| title == 'sbd' |>
+      -> Exec<| title == "Create Cluster ${cluster_name}" |>
+        -> Exec<| title == 'Enable SBD' |>
+          -> Exec<| title == "Start Cluster ${cluster_name}" |>
+    }
+
     if $pacemaker::pcsd_mode {
       Exec['auth-successful-across-all-nodes'] ->
         Exec["Create Cluster ${cluster_name}"]
