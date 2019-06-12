@@ -66,7 +66,7 @@ def backup_cib()
   # We use the pacemaker CIB folder because of its restricted access permissions
   cib = pcmk_tmpname("#{PCMK_TMP_BASE}/puppet-cib-backup", nil)
   cmd = "#{PCS_BIN} cluster cib #{cib}"
-  output = `#{cmd}`
+  output = `#{cmd} 2>&1`
   ret = $?
   if not ret.success?
     msg = "backup_cib: Running: #{cmd} failed with code: #{ret.exitstatus} -> #{output}"
@@ -97,7 +97,7 @@ def push_cib(cib)
   if has_diffagainst
     cmd += " diff-against=#{cib}.orig"
   end
-  output = `#{cmd}`
+  output = `#{cmd} 2>&1`
   ret = $?
   delete_cib(cib)
   if not ret.success?
