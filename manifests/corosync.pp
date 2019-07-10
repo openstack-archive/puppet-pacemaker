@@ -71,6 +71,10 @@
 #   (optional) Enable pcsd debugging
 #   Defaults to false
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to undef
+#
 # === Dependencies
 #
 #  None
@@ -112,6 +116,7 @@ class pacemaker::corosync(
   $settle_try_sleep        = '10',
   $setup_cluster           = true,
   $pcsd_debug              = false,
+  $tls_priorities          = undef,
 ) inherits pacemaker {
   include ::pacemaker::params
   if ! $cluster_members_rrp {
@@ -162,6 +167,15 @@ class pacemaker::corosync(
       require => Class['::pacemaker::install'],
       before  => Service['pcsd'],
       notify  => Service['pcsd'],
+    }
+    if $tls_priorities != undef {
+      file_line { 'tls_priorities':
+        path    => $::pacemaker::pcmk_sysconfig,
+        line    => "PCMK_tls_priorities=${tls_priorities}",
+        match   => '^PCMK_tls_priorities=',
+        require => Class['::pacemaker::install'],
+        before  => Service['pcsd'],
+      }
     }
 
     user { 'hacluster':
