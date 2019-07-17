@@ -36,6 +36,10 @@
 #   (optional) Enable pcsd debugging
 #   Defaults to false
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to undef
+#
 class pacemaker::remote (
   $remote_authkey,
   $use_pcsd        = false,
@@ -43,6 +47,7 @@ class pacemaker::remote (
   $pcs_password    = undef,
   $manage_fw       = true,
   $pcsd_debug      = false,
+  $tls_priorities  = undef,
 ) {
   include ::pacemaker::params
   ensure_resource('package', $::pacemaker::params::pcmk_remote_package_list, {
@@ -72,6 +77,15 @@ class pacemaker::remote (
       require => Class['::pacemaker::install'],
       before  => Service['pcsd'],
       notify  => Service['pcsd'],
+    }
+    if $tls_priorities != undef {
+      file_line { 'tls_priorities':
+        path    => $::pacemaker::pcmk_sysconfig,
+        line    => "PCMK_tls_priorities=${tls_priorities}",
+        match   => '^PCMK_tls_priorities=',
+        require => Class['::pacemaker::install'],
+        before  => Service['pcsd'],
+      }
     }
     user { $pcs_user:
       password => pw_hash($pcs_password, 'SHA-512', fqdn_rand_string(10)),
