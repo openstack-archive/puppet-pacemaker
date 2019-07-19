@@ -227,23 +227,30 @@ class pacemaker::corosync(
   if $setup_cluster {
     # Detect if we are trying to add some nodes by comparing
     # $cluster_members and the actual running nodes in the cluster
-    $nodes_added = pcmk_nodes_added($cluster_members)
+    if $::pacemaker::pcs_010 {
+      $nodes_added = pcmk_nodes_added($cluster_members, $cluster_members_addr, '0.10')
+      $node_add_start_part = '--start'
+    } else {
+      $nodes_added = pcmk_nodes_added($cluster_members, $cluster_members_addr, '0.9')
+      $node_add_start_part = ''
+    }
     # If we're rerunning this puppet manifest and $cluster_members
     # contains more nodes than the currently running cluster
     if count($nodes_added) > 0 {
       $nodes_added.each |$node_to_add| {
+        $node_name = split($node_to_add, ' ')[0]
         exec {"Adding Cluster node: ${node_to_add} to Cluster ${cluster_name}":
-          unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_to_add} .*\"",
-          command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} --wait",
+          unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
+          command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} ${node_add_start_part} --wait",
           timeout   => $cluster_start_timeout,
           tries     => $cluster_start_tries,
           try_sleep => $cluster_start_try_sleep,
-          notify    => Exec["node-cluster-start-${node_to_add}"],
+          notify    => Exec["node-cluster-start-${node_name}"],
           tag       => 'pacemaker-scaleup',
         }
-        exec {"node-cluster-start-${node_to_add}":
-          unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_to_add} .*\"",
-          command     => "${::pacemaker::pcs_bin} cluster start ${node_to_add} --wait",
+        exec {"node-cluster-start-${node_name}":
+          unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
+          command     => "${::pacemaker::pcs_bin} cluster start ${node_name} --wait",
           timeout     => $cluster_start_timeout,
           tries       => $cluster_start_tries,
           try_sleep   => $cluster_start_try_sleep,
