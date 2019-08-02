@@ -18,7 +18,12 @@ group :test do
   gem 'rspec-puppet',                                               :require => false
   gem 'puppet-lint', '~> 1.1.0',                                    :require => false
   gem 'metadata-json-lint',                                         :require => false
+  # rspec-puppet-facts >= 1.9.5 requires ruby 2.1.0+
+  if RUBY_VERSION.to_f >= 2.1
   gem 'rspec-puppet-facts',                                         :require => false
+  else
+    gem 'rspec-puppet-facts', '< 1.9.5',                            :require => false
+  end
   gem 'rspec',                                                      :require => false
   gem 'rspec-puppet-utils',                                         :require => false
   gem 'puppet-lint-absolute_classname-check', '~> 0.2.4',           :require => false
