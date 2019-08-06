@@ -249,6 +249,16 @@ class pacemaker::corosync(
     if count($nodes_added) > 0 {
       $nodes_added.each |$node_to_add| {
         $node_name = split($node_to_add, ' ')[0]
+        if $::pacemaker::pcs_010 {
+          exec {"Authenticating new cluster node: ${node_to_add}":
+            command   => "${::pacemaker::pcs_bin} host auth ${node_name} -u hacluster -p ${::pacemaker::hacluster_pwd}",
+            timeout   => $cluster_start_timeout,
+            tries     => $cluster_start_tries,
+            try_sleep => $cluster_start_try_sleep,
+            require   => [Service['pcsd'], User['hacluster']],
+            tag       => 'pacemaker-auth',
+          }
+        }
         exec {"Adding Cluster node: ${node_to_add} to Cluster ${cluster_name}":
           unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
           command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} ${node_add_start_part} --wait",
