@@ -29,34 +29,34 @@
       </node>
     </nodes>
     <resources>
-      <primitive class="stonith" id="stonith-fence_amt-stonith-fence-1" type="fence_amt">
-        <instance_attributes id="stonith-fence_amt-stonith-fence-1-instance_attributes">
-          <nvpair id="stonith-fence_amt-stonith-fence-1-instance_attributes-ipaddr" name="ipaddr" value="192.0.3.99"/>
-          <nvpair id="stonith-fence_amt-stonith-fence-1-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
-          <nvpair id="stonith-fence_amt-stonith-fence-1-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-0"/>
+      <primitive class="stonith" id="stonith-fence_ipmilan-stonith-fence-1" type="fence_ipmilan">
+        <instance_attributes id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes">
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-ipaddr" name="ipaddr" value="192.0.3.99"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-0"/>
         </instance_attributes>
         <operations>
-          <op id="stonith-fence_amt-stonith-fence-1-monitor-interval-60s" interval="60s" name="monitor"/>
+          <op id="stonith-fence_ipmilan-stonith-fence-1-monitor-interval-60s" interval="60s" name="monitor"/>
         </operations>
       </primitive>
-      <primitive class="stonith" id="stonith-fence_amt-stonith-fence-2" type="fence_amt">
-        <instance_attributes id="stonith-fence_amt-stonith-fence-2-instance_attributes">
-          <nvpair id="stonith-fence_amt-stonith-fence-2-instance_attributes-ipaddr" name="ipaddr" value="192.0.2.100"/>
-          <nvpair id="stonith-fence_amt-stonith-fence-2-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
-          <nvpair id="stonith-fence_amt-stonith-fence-2-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-1"/>
+      <primitive class="stonith" id="stonith-fence_ipmilan-stonith-fence-2" type="fence_ipmilan">
+        <instance_attributes id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes">
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-ipaddr" name="ipaddr" value="192.0.2.100"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-1"/>
         </instance_attributes>
         <operations>
-          <op id="stonith-fence_amt-stonith-fence-2-monitor-interval-60s" interval="60s" name="monitor"/>
+          <op id="stonith-fence_ipmilan-stonith-fence-2-monitor-interval-60s" interval="60s" name="monitor"/>
         </operations>
       </primitive>
-      <primitive class="stonith" id="stonith-fence_amt-stonith-fence-3" type="fence_amt">
-        <instance_attributes id="stonith-fence_amt-stonith-fence-3-instance_attributes">
-          <nvpair id="stonith-fence_amt-stonith-fence-3-instance_attributes-ipaddr" name="ipaddr" value="192.0.2.101"/>
-          <nvpair id="stonith-fence_amt-stonith-fence-3-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
-          <nvpair id="stonith-fence_amt-stonith-fence-3-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-2"/>
+      <primitive class="stonith" id="stonith-fence_ipmilan-stonith-fence-3" type="fence_ipmilan">
+        <instance_attributes id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes">
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-ipaddr" name="ipaddr" value="192.0.2.101"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-2"/>
         </instance_attributes>
         <operations>
-          <op id="stonith-fence_amt-stonith-fence-3-monitor-interval-60s" interval="60s" name="monitor"/>
+          <op id="stonith-fence_ipmilan-stonith-fence-3-monitor-interval-60s" interval="60s" name="monitor"/>
         </operations>
       </primitive>
       <bundle id="test_bundle">
@@ -105,9 +105,9 @@
       </clone>
     </resources>
     <constraints>
-      <rsc_location id="location-stonith-fence_amt-stonith-fence-1-foobar-0--INFINITY" node="foobar-0" rsc="stonith-fence_amt-stonith-fence-1" score="-INFINITY"/>
-      <rsc_location id="location-stonith-fence_amt-stonith-fence-2-foobar-1--INFINITY" node="foobar-1" rsc="stonith-fence_amt-stonith-fence-2" score="-INFINITY"/>
-      <rsc_location id="location-stonith-fence_amt-stonith-fence-3-foobar-2--INFINITY" node="foobar-2" rsc="stonith-fence_amt-stonith-fence-3" score="-INFINITY"/>
+      <rsc_location id="location-stonith-fence_ipmilan-stonith-fence-1-foobar-0--INFINITY" node="foobar-0" rsc="stonith-fence_ipmilan-stonith-fence-1" score="-INFINITY"/>
+      <rsc_location id="location-stonith-fence_ipmilan-stonith-fence-2-foobar-1--INFINITY" node="foobar-1" rsc="stonith-fence_ipmilan-stonith-fence-2" score="-INFINITY"/>
+      <rsc_location id="location-stonith-fence_ipmilan-stonith-fence-3-foobar-2--INFINITY" node="foobar-2" rsc="stonith-fence_ipmilan-stonith-fence-3" score="-INFINITY"/>
       <rsc_location id="location-rabbitmq-clone" resource-discovery="exclusive" rsc="rabbitmq-clone">
         <rule id="location-rabbitmq-clone-rule" score="0">
           <expression attribute="rabbitmq-role" id="location-rabbitmq-clone-rule-expr" operation="eq" value="true"/>
@@ -119,16 +119,16 @@
     <node_state id="1" uname="foobar-0" in_ccm="true" crmd="online" crm-debug-origin="do_update_resource" join="member" expected="member">
       <lrm id="1">
         <lrm_resources>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-1" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-1_last_0" operation_key="stonith-fence_amt-stonith-fence-1_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="2:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;2:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="5" rc-code="7" op-status="0" interval="0" last-run="1523017362" last-rc-change="1523017362" exec-time="1" queue-time="0" op-digest="c200ae5d45b5c3cbba9fee03e78cacfe" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-1" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-1_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-1_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="2:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;2:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="5" rc-code="7" op-status="0" interval="0" last-run="1523017362" last-rc-change="1523017362" exec-time="1" queue-time="0" op-digest="c200ae5d45b5c3cbba9fee03e78cacfe" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
           </lrm_resource>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-2" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-2_last_0" operation_key="stonith-fence_amt-stonith-fence-2_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;5:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="10" rc-code="0" op-status="0" interval="0" last-run="1523017368" last-rc-change="1523017368" exec-time="1372" queue-time="0" op-digest="fa99cc06478ff373a3c01d551764307a" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-2_monitor_60000" operation_key="stonith-fence_amt-stonith-fence-2_monitor_60000" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="6:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;6:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="11" rc-code="0" op-status="0" interval="60000" last-rc-change="1523017370" exec-time="347" queue-time="0" op-digest="1b6e96c30cd893e21ef817d56c08b03c" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-2" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-2_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-2_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;5:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="10" rc-code="0" op-status="0" interval="0" last-run="1523017368" last-rc-change="1523017368" exec-time="1372" queue-time="0" op-digest="fa99cc06478ff373a3c01d551764307a" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-2_monitor_60000" operation_key="stonith-fence_ipmilan-stonith-fence-2_monitor_60000" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="6:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;6:10:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="11" rc-code="0" op-status="0" interval="60000" last-rc-change="1523017370" exec-time="347" queue-time="0" op-digest="1b6e96c30cd893e21ef817d56c08b03c" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
           </lrm_resource>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-3" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-3_last_0" operation_key="stonith-fence_amt-stonith-fence-3_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="8:13:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;8:13:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="16" rc-code="0" op-status="0" interval="0" last-run="1523017372" last-rc-change="1523017372" exec-time="373" queue-time="0" op-digest="01086af23cd7814717dd88ba475f6923" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-3_monitor_60000" operation_key="stonith-fence_amt-stonith-fence-3_monitor_60000" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="19:14:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;19:14:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="17" rc-code="0" op-status="0" interval="60000" last-rc-change="1523017374" exec-time="524" queue-time="0" op-digest="39a65383b8fc43227462ca188262169d" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-3" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-3_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-3_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="8:13:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;8:13:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="16" rc-code="0" op-status="0" interval="0" last-run="1523017372" last-rc-change="1523017372" exec-time="373" queue-time="0" op-digest="01086af23cd7814717dd88ba475f6923" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-3_monitor_60000" operation_key="stonith-fence_ipmilan-stonith-fence-3_monitor_60000" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="19:14:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;19:14:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="17" rc-code="0" op-status="0" interval="60000" last-rc-change="1523017374" exec-time="524" queue-time="0" op-digest="39a65383b8fc43227462ca188262169d" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
           </lrm_resource>
           <lrm_resource id="test_bundle-docker-1" type="docker" class="ocf" provider="heartbeat">
             <lrm_rsc_op id="test_bundle-docker-1_last_0" operation_key="test_bundle-docker-1_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:14:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;5:14:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-0" call-id="25" rc-code="7" op-status="0" interval="0" last-run="1523017374" last-rc-change="1523017374" exec-time="140" queue-time="0" op-digest="635b2bc9607b43869f8f42920727446e"/>
@@ -159,15 +159,15 @@
     <node_state id="2" uname="foobar-1" in_ccm="true" crmd="online" crm-debug-origin="do_update_resource" join="member" expected="member">
       <lrm id="2">
         <lrm_resources>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-1" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-1_last_0" operation_key="stonith-fence_amt-stonith-fence-1_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="2:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;2:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="6" rc-code="0" op-status="0" interval="0" last-run="1523017363" last-rc-change="1523017363" exec-time="1381" queue-time="0" op-digest="c200ae5d45b5c3cbba9fee03e78cacfe" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-1_monitor_60000" operation_key="stonith-fence_amt-stonith-fence-1_monitor_60000" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="3:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;3:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="7" rc-code="0" op-status="0" interval="60000" last-rc-change="1523017365" exec-time="376" queue-time="0" op-digest="f251574e6cd2fec78c54b1807f085f85" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-1" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-1_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-1_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="2:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;2:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="6" rc-code="0" op-status="0" interval="0" last-run="1523017363" last-rc-change="1523017363" exec-time="1381" queue-time="0" op-digest="c200ae5d45b5c3cbba9fee03e78cacfe" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-1_monitor_60000" operation_key="stonith-fence_ipmilan-stonith-fence-1_monitor_60000" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="3:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;3:7:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="7" rc-code="0" op-status="0" interval="60000" last-rc-change="1523017365" exec-time="376" queue-time="0" op-digest="f251574e6cd2fec78c54b1807f085f85" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
           </lrm_resource>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-2" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-2_last_0" operation_key="stonith-fence_amt-stonith-fence-2_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="4:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;4:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="11" rc-code="7" op-status="0" interval="0" last-run="1523017366" last-rc-change="1523017366" exec-time="0" queue-time="0" op-digest="fa99cc06478ff373a3c01d551764307a" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-2" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-2_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-2_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="4:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;4:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="11" rc-code="7" op-status="0" interval="0" last-run="1523017366" last-rc-change="1523017366" exec-time="0" queue-time="0" op-digest="fa99cc06478ff373a3c01d551764307a" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
           </lrm_resource>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-3" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-3_last_0" operation_key="stonith-fence_amt-stonith-fence-3_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;5:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="15" rc-code="7" op-status="0" interval="0" last-run="1523017371" last-rc-change="1523017371" exec-time="0" queue-time="0" op-digest="01086af23cd7814717dd88ba475f6923" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-3" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-3_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-3_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;5:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="15" rc-code="7" op-status="0" interval="0" last-run="1523017371" last-rc-change="1523017371" exec-time="0" queue-time="0" op-digest="01086af23cd7814717dd88ba475f6923" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
           </lrm_resource>
           <lrm_resource id="test_bundle-docker-1" type="docker" class="ocf" provider="heartbeat">
             <lrm_rsc_op id="test_bundle-docker-1_last_0" operation_key="test_bundle-docker-1_start_0" operation="start" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="22:14:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:0;22:14:0:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-1" call-id="28" rc-code="0" op-status="0" interval="0" last-run="1523017374" last-rc-change="1523017374" exec-time="493" queue-time="0" op-digest="635b2bc9607b43869f8f42920727446e"/>
@@ -198,14 +198,14 @@
     <node_state id="3" uname="foobar-2" in_ccm="true" crmd="online" crm-debug-origin="do_update_resource" join="member" expected="member">
       <lrm id="3">
         <lrm_resources>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-1" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-1_last_0" operation_key="stonith-fence_amt-stonith-fence-1_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="4:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;4:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="5" rc-code="7" op-status="0" interval="0" last-run="1523017362" last-rc-change="1523017362" exec-time="4" queue-time="0" op-digest="c200ae5d45b5c3cbba9fee03e78cacfe" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-1" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-1_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-1_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="4:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;4:5:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="5" rc-code="7" op-status="0" interval="0" last-run="1523017362" last-rc-change="1523017362" exec-time="4" queue-time="0" op-digest="c200ae5d45b5c3cbba9fee03e78cacfe" op-secure-params=" passwd  password " op-secure-digest="50391a6be4d0d4ebb76998356c8ff966"/>
           </lrm_resource>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-2" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-2_last_0" operation_key="stonith-fence_amt-stonith-fence-2_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;5:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="9" rc-code="7" op-status="0" interval="0" last-run="1523017366" last-rc-change="1523017366" exec-time="0" queue-time="0" op-digest="fa99cc06478ff373a3c01d551764307a" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-2" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-2_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-2_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="5:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;5:8:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="9" rc-code="7" op-status="0" interval="0" last-run="1523017366" last-rc-change="1523017366" exec-time="0" queue-time="0" op-digest="fa99cc06478ff373a3c01d551764307a" op-secure-params=" passwd  password " op-secure-digest="43d7a028a1d194c5265a3b3ce302fde5"/>
           </lrm_resource>
-          <lrm_resource id="stonith-fence_amt-stonith-fence-3" type="fence_amt" class="stonith">
-            <lrm_rsc_op id="stonith-fence_amt-stonith-fence-3_last_0" operation_key="stonith-fence_amt-stonith-fence-3_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="6:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;6:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="13" rc-code="7" op-status="0" interval="0" last-run="1523017371" last-rc-change="1523017371" exec-time="0" queue-time="0" op-digest="01086af23cd7814717dd88ba475f6923" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
+          <lrm_resource id="stonith-fence_ipmilan-stonith-fence-3" type="fence_ipmilan" class="stonith">
+            <lrm_rsc_op id="stonith-fence_ipmilan-stonith-fence-3_last_0" operation_key="stonith-fence_ipmilan-stonith-fence-3_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="6:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;6:11:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="13" rc-code="7" op-status="0" interval="0" last-run="1523017371" last-rc-change="1523017371" exec-time="0" queue-time="0" op-digest="01086af23cd7814717dd88ba475f6923" op-secure-params=" passwd  password " op-secure-digest="f81520ca6e7990fb7f328802941e5fd6"/>
           </lrm_resource>
           <lrm_resource id="test_bundle-docker-1" type="docker" class="ocf" provider="heartbeat">
             <lrm_rsc_op id="test_bundle-docker-1_last_0" operation_key="test_bundle-docker-1_monitor_0" operation="monitor" crm-debug-origin="do_update_resource" crm_feature_set="3.0.12" transition-key="11:14:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" transition-magic="0:7;11:14:7:604473fe-c25e-49df-a803-9e1d0a74f9ba" on_node="foobar-2" call-id="21" rc-code="7" op-status="0" interval="0" last-run="1523017374" last-rc-change="1523017374" exec-time="97" queue-time="0" op-digest="635b2bc9607b43869f8f42920727446e"/>
