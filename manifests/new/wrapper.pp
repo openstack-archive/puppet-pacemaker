@@ -68,7 +68,7 @@
 #   Default: undef
 #
 # [*create_primitive*]
-#   (optional) Should the Pcemaker primitive be created
+#   (optional) Should the Pacemaker primitive be created
 #   Default: true
 #
 # [*service_override*]
