@@ -95,6 +95,18 @@
 #   (optional) String of meta attributes
 #   Defaults to undef
 #
+# [*deep_compare*]
+#   Enable deep comparing of resources and bundles
+#   When set to true a resource will be compared in full (options, meta parameters,..)
+#   to the existing one and in case of difference it will be repushed to the CIB
+#   Defaults to false
+#
+# [*update_settle_secs*]
+#   When deep_compare is enabled and puppet updates a resource, this
+#   parameter represents the number (in seconds) to wait for the cluster to settle
+#   after the resource update.
+#   Defaults to 600 (seconds)
+#
 # === Dependencies
 #  None
 #
@@ -151,6 +163,8 @@ define pacemaker::stonith::fence_bladecenter (
   $tries          = undef,
   $try_sleep      = undef,
 
+  $deep_compare       = false,
+  $update_settle_secs = 600,
 ) {
   $ipaddr_chunk = $ipaddr ? {
     undef   => '',
@@ -267,11 +281,13 @@ define pacemaker::stonith::fence_bladecenter (
     Package['fence-agents-bladecenter'] -> Pcmk_stonith["stonith-fence_bladecenter-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_bladecenter-${safe_title}":
-    ensure           => $ensure,
-    stonith_type     => 'fence_bladecenter',
-    pcmk_host_list   => $pcmk_host_value_chunk,
-    pcs_param_string => $param_string,
-    tries            => $tries,
-    try_sleep        => $try_sleep,
+    ensure             => $ensure,
+    stonith_type       => 'fence_bladecenter',
+    pcmk_host_list     => $pcmk_host_value_chunk,
+    pcs_param_string   => $param_string,
+    tries              => $tries,
+    try_sleep          => $try_sleep,
+    deep_compare       => $deep_compare,
+    update_settle_secs => $update_settle_secs,
   }
 }
