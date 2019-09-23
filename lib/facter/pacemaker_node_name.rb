@@ -4,7 +4,7 @@ require 'facter'
 if not File.exists?('/.dockerenv') and not File.exists?('/run/.containerenv')
   Facter.add('pacemaker_node_name') do
     setcode do
-      Facter::Core::Execution.exec 'crm_node -n'
+      Facter::Core::Execution.exec 'crm_node -n 2>/dev/null'
     end
   end
 end
