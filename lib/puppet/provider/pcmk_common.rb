@@ -69,7 +69,8 @@ def backup_cib()
   output = `#{cmd} 2>&1`
   ret = $?
   if not ret.success?
-    msg = "backup_cib: Running: #{cmd} failed with code: #{ret.exitstatus} -> #{output}"
+    msg = "backup_cib: Running: #{cmd} failed with code: #{ret.exitstatus} -> #{output}." \
+          " Either the cluster was not running or the versions of pcmk/pcs between host and container are not matching"
     FileUtils.rm(cib, :force => true)
     raise Puppet::Error, msg
   end
