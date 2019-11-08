@@ -14,7 +14,10 @@ group :test do
   gem 'net-telnet', '~> 0.1.1',                                     :require => false
   gem 'jwt', '~> 1.5.6',                                            :require => false
   gem 'nokogiri', '~> 1.6.0',                                       :require => false
-  gem 'rake',                                                       :require => false
+  gem 'rake', '< 13.0.0',                                           :require => false
+  gem 'dry-inflector', '~> 0.1.2',                                  :require => false
+  gem 'signet', '~> 0.11.0',                                        :require => false
+  gem 'minitest', '~> 5.11.3',                                      :require => false
   gem 'rspec-puppet',                                               :require => false
   gem 'puppet-lint', '~> 1.1.0',                                    :require => false
   gem 'metadata-json-lint',                                         :require => false
