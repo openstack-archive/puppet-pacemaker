@@ -26,7 +26,7 @@ class pacemaker::new::setup::auth_key (
   $cluster_auth_key     = $::pacemaker::new::params::cluster_auth_key,
   $cluster_user         = $::pacemaker::new::params::cluster_user,
   $cluster_group        = $::pacemaker::new::params::cluster_group,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_bool($cluster_auth_enabled)
   validate_string($cluster_user)
   validate_string($cluster_group)

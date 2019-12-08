@@ -129,7 +129,7 @@ define pacemaker::resource::service(
   $deep_compare       = false,
   $update_settle_secs = hiera('pacemaker::resource::service::update_settle_secs', 600),
 ) {
-  include ::pacemaker::params
+  include pacemaker::params
   $res = "pacemaker::resource::${::pacemaker::params::services_manager}"
 
   create_resources($res,

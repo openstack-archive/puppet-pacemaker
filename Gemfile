@@ -29,7 +29,7 @@ group :test do
   end
   gem 'rspec',                                                      :require => false
   gem 'rspec-puppet-utils',                                         :require => false
-  gem 'puppet-lint-absolute_classname-check', '~> 0.2.4',           :require => false
+  gem 'puppet-lint-absolute_classname-check', '~> 2.0.0',           :require => false
   gem 'puppet-lint-leading_zero-check',                             :require => false
   gem 'puppet-lint-trailing_comma-check',                           :require => false
   gem 'puppet-lint-version_comparison-check',                       :require => false

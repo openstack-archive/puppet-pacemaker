@@ -13,7 +13,5 @@ define pacemaker::contain ($class_name='') {
   $k = pick($class_name, $name)
   validate_re($k, '^[^:][^:]', "The class name must be relative not ${k}")
   include "::${k}"
-  # lint:ignore:relative_classname_inclusion
   contain $k
-  # lint:endignore
 }

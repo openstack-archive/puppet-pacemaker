@@ -12,9 +12,9 @@ class properties {
 
 }
 
-include ::properties
+include properties
 
-class { '::pacemaker::new' :
+class { 'pacemaker::new' :
   cluster_nodes    => ['node'],
   cluster_password => 'hacluster',
 

@@ -145,7 +145,7 @@ class pacemaker::new::setup::pcsd (
   $cluster_group     = $::pacemaker::new::params::cluster_group,
   $cluster_password  = $::pacemaker::new::params::cluster_password,
   $pcs_bin_path      = $::pacemaker::new::params::pcs_bin_path,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_string($cluster_name)
   validate_bool($cluster_setup)
   validate_string($cluster_user)

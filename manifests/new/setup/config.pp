@@ -121,7 +121,7 @@ class pacemaker::new::setup::config (
   $cluster_interfaces   = $::pacemaker::new::params::cluster_interfaces,
   $cluster_log_subsys   = $::pacemaker::new::params::cluster_log_subsys,
   $log_file_path        = $::pacemaker::new::params::log_file_path,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_absolute_path($log_file_path)
   validate_absolute_path($cluster_config_path)
   validate_hash($cluster_options)

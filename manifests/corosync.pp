@@ -144,7 +144,7 @@ class pacemaker::corosync(
   $tls_priorities          = undef,
   $enable_scaleup          = true,
 ) inherits pacemaker {
-  include ::pacemaker::params
+  include pacemaker::params
   if ! $cluster_members_rrp {
     if $::pacemaker::pcs_010 {
       $cluster_members_rrp_real = pcmk_cluster_setup($cluster_members, $cluster_members_addr, '0.10')
@@ -190,7 +190,7 @@ class pacemaker::corosync(
       path    => $::pacemaker::pcsd_sysconfig,
       line    => "PCSD_DEBUG=${pcsd_debug_str}",
       match   => '^PCSD_DEBUG=',
-      require => Class['::pacemaker::install'],
+      require => Class['pacemaker::install'],
       before  => Service['pcsd'],
       notify  => Service['pcsd'],
     }
@@ -200,7 +200,7 @@ class pacemaker::corosync(
         path    => $::pacemaker::pcsd_sysconfig,
         line    => "PCSD_BIND_ADDR='${pcsd_bind_addr}'",
         match   => '^PCSD_BIND_ADDR=',
-        require => Class['::pacemaker::install'],
+        require => Class['pacemaker::install'],
         before  => Service['pcsd'],
         notify  => Service['pcsd'],
       }
@@ -210,7 +210,7 @@ class pacemaker::corosync(
         ensure            => absent,
         path              => $::pacemaker::pcsd_sysconfig,
         match             => '^PCSD_BIND_ADDR=*',
-        require           => Class['::pacemaker::install'],
+        require           => Class['pacemaker::install'],
         before            => Service['pcsd'],
         notify            => Service['pcsd'],
         match_for_absence => true,
@@ -222,7 +222,7 @@ class pacemaker::corosync(
         path    => $::pacemaker::pcmk_sysconfig,
         line    => "PCMK_tls_priorities=${tls_priorities}",
         match   => '^PCMK_tls_priorities=',
-        require => Class['::pacemaker::install'],
+        require => Class['pacemaker::install'],
         before  => Service['pcsd'],
       }
     }
@@ -230,7 +230,7 @@ class pacemaker::corosync(
     user { 'hacluster':
       password => pw_hash($::pacemaker::hacluster_pwd, 'SHA-512', fqdn_rand_string(10)),
       groups   => 'haclient',
-      require  => Class['::pacemaker::install'],
+      require  => Class['pacemaker::install'],
       before   => Service['pcsd'],
       notify   => Exec['reauthenticate-across-all-nodes'],
     }
@@ -341,7 +341,7 @@ class pacemaker::corosync(
       tries     => $cluster_start_tries,
       try_sleep => $cluster_start_try_sleep,
       unless    => '/usr/bin/test -f /etc/corosync/corosync.conf',
-      require   => Class['::pacemaker::install'],
+      require   => Class['pacemaker::install'],
     }
     ->
     exec {"Start Cluster ${cluster_name}":

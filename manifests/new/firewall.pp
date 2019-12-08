@@ -55,7 +55,7 @@ class pacemaker::new::firewall (
   $firewall_pcsd_ensure     = $::pacemaker::new::params::firewall_pcsd_ensure,
   $firewall_pcsd_dport      = $::pacemaker::new::params::firewall_pcsd_dport,
   $firewall_pcsd_action     = $::pacemaker::new::params::firewall_pcsd_action,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_bool($firewall_ipv6_manage)
 
   validate_bool($firewall_corosync_manage)

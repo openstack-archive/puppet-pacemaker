@@ -36,7 +36,7 @@
 class pacemaker::install (
   $ensure = present,
 ) {
-  include ::pacemaker::params
+  include pacemaker::params
   ensure_resource('package', $::pacemaker::params::package_list, {
     ensure => present
   })

@@ -51,7 +51,7 @@ class pacemaker::service (
   $hasrestart = true,
   $enable     = true,
 ) {
-  include ::pacemaker::params
+  include pacemaker::params
 
   if $::pacemaker::params::pcsd_mode {
     # only set up pcsd, not the other cluster services which have
@@ -62,14 +62,14 @@ class pacemaker::service (
       hasstatus  => $hasstatus,
       hasrestart => $hasrestart,
       enable     => $enable,
-      require    => Class['::pacemaker::install'],
+      require    => Class['pacemaker::install'],
     }
 
     # The idempotent version of pcs cluster enable, which whas enable
     # unconditionally.
     service { ['corosync', $::pacemaker::params::service_name]:
       enable  => true,
-      require => Class['::pacemaker::install'],
+      require => Class['pacemaker::install'],
       tag     => 'pcsd-cluster-service',
     }
   } else {
@@ -78,7 +78,7 @@ class pacemaker::service (
       hasstatus  => $hasstatus,
       hasrestart => $hasrestart,
       enable     => $enable,
-      require    => Class['::pacemaker::install'],
+      require    => Class['pacemaker::install'],
     }
   }
 }

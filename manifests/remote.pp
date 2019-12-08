@@ -59,13 +59,13 @@ class pacemaker::remote (
   $force_authkey   = undef,
   $tls_priorities  = undef,
 ) {
-  include ::pacemaker::params
+  include pacemaker::params
   ensure_resource('package', $::pacemaker::params::pcmk_remote_package_list, {
     ensure => present
   })
   # pacemaker remote needs pcsd only with pcs >= 0.10
   if $use_pcsd {
-    include ::pacemaker::install
+    include pacemaker::install
     if $manage_fw {
       firewall { '001 pcsd':
         proto  => 'tcp',
@@ -85,7 +85,7 @@ class pacemaker::remote (
       path    => $::pacemaker::params::pcsd_sysconfig,
       line    => "PCSD_DEBUG=${pcsd_debug_str}",
       match   => '^PCSD_DEBUG=',
-      require => Class['::pacemaker::install'],
+      require => Class['pacemaker::install'],
       before  => Service['pcsd'],
       notify  => Service['pcsd'],
     }
@@ -95,7 +95,7 @@ class pacemaker::remote (
         path    => $::pacemaker::params::pcsd_sysconfig,
         line    => "PCSD_BIND_ADDR='${pcsd_bind_addr}'",
         match   => '^PCSD_BIND_ADDR=',
-        require => Class['::pacemaker::install'],
+        require => Class['pacemaker::install'],
         before  => Service['pcsd'],
         notify  => Service['pcsd'],
       }
@@ -105,7 +105,7 @@ class pacemaker::remote (
         ensure            => absent,
         path              => $::pacemaker::params::pcsd_sysconfig,
         match             => '^PCSD_BIND_ADDR=*',
-        require           => Class['::pacemaker::install'],
+        require           => Class['pacemaker::install'],
         before            => Service['pcsd'],
         notify            => Service['pcsd'],
         match_for_absence => true,
@@ -117,7 +117,7 @@ class pacemaker::remote (
         path    => $::pacemaker::params::pcmk_sysconfig,
         line    => "PCMK_tls_priorities=${tls_priorities}",
         match   => '^PCMK_tls_priorities=',
-        require => Class['::pacemaker::install'],
+        require => Class['pacemaker::install'],
         before  => Service['pcsd'],
       }
     }
@@ -125,7 +125,7 @@ class pacemaker::remote (
     user { $pcs_user:
       password => pw_hash($pcs_password, 'SHA-512', fqdn_rand_string(10)),
       groups   => 'haclient',
-      require  => Class['::pacemaker::install'],
+      require  => Class['pacemaker::install'],
       before   => Service['pcsd'],
     }
     # only set up pcsd, not the other cluster services which have
@@ -136,7 +136,7 @@ class pacemaker::remote (
       hasstatus  => true,
       hasrestart => true,
       enable     => true,
-      require    => Class['::pacemaker::install'],
+      require    => Class['pacemaker::install'],
     }
     Service<| title == 'pcsd' |> -> Pcmk_constraint<||>
     Service<| title == 'pcsd' |> -> Pcmk_resource<||>

@@ -5,7 +5,7 @@
 #
 class pacemaker::new::setup::debian (
   $plugin_version = $pacemaker::new::params::plugin_version,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_integer($plugin_version)
 
   File {

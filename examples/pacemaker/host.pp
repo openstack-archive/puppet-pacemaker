@@ -31,5 +31,5 @@ class hostname (
 
 }
 
-include ::hosts
-include ::hostname
+include hosts
+include hostname

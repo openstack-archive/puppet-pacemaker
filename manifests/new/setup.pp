@@ -22,15 +22,15 @@ class pacemaker::new::setup (
   $cluster_log_subsys   = $::pacemaker::new::params::cluster_log_subsys,
   $plugin_version       = $::pacemaker::new::params::plugin_version,
   $log_file_path        = $::pacemaker::new::params::log_file_path,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   if $::os['family'] == 'Debian' {
-    class { '::pacemaker::new::setup::debian' :
+    class { 'pacemaker::new::setup::debian' :
       plugin_version => $plugin_version,
     }
     pacemaker::contain { 'pacemaker::new::setup::debian': }
   }
 
-  class { '::pacemaker::new::setup::auth_key' :
+  class { 'pacemaker::new::setup::auth_key' :
     cluster_auth_enabled => $cluster_auth_enabled,
     cluster_auth_key     => $cluster_auth_key,
     cluster_user         => $cluster_user,
@@ -39,7 +39,7 @@ class pacemaker::new::setup (
   pacemaker::contain { 'pacemaker::new::setup::auth_key': }
 
   if $pcsd_mode {
-    class { '::pacemaker::new::setup::pcsd' :
+    class { 'pacemaker::new::setup::pcsd' :
       cluster_nodes     => $cluster_nodes,
       cluster_rrp_nodes => $cluster_rrp_nodes,
       cluster_name      => $cluster_name,
@@ -52,7 +52,7 @@ class pacemaker::new::setup (
     }
     pacemaker::contain { 'pacemaker::new::setup::pcsd': }
   } else {
-    class { '::pacemaker::new::setup::config' :
+    class { 'pacemaker::new::setup::config' :
       cluster_nodes        => $cluster_nodes,
       cluster_rrp_nodes    => $cluster_rrp_nodes,
       cluster_name         => $cluster_name,

@@ -45,9 +45,9 @@ class pacemaker::new (
   $pacemaker_enable   = $::pacemaker::new::params::pacemaker_enable,
   $pacemaker_service  = $::pacemaker::new::params::pacemaker_service,
   $pacemaker_provider = $::pacemaker::new::params::pacemaker_provider,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
 
-  class { '::pacemaker::new::firewall' :
+  class { 'pacemaker::new::firewall' :
     firewall_ipv6_manage     => $firewall_ipv6_manage,
     firewall_corosync_manage => $firewall_corosync_manage,
     firewall_corosync_ensure => $firewall_corosync_ensure,
@@ -60,14 +60,14 @@ class pacemaker::new (
     firewall_pcsd_action     => $firewall_pcsd_action,
   }
 
-  class { '::pacemaker::new::install' :
+  class { 'pacemaker::new::install' :
     package_manage   => $package_manage,
     package_list     => $package_list,
     package_ensure   => $package_ensure,
     package_provider => $package_provider,
   }
 
-  class { '::pacemaker::new::setup' :
+  class { 'pacemaker::new::setup' :
     pcsd_mode            => $pcsd_mode,
     # pcsd only
     cluster_nodes        => $cluster_nodes,
@@ -88,7 +88,7 @@ class pacemaker::new (
     log_file_path        => $log_file_path,
   }
 
-  class { '::pacemaker::new::service' :
+  class { 'pacemaker::new::service' :
     pcsd_manage        => $pcsd_manage,
     pcsd_enable        => $pcsd_enable,
     pcsd_service       => $pcsd_service,
@@ -108,13 +108,13 @@ class pacemaker::new (
   pacemaker::contain { 'pacemaker::new::setup': }
   pacemaker::contain { 'pacemaker::new::service': }
 
-  Class['::pacemaker::new::firewall'] ->
-  Class['::pacemaker::new::install']
+  Class['pacemaker::new::firewall'] ->
+  Class['pacemaker::new::install']
 
-  Class['::pacemaker::new::install'] ->
-  Class['::pacemaker::new::service']
+  Class['pacemaker::new::install'] ->
+  Class['pacemaker::new::service']
 
-  Class['::pacemaker::new::install'] ->
-  Class['::pacemaker::new::setup']
+  Class['pacemaker::new::install'] ->
+  Class['pacemaker::new::setup']
 
 }

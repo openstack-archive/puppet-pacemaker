@@ -22,7 +22,7 @@ class pacemaker::new::install (
   $package_list     = $::pacemaker::new::params::package_list,
   $package_ensure   = $::pacemaker::new::params::package_ensure,
   $package_provider = $::pacemaker::new::params::package_provider,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_bool($package_manage)
   validate_array($package_list)
   validate_string($package_ensure)

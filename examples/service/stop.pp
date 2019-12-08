@@ -7,7 +7,7 @@ service { 'service-test1' :
 }
 
 # apply a wrapper
-::pacemaker::new::wrapper { 'service-test1' :
+pacemaker::new::wrapper { 'service-test1' :
   primitive_class    => 'ocf',
   primitive_provider => 'pacemaker',
   primitive_type     => 'Dummy',

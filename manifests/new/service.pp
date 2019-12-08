@@ -17,7 +17,7 @@ class pacemaker::new::service (
   $pacemaker_enable   = $::pacemaker::new::params::pacemaker_enable,
   $pacemaker_service  = $::pacemaker::new::params::pacemaker_service,
   $pacemaker_provider = $::pacemaker::new::params::pacemaker_provider,
-) inherits ::pacemaker::new::params {
+) inherits pacemaker::new::params {
   validate_bool($pcsd_manage)
   validate_bool($pcsd_enable)
   validate_string($pcsd_service)
