@@ -79,6 +79,10 @@
 #   (optional) Enable pcsd debugging
 #   Defaults to false
 #
+# [*pcsd_bind_addr*]
+#   (optional) List of IP addresses pcsd should bind to
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to undef
@@ -126,6 +130,7 @@ class pacemaker::corosync(
   $enable_sbd              = false,
   $sbd_watchdog_timeout    = '10',
   $pcsd_debug              = false,
+  $pcsd_bind_addr          = undef,
   $tls_priorities          = undef,
 ) inherits pacemaker {
   include ::pacemaker::params
@@ -178,6 +183,29 @@ class pacemaker::corosync(
       before  => Service['pcsd'],
       notify  => Service['pcsd'],
     }
+
+    if $pcsd_bind_addr != undef {
+      file_line { 'pcsd_bind_addr':
+        path    => $::pacemaker::pcsd_sysconfig,
+        line    => "PCSD_BIND_ADDR='${pcsd_bind_addr}'",
+        match   => '^PCSD_BIND_ADDR=',
+        require => Class['::pacemaker::install'],
+        before  => Service['pcsd'],
+        notify  => Service['pcsd'],
+      }
+    }
+    else {
+      file_line { 'pcsd_bind_addr':
+        ensure            => absent,
+        path              => $::pacemaker::pcsd_sysconfig,
+        match             => '^PCSD_BIND_ADDR=*',
+        require           => Class['::pacemaker::install'],
+        before            => Service['pcsd'],
+        notify            => Service['pcsd'],
+        match_for_absence => true,
+      }
+    }
+
     if $tls_priorities != undef {
       file_line { 'tls_priorities':
         path    => $::pacemaker::pcmk_sysconfig,
