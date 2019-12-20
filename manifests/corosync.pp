@@ -87,6 +87,11 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to undef
 #
+# [*enable_scaleup*]
+#   (optional) Enables the scaleup logic of the cluster nodes (i.e. we do not add a
+#   node via pcs if we detect a new node compared to the existing cluster)
+#   Defaults to true
+#
 # === Dependencies
 #
 #  None
@@ -132,6 +137,7 @@ class pacemaker::corosync(
   $pcsd_debug              = false,
   $pcsd_bind_addr          = undef,
   $tls_priorities          = undef,
+  $enable_scaleup          = true,
 ) inherits pacemaker {
   include ::pacemaker::params
   if ! $cluster_members_rrp {
@@ -272,41 +278,43 @@ class pacemaker::corosync(
       $nodes_added = pcmk_nodes_added($cluster_members, $cluster_members_addr, '0.9')
       $node_add_start_part = ''
     }
-    # If we're rerunning this puppet manifest and $cluster_members
-    # contains more nodes than the currently running cluster
-    if count($nodes_added) > 0 {
-      $nodes_added.each |$node_to_add| {
-        $node_name = split($node_to_add, ' ')[0]
-        if $::pacemaker::pcs_010 {
-          exec {"Authenticating new cluster node: ${node_to_add}":
-            command   => "${::pacemaker::pcs_bin} host auth ${node_name} -u hacluster -p ${::pacemaker::hacluster_pwd}",
+    if $enable_scaleup {
+      # If we're rerunning this puppet manifest and $cluster_members
+      # contains more nodes than the currently running cluster
+      if count($nodes_added) > 0 {
+        $nodes_added.each |$node_to_add| {
+          $node_name = split($node_to_add, ' ')[0]
+          if $::pacemaker::pcs_010 {
+            exec {"Authenticating new cluster node: ${node_to_add}":
+              command   => "${::pacemaker::pcs_bin} host auth ${node_name} -u hacluster -p ${::pacemaker::hacluster_pwd}",
+              timeout   => $cluster_start_timeout,
+              tries     => $cluster_start_tries,
+              try_sleep => $cluster_start_try_sleep,
+              require   => [Service['pcsd'], User['hacluster']],
+              tag       => 'pacemaker-auth',
+            }
+          }
+          exec {"Adding Cluster node: ${node_to_add} to Cluster ${cluster_name}":
+            unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
+            command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} ${node_add_start_part} --wait",
             timeout   => $cluster_start_timeout,
             tries     => $cluster_start_tries,
             try_sleep => $cluster_start_try_sleep,
-            require   => [Service['pcsd'], User['hacluster']],
-            tag       => 'pacemaker-auth',
+            notify    => Exec["node-cluster-start-${node_name}"],
+            tag       => 'pacemaker-scaleup',
+          }
+          exec {"node-cluster-start-${node_name}":
+            unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
+            command     => "${::pacemaker::pcs_bin} cluster start ${node_name} --wait",
+            timeout     => $cluster_start_timeout,
+            tries       => $cluster_start_tries,
+            try_sleep   => $cluster_start_try_sleep,
+            refreshonly => true,
+            tag         => 'pacemaker-scaleup',
           }
         }
-        exec {"Adding Cluster node: ${node_to_add} to Cluster ${cluster_name}":
-          unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
-          command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} ${node_add_start_part} --wait",
-          timeout   => $cluster_start_timeout,
-          tries     => $cluster_start_tries,
-          try_sleep => $cluster_start_try_sleep,
-          notify    => Exec["node-cluster-start-${node_name}"],
-          tag       => 'pacemaker-scaleup',
-        }
-        exec {"node-cluster-start-${node_name}":
-          unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
-          command     => "${::pacemaker::pcs_bin} cluster start ${node_name} --wait",
-          timeout     => $cluster_start_timeout,
-          tries       => $cluster_start_tries,
-          try_sleep   => $cluster_start_try_sleep,
-          refreshonly => true,
-          tag         => 'pacemaker-scaleup',
-        }
+        Exec <|tag == 'pacemaker-auth'|> -> Exec <|tag == 'pacemaker-scaleup'|>
       }
-      Exec <|tag == 'pacemaker-auth'|> -> Exec <|tag == 'pacemaker-scaleup'|>
     }
 
     Exec <|tag == 'pacemaker-auth'|>
