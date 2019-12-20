@@ -48,6 +48,7 @@ Output forms:
       # if the command fails we certainly did not add any nodes
       return [] if $?.exitstatus != 0
     end
+    Puppet.debug("pcmk_nodes_added: crm_nodes_output #{crm_nodes_output}")
 
     crm_nodes = []
     crm_nodes_output.lines.each { |line|
@@ -94,7 +95,7 @@ Output forms:
       fail("pcmk_nodes_added: pcs #{pcs_version} is unsupported")
     end
 
-    Puppet.debug("pcmk_nodes_added: #{ret}")
+    Puppet.debug("pcmk_nodes_added: #{ret} [#{node_list} - #{crm_nodes}]")
     ret
   end
 end
