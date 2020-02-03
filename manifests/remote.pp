@@ -87,7 +87,7 @@ class pacemaker::remote (
 
     if $pcsd_bind_addr != undef {
       file_line { 'pcsd_bind_addr':
-        path    => $::pacemaker::pcsd_sysconfig,
+        path    => $::pacemaker::params::pcsd_sysconfig,
         line    => "PCSD_BIND_ADDR='${pcsd_bind_addr}'",
         match   => '^PCSD_BIND_ADDR=',
         require => Class['::pacemaker::install'],
@@ -109,7 +109,7 @@ class pacemaker::remote (
 
     if $tls_priorities != undef {
       file_line { 'tls_priorities':
-        path    => $::pacemaker::pcmk_sysconfig,
+        path    => $::pacemaker::params::pcmk_sysconfig,
         line    => "PCMK_tls_priorities=${tls_priorities}",
         match   => '^PCMK_tls_priorities=',
         require => Class['::pacemaker::install'],
