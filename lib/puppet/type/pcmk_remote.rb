@@ -38,6 +38,12 @@ Puppet::Type.newtype(:pcmk_remote) do
     defaultto 0
   end
 
+  newparam(:force, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc "Wheter to use --force with pcs"
+
+    defaultto false
+  end
+
   ## borrowed from exec.rb
   newparam(:tries) do
     desc "The number of times to attempt to create a pcs resource.

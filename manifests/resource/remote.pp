@@ -46,6 +46,10 @@
 #   (optional) Whether to verify creation of resource
 #   Defaults to false
 #
+# [*force*]
+#   (optional) Whether to force creation via pcs --force
+#   Defaults to false
+#
 # [*location_rule*]
 #   (optional) Add a location constraint before actually enabling
 #   the resource. Must be a hash like the following example:
@@ -106,6 +110,7 @@ define pacemaker::resource::remote(
   $tries              = 1,
   $try_sleep          = 0,
   $verify_on_create   = false,
+  $force              = false,
   $pcs_user           = 'hacluster',
   $pcs_password       = undef,
   $location_rule      = undef,
@@ -126,6 +131,7 @@ define pacemaker::resource::remote(
       pcs_password       => $pcs_password,
       deep_compare       => $deep_compare,
       update_settle_secs => $update_settle_secs,
+      force              => $force,
     }
   } else {
     pcmk_resource { $name:
@@ -140,6 +146,7 @@ define pacemaker::resource::remote(
       tries              => $tries,
       try_sleep          => $try_sleep,
       verify_on_create   => $verify_on_create,
+      force              => $force,
       location_rule      => $location_rule,
       deep_compare       => $deep_compare,
       update_settle_secs => $update_settle_secs,

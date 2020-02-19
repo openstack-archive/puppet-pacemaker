@@ -56,6 +56,10 @@
 #   (optional) Whether to verify creation of resource
 #   Defaults to false
 #
+# [*force*]
+#   (optional) Whether to force creation via pcs --force
+#   Defaults to false
+#
 # [*location_rule*]
 #   (optional) Add a location constraint before actually enabling
 #   the resource. Must be a hash like the following example:
@@ -119,6 +123,7 @@ define pacemaker::resource::route(
   $tries              = 1,
   $try_sleep          = 0,
   $verify_on_create   = false,
+  $force              = false,
   $location_rule      = undef,
   $deep_compare       = false,
   $update_settle_secs = hiera('pacemaker::resource::route::update_settle_secs', 600),
@@ -155,6 +160,7 @@ define pacemaker::resource::route(
     tries              => $tries,
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
+    force              => $force,
     location_rule      => $location_rule,
     deep_compare       => $deep_compare,
     update_settle_secs => $update_settle_secs,

@@ -43,8 +43,13 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
       docker_cmd = container_backend
     end
 
+    if @resource[:force]
+      force_cmd = '--force '
+    else
+      force_cmd = ''
+    end
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
-    cmd = 'resource bundle ' + create_cmd + ' ' + @resource[:name] + ' container ' + docker_cmd + ' image=' + @resource[:image]
+    cmd = force_cmd + 'resource bundle ' + create_cmd + ' ' + @resource[:name] + ' container ' + docker_cmd + ' image=' + @resource[:image]
     if replicas
       cmd += " replicas=#{replicas}"
     end

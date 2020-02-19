@@ -67,6 +67,10 @@
 #   (optional) Whether to verify creation of resource
 #   Defaults to false
 #
+# [*force*]
+#   (optional) Whether to force creation via pcs --force
+#   Defaults to false
+#
 # [*location_rule*]
 #   (optional) Add a location constraint before actually enabling
 #   the resource. Must be a hash like the following example:
@@ -130,6 +134,7 @@ define pacemaker::resource::bundle(
   $tries              = 1,
   $try_sleep          = 0,
   $verify_on_create   = false,
+  $force              = false,
   $location_rule      = undef,
   $container_backend  = 'docker',
   $deep_compare       = hiera('pacemaker::resource::bundle::deep_compare', false),
@@ -159,6 +164,7 @@ define pacemaker::resource::bundle(
     tries              => $tries,
     try_sleep          => $try_sleep,
     verify_on_create   => $verify_on_create,
+    force              => $force,
     location_rule      => $location_rule,
     container_backend  => $container_backend,
     deep_compare       => $deep_compare,

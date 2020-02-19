@@ -77,6 +77,12 @@ Puppet::Type.newtype(:pcmk_resource) do
      defaultto false
    end
 
+  newparam(:force, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc "Wheter to use --force with pcs"
+
+    defaultto false
+  end
+
   newproperty(:op_params) do
     desc "op parameters"
   end

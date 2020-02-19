@@ -27,8 +27,13 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
       create_cmd = ' create '
     end
 
+    if @resource[:force]
+      force_cmd = '--force '
+    else
+      force_cmd = ''
+    end
     # Build the 'pcs resource create' command.  Check out the pcs man page :-)
-    cmd = 'resource' + create_cmd + @resource[:name] + ' ' + @resource[:resource_type]
+    cmd = force_cmd + 'resource' + create_cmd + @resource[:name] + ' ' + @resource[:resource_type]
     if @resource[:resource_type] == 'remote'
       if not_empty_string(@resource[:remote_address])
         cmd += ' server=' + @resource[:remote_address]

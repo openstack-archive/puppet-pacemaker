@@ -74,6 +74,12 @@ Puppet::Type.newtype(:pcmk_bundle) do
      defaultto false
    end
 
+  newparam(:force, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc "Wheter to use --force with pcs"
+
+    defaultto false
+  end
+
   newproperty(:image) do
     desc "docker image"
   end
