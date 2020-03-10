@@ -127,17 +127,22 @@ is valid.
     eof
 
     validate do |value|
-      raise "Operations property must be an Hash or a Set. Got: #{value.inspect}" unless value.is_a? Hash or value.is_a? Set
+      raise "Operations property must be an Hash. Got: #{value.inspect}" unless value.is_a? Hash
     end
 
+    # Puppet calls this for individual operations inside the Array
     munge do |value|
+      raise "expected to munge a single operation" if value.is_a? Array
       value = resource.stringify_data value
-      resource.munge_operations(value)
+      resource.munge_operation(value)
     end
 
     def should=(value)
-      super
-      @should = [resource.munge_operations(@should)]
+      munged = resource.munge_operations_array(value)
+      super(munged)
+      # @shouldorig is supposed to hold the original value, but super will
+      # stored munged, not the original it didn't receive.
+      @shouldorig = value
     end
 
     def is_to_s(is)

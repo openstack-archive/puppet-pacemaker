@@ -1,5 +1,3 @@
-require 'set'
-
 module Pacemaker
   # function related to the primitives configuration
   # main structure "primitives"

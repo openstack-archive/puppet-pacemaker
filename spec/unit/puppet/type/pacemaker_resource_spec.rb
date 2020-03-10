@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'set'
 
 describe Puppet::Type.type(:pacemaker_resource) do
   subject do
@@ -82,46 +81,62 @@ describe Puppet::Type.type(:pacemaker_resource) do
     end
 
     context 'on operations' do
+      it 'should maintain a set-like operations array' do
+        ops = []
+        instance.add_to_operations_array(ops, { 'name' => 'foo', 'interval' => 10, })
+        instance.add_to_operations_array(ops, { 'name' => 'foo', 'interval' => 20, 'timeout' => 4, })
+        instance.add_to_operations_array(ops, { 'name' => 'foo', 'interval' => 20, })
+        instance.add_to_operations_array(ops, { 'name' => 'bar', 'interval' => 20, })
+
+        ops2 = [
+          { 'name' => 'bar', 'interval' => 20, },
+          { 'name' => 'foo', 'interval' => 10, },
+          { 'name' => 'foo', 'interval' => 20, },
+        ]
+
+        expect(ops).to eq ops2
+      end
+
       it 'should change operations format if provided as hash' do
         data_from = {'start' => {'timeout' => '20', 'interval' => '0'}, 'monitor' => {'interval' => '10'}}
         data_to = [{'interval' => '10', 'name' => 'monitor'}, {'timeout' => '20', 'name' => 'start', 'interval' => '0'}]
         instance[:operations] = data_from
-        expect(instance[:operations]).to eq [Set.new(data_to)]
+        expect(instance[:operations]).to eq data_to
       end
 
       it 'should support several monitor operations' do
         data_from = [{'interval' => '10', 'name' => 'monitor'}, {'interval' => '20', 'name' => 'monitor'}]
         data_to = [{'interval' => '10', 'name' => 'monitor'}, {'interval' => '20', 'name' => 'monitor'}]
         instance[:operations] = data_from
-        expect(instance[:operations]).to eq [Set.new(data_to)]
+        expect(instance[:operations]).to eq data_to
       end
 
       it 'should reset non-monitor operation interval to 0' do
         data_from = {'start' => {'timeout' => '20', 'interval' => '10'}, 'stop' => {'interval' => '20', 'timeout' => '20'}}
         data_to = [{'timeout' => '20', 'name' => 'start', 'interval' => '0'}, {'interval' => '0', 'name' => 'stop', 'timeout' => '20', }]
         instance[:operations] = data_from
-        expect(instance[:operations]).to eq [Set.new(data_to)]
+        expect(instance[:operations]).to eq data_to
       end
 
       it 'should add missing interval values' do
         data_from = [{'interval' => '10', 'name' => 'monitor'}, {'timeout' => '20', 'name' => 'start'}]
         data_to = [{'interval' => '10', 'name' => 'monitor'}, {'timeout' => '20', 'name' => 'start', 'interval' => '0'}]
         instance[:operations] = data_from
-        expect(instance[:operations]).to eq [Set.new(data_to)]
+        expect(instance[:operations]).to eq data_to
       end
 
       it 'should capitalize role value' do
         data_from = [{'interval' => '10', 'name' => 'monitor', 'role' => 'master'}]
         data_to = [{'interval' => '10', 'name' => 'monitor', 'role' => 'Master'}]
         instance[:operations] = data_from
-        expect(instance[:operations]).to eq [Set.new(data_to)]
+        expect(instance[:operations]).to eq data_to
       end
 
       it 'should stringify operations structure' do
         data_from = {'interval' => 10, :name => 'monitor'}
         data_to = [{'interval' => '10', 'name' => 'monitor'}]
         instance[:operations] = data_from
-        expect(instance[:operations]).to eq [Set.new(data_to)]
+        expect(instance[:operations]).to eq data_to
       end
     end
 

@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'set'
 
 describe Puppet::Type.type(:pacemaker_resource).provider(:xml) do
   let(:resource) do
@@ -196,13 +195,11 @@ describe Puppet::Type.type(:pacemaker_resource).provider(:xml) do
           metadata: {
               'resource-stickiness' => '1'
           },
-          operations: Set.new(
-              [
-                  {'interval' => '20', 'name' => 'monitor', 'timeout' => '10'},
-                  {'interval' => '0', 'name' => 'start', 'timeout' => '60'},
-                  {'interval' => '0', 'name' => 'stop', 'timeout' => '60'},
-              ]
-          )
+          operations: [
+              {'interval' => '20', 'name' => 'monitor', 'timeout' => '10'},
+              {'interval' => '0', 'name' => 'start', 'timeout' => '60'},
+              {'interval' => '0', 'name' => 'stop', 'timeout' => '60'},
+          ],
       }
       expect(provider.property_hash).to eq data
     end
@@ -232,17 +229,15 @@ describe Puppet::Type.type(:pacemaker_resource).provider(:xml) do
               'migration-threshold' => 'INFINITY',
               'failure-timeout' => '60s'
           },
-          operations: Set.new(
-              [
-                  {'name' => 'demote', 'timeout' => '60', 'interval' => '0'},
-                  {'name' => 'monitor', 'timeout' => '60', 'interval' => '27', 'role' => 'Master'},
-                  {'name' => 'monitor', 'timeout' => '60', 'interval' => '30'},
-                  {'name' => 'notify', 'timeout' => '60', 'interval' => '0'},
-                  {'name' => 'promote', 'timeout' => '120', 'interval' => '0'},
-                  {'name' => 'start', 'timeout' => '120', 'interval' => '0'},
-                  {'name' => 'stop', 'timeout' => '60', 'interval' => '0'},
-              ]
-          ),
+          operations: [
+              {'name' => 'demote', 'timeout' => '60', 'interval' => '0'},
+              {'name' => 'monitor', 'timeout' => '60', 'interval' => '27', 'role' => 'Master'},
+              {'name' => 'monitor', 'timeout' => '60', 'interval' => '30'},
+              {'name' => 'notify', 'timeout' => '60', 'interval' => '0'},
+              {'name' => 'promote', 'timeout' => '120', 'interval' => '0'},
+              {'name' => 'start', 'timeout' => '120', 'interval' => '0'},
+              {'name' => 'stop', 'timeout' => '60', 'interval' => '0'},
+          ],
       }
       expect(provider.property_hash).to eq data
     end

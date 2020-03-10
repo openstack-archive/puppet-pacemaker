@@ -1,5 +1,3 @@
-require 'set'
-
 module Pacemaker
   # contains functions that can be included to the pacemaker types
   module Type
@@ -36,48 +34,59 @@ module Pacemaker
           stringify_data element
         end
       elsif data.is_a? Set
-        new_data = Set.new
-        data.each do |element|
-          new_data.add(stringify_data element)
-        end
-        new_data
+        raise "unexpected Set data: #{data}"
       else
         data.to_s
       end
     end
 
-    # modify provided operations data
+    # Maintains an array of operation hashes as if it was a sorted set. These
+    # are in Array-of-Hash format ({ 'name' => 'monitor', 'interval' => ...}),
+    # not { 'monitor' => {...} } ones. The unicity is done on the name and
+    # interval operation keys. The input is expected to have been stringified
+    # and munged.
+    #
+    # Modifies the operations argument and returns it.
+    #
+    # We can't use a real Set as it doesn't serialize correctly in Puppet's
+    # transaction store. This datastructure is always small, so performance
+    # is irrelevant.
+    def add_to_operations_array(operations, new_op)
+      operations.delete_if { |op| op['name'] == new_op['name'] && op['interval'] == new_op['interval'] }
+      operations << new_op
+      operations.sort_by! { |op| "#{op['name']} #{op['interval']}" }
+    end
+
+    # Munges the input into an Array of munged operations.
     # @param [Hash,Array] operations_input parameter value from catalog
-    def munge_operations(operations_input)
+    def munge_operations_array(operations_input)
+      operations_input = stringify_data(operations_input)
       operations_input = [operations_input] unless operations_input.is_a? Array
-      operations = Set.new
+      operations = []
       operations_input.each do |operation|
-        # operations are an array of sets
-        if operation.is_a? Set
-          operations.merge operation
-          next
-        end
-        # # operations were provided as an array of hashes
+        # operations were provided as an array of hashes
         if operation.is_a? Hash and operation['name']
           munge_operation operation
-          operations.add operation
-          next
-        end
-        # operations were provided as a hash of hashes
-        operation.each do |operation_name, operation_data|
-          next unless operation_data.is_a? Hash
-          operation = {}
-          if operation_name.include? ':'
-            operation_name_array = operation_name.split(':')
-            operation_name = operation_name_array[0]
-            if not operation_data['role'] and operation_name_array[1]
-              operation_data['role'] = operation_name_array[1]
+          add_to_operations_array(operations, operation)
+        elsif operation.is_a? Hash
+          # operations were provided as a hash of hashes
+          operation.each do |operation_name, operation_data|
+            raise "invalid operation in a hash of hashes: #{operation_data}" unless operation_data.is_a? Hash
+            operation = {}
+            if operation_name.include? ':'
+              operation_name_array = operation_name.split(':')
+              operation_name = operation_name_array[0]
+              if not operation_data['role'] and operation_name_array[1]
+                operation_data['role'] = operation_name_array[1]
+              end
             end
+            operation['name'] = operation_name
+            operation.merge! operation_data
+            munge_operation operation
+            add_to_operations_array(operations, operation) if operation.any?
           end
-          operation['name'] = operation_name
-          operation.merge! operation_data
-          munge_operation operation
-          operations.add operation if operation.any?
+        else
+          raise "invalid pacemaker_resource.operations input: #{operations_input}"
         end
       end
       operations
@@ -86,7 +95,7 @@ module Pacemaker
     # munge a single operations hash
     # @param [Hash] operation
     def munge_operation(operation)
-      return unless operation.is_a? Hash
+      raise "invalid pacemaker_resource.operations element: #{operation}" unless operation.is_a? Hash
       operation['name'] = 'monitor' unless operation['name']
       operation['interval'] = '0' unless operation['name'] == 'monitor'
       operation['interval'] = '0' unless operation['interval']

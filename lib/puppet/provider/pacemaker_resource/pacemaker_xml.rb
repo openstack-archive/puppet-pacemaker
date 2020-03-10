@@ -1,5 +1,4 @@
 require_relative '../pacemaker_xml'
-require 'set'
 
 Puppet::Type.type(:pacemaker_resource).provide(:xml, parent: Puppet::Provider::PacemakerXML) do
   desc <<-eof
@@ -83,12 +82,13 @@ better model since these values can be almost anything.'
     end
 
     if data['operations']
-      operations_set = Set.new
+      operations_data = []
       data['operations'].each do |_id, operation|
         operation.delete 'id'
-        operations_set.add operation
+        operation = munge_operation(operation)
+        add_to_operations_array(operations_data, operation)
       end
-      target_structure[:operations] = operations_set
+      target_structure[:operations] = operations_data
     end
   end
 
@@ -232,7 +232,6 @@ better model since these values can be almost anything.'
   end
 
   def operations=(should)
-    should = should.first if should.is_a? Array
     property_hash[:operations] = should
   end
 
@@ -305,14 +304,10 @@ better model since these values can be almost anything.'
 
     # operations structure
     if operations && operations.any?
+      raise "expected operations to be an array" unless operations.is_a? Array
       primitive_structure['operations'] = {}
       operations.each do |operation|
-        if operation.is_a?(Array) && operation.length == 2
-          # operations were provided and Hash { name => { parameters } }, convert it
-          operation_name = operation[0]
-          operation = operation[1]
-          operation['name'] = operation_name unless operation['name']
-        end
+        raise "expected operations members to be hashes" unless operation.is_a? Hash
         unless operation['id']
           # there is no id provided, generate it
           id_components = [name, operation['name'], operation['interval']]
