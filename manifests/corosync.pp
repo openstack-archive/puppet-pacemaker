@@ -390,4 +390,5 @@ class pacemaker::corosync(
   Exec<| title == 'wait-for-settle' |> -> Pcmk_resource<||>
   Exec<| title == 'wait-for-settle' |> -> Pcmk_property<||>
   Exec<| title == 'wait-for-settle' |> -> Pcmk_bundle<||>
+  Exec<| title == 'wait-for-settle' |> -> Pcmk_remote<||>
 }
