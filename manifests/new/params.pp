@@ -3,11 +3,11 @@
 # Common default parameter values for the Paceamker module
 #
 class pacemaker::new::params {
-  $release = split($::operatingsystemrelease, '[.]')
-  $major = $release[0]
-  $minor = $release[1]
+  $release = split($::os['release']['full'], '[.]')
+  $major = $::os['release']['major']
+  $minor = $::os['release']['minor']
 
-  if $::osfamily == 'RedHat' {
+  if $::os['family'] == 'RedHat' {
     if $major >= '7' {
       $package_list = ['pacemaker', 'pcs', 'fence-agents-all', 'pacemaker-libs']
       $pcsd_mode = true
@@ -22,9 +22,9 @@ class pacemaker::new::params {
     $cluster_user  = 'hacluster'
     $cluster_group = 'haclient'
     $log_file_path = '/var/log/cluster/corosync.log'
-  } elsif $::osfamily == 'Debian' {
+  } elsif $::os['family'] == 'Debian' {
     $pcsd_mode = false
-    if ($::operatingsystem == 'Ubuntu') and (versioncmp($::operatingsystemmajrelease, '16') >= 0) {
+    if ($::os['name'] == 'Ubuntu') and (versioncmp($::os['release']['full'], '16') >= 0) {
       $package_list = ['dbus', 'pacemaker', 'corosync', 'pacemaker-cli-utils', 'resource-agents', 'crmsh']
     } else {
       $package_list = ['pacemaker-mgmt', 'pacemaker', 'corosync', 'pacemaker-cli-utils', 'resource-agents', 'crmsh']
@@ -33,7 +33,7 @@ class pacemaker::new::params {
     $cluster_group = 'root'
     $log_file_path = '/var/log/corosync/corosync.log'
   } else {
-    fail("OS '${::operatingsystem}' is not supported!")
+    fail("OS '${::os['name']}' is not supported!")
   }
 
   $firewall_ipv6_manage     = true

@@ -23,7 +23,7 @@ class pacemaker::new::setup (
   $plugin_version       = $::pacemaker::new::params::plugin_version,
   $log_file_path        = $::pacemaker::new::params::log_file_path,
 ) inherits ::pacemaker::new::params {
-  if $::osfamily == 'Debian' {
+  if $::os['family'] == 'Debian' {
     class { '::pacemaker::new::setup::debian' :
       plugin_version => $plugin_version,
     }

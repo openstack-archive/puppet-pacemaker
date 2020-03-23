@@ -30,12 +30,12 @@
 class pacemaker::params {
 
   $hacluster_pwd         = 'CHANGEME'
-  case $::osfamily {
+  case downcase($::facts['os']['family']) {
     'redhat': {
       $pcs_bin = '/sbin/pcs'
       $pcsd_sysconfig = '/etc/sysconfig/pcsd'
       $pcmk_sysconfig = '/etc/sysconfig/pacemaker'
-      if $::operatingsystemrelease =~ /^6\..*$/ {
+      if (versioncmp($::os['release']['major'], '7.0') < 0) {
         $package_list = ['pacemaker','pcs','fence-agents','cman']
         # TODO in el6.6, $pcsd_mode should be true
         $pcsd_mode = false
@@ -46,13 +46,13 @@ class pacemaker::params {
         $services_manager = 'systemd'
       }
       # Starting with 7.3 we have a separate pacemaker-remote package
-      if $::operatingsystemrelease =~ /7\.[012]*$/ {
+      if (versioncmp($::os['release']['full'], '7.2') < 1) {
         $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
       } else {
         $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs', 'pacemaker-remote']
       }
       # Detect pcs 0.10.x versions and use different commands
-      if $::operatingsystemrelease =~ /8\..*$/ {
+      if (versioncmp($::os['release']['full'], '8.0') > 0) {
         $pcs_010 = true
       } else {
         $pcs_010 = false
@@ -60,11 +60,7 @@ class pacemaker::params {
       $service_name = 'pacemaker'
     }
     default: {
-      case $::operatingsystem {
-        default: {
-          fail("Unsupported platform: ${::osfamily}/${::operatingsystem}")
-        }
-      }
+      fail("Unsupported platform: ${::os['family']}")
     }
   }
 }
