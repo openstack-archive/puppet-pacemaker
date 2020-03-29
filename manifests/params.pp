@@ -35,7 +35,7 @@ class pacemaker::params {
       $pcs_bin = '/sbin/pcs'
       $pcsd_sysconfig = '/etc/sysconfig/pcsd'
       $pcmk_sysconfig = '/etc/sysconfig/pacemaker'
-      if (versioncmp($::os['release']['major'], '7.0') < 0) {
+      if (versioncmp($::os['release']['full'], '7.0') < 0) {
         $package_list = ['pacemaker','pcs','fence-agents','cman']
         # TODO in el6.6, $pcsd_mode should be true
         $pcsd_mode = false
