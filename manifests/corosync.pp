@@ -230,6 +230,16 @@ class pacemaker::corosync(
       notify   => Exec['reauthenticate-across-all-nodes'],
     }
 
+    # If we fail the local authentication via pcs, let's try and reauthenticate
+    # This might happen if /var/lib/pcsd/tokens got corrupt or if we upgraded pcs versions
+    # and authentication is not working even though the hacluster user has not changed
+    exec { 'check-for-local-authentication':
+      command => "/bin/echo 'local pcsd auth failed, triggering a reauthentication'",
+      onlyif  => "${::pacemaker::pcs_bin} status pcsd ${::hostname} 2>&1 | grep 'Unable to authenticate'",
+      tag     => 'pacemaker-auth',
+      notify  => Exec['reauthenticate-across-all-nodes'],
+    }
+
     # pcs-0.10.x has different commands to set up the cluster
     if $::pacemaker::pcs_010 {
       $cluster_setup_cmd = "${::pacemaker::pcs_bin} cluster setup ${cluster_name} ${cluster_members_rrp_real}"
