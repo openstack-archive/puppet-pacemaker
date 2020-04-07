@@ -23,7 +23,7 @@ describe 'pacemaker::new::setup', type: :class do
         major = release.first
         minor = release.last
 
-        if facts[:osfamily] == 'RedHat' and ( (major == '8') or (major == '7') or (minor == '6' and major.to_i >= 6) )
+        if facts[:osfamily] == 'RedHat'
           it { is_expected.to contain_class('pacemaker::new::setup::pcsd') }
         else
           it { is_expected.to contain_class('pacemaker::new::setup::config') }
