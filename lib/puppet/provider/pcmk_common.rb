@@ -2,29 +2,27 @@ require 'digest'
 require 'rexml/document'
 
 # Constants that represent the state of a resource/constraint
-PCMK_NOCHANGENEEDED = 0
-PCMK_NOTEXISTS      = 1
-PCMK_CHANGENEEDED   = 2
+PCMK_NOCHANGENEEDED = 0 unless defined? PCMK_NOCHANGENEEDED
+PCMK_NOTEXISTS      = 1 unless defined? PCMK_NOTEXISTS
+PCMK_CHANGENEEDED   = 2 unless defined? PCMK_CHANGENEEDED
 
 # Base temporary CIB backup folder
-PCMK_TMP_BASE = "/var/lib/pacemaker/cib"
+PCMK_TMP_BASE = "/var/lib/pacemaker/cib" unless defined? PCMK_TMP_BASE
 
 # Let's use pcs from PATH when it is set:
 # Useful to run pcs from a different path when using
 # containers
 if ENV.has_key?('PATH')
-  PCS_BIN = 'pcs'
-  CRMDIFF_BIN = 'crm_diff'
-  CRMSIMULATE_BIN = 'crm_simulate'
-  CRMRESOURCE_BIN = 'crm_resource'
-  TIMEOUT_BIN = 'timeout'
+  prefix_path = ''
 else
-  PCS_BIN = '/usr/sbin/pcs'
-  CRMDIFF_BIN = '/usr/sbin/crm_diff'
-  CRMSIMULATE_BIN = '/usr/sbin/crm_simulate'
-  CRMRESOURCE_BIN = '/usr/sbin/crm_resource'
-  TIMEOUT_BIN = '/usr/bin/timeout'
+  prefix_path = '/usr/sbin/'
 end
+
+PCS_BIN = "#{prefix_path}pcs" unless defined? PCS_BIN
+CRMDIFF_BIN = "#{prefix_path}crm_diff unless" unless defined? CRMDIFF_BIN
+CRMSIMULATE_BIN = "#{prefix_path}crm_simulate" unless defined? CRMSIMULATE_BIN
+CRMRESOURCE_BIN = "#{prefix_path}crm_resource" unless defined? CRMRESOURCE_BIN
+TIMEOUT_BIN = "#{prefix_path}timeout" unless defined? TIMEOUT_BIN
 
 # Use pcs_cli_version() as opposed to a facter so that if the pcs
 # package gets installed during the puppet run everything still works
