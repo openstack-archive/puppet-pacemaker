@@ -8,17 +8,8 @@ class pacemaker::new::params {
   $minor = $::os['release']['minor']
 
   if $::os['family'] == 'RedHat' {
-    if $major >= '7' {
-      $package_list = ['pacemaker', 'pcs', 'fence-agents-all', 'pacemaker-libs']
-      $pcsd_mode = true
-    } else {
-      $package_list = ['pacemaker', 'pcs', 'fence-agents', 'cman']
-      if $major == '6' and $minor >= '6' {
-        $pcsd_mode = true
-      } else {
-        $pcsd_mode = false
-      }
-    }
+    $package_list  = ['pacemaker', 'pcs', 'fence-agents-all', 'pacemaker-libs']
+    $pcsd_mode     = true
     $cluster_user  = 'hacluster'
     $cluster_group = 'haclient'
     $log_file_path = '/var/log/cluster/corosync.log'

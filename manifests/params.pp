@@ -32,19 +32,12 @@ class pacemaker::params {
   $hacluster_pwd         = 'CHANGEME'
   case downcase($::facts['os']['family']) {
     'redhat': {
-      $pcs_bin = '/sbin/pcs'
-      $pcsd_sysconfig = '/etc/sysconfig/pcsd'
-      $pcmk_sysconfig = '/etc/sysconfig/pacemaker'
-      if (versioncmp($::os['release']['full'], '7.0') < 0) {
-        $package_list = ['pacemaker','pcs','fence-agents','cman']
-        # TODO in el6.6, $pcsd_mode should be true
-        $pcsd_mode = false
-        $services_manager = 'lsb'
-      } else {
-        $package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
-        $pcsd_mode = true
-        $services_manager = 'systemd'
-      }
+      $pcs_bin          = '/sbin/pcs'
+      $pcsd_sysconfig   = '/etc/sysconfig/pcsd'
+      $pcmk_sysconfig   = '/etc/sysconfig/pacemaker'
+      $package_list     = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
+      $pcsd_mode        = true
+      $services_manager = 'systemd'
       # Starting with 7.3 we have a separate pacemaker-remote package
       if (versioncmp($::os['release']['full'], '7.2') < 1) {
         $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
