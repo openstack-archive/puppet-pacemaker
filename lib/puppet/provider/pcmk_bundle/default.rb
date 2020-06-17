@@ -27,6 +27,7 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     image = @resource[:image]
     replicas = @resource[:replicas]
     masters = @resource[:masters]
+    promoted_max = @resource[:promoted_max]
     container_options = @resource[:container_options]
     options = @resource[:options]
     run_command = @resource[:run_command]
@@ -55,6 +56,12 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
     end
     if masters
       cmd += " masters=#{masters}"
+    end
+    if promoted_max
+      if update
+        cmd += " masters="
+      end
+      cmd += " promoted-max=#{promoted_max}"
     end
     if options
       cmd += ' options="' + options + '"'
@@ -228,6 +235,13 @@ Puppet::Type.type(:pcmk_bundle).provide(:default) do
   end
 
   def masters=(value)
+  end
+
+  def promoted_max
+    @resource[:promoted_max]
+  end
+
+  def promoted_max=(value)
   end
 
   def options

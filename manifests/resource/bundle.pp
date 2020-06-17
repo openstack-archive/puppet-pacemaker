@@ -25,6 +25,11 @@
 #   (optional) Number of masters to be set in the bundle
 #   Defaults to undef
 #
+# [*promoted_max*]
+#   (optional) Number of masters to be set in the bundle. Supersedes
+#   deprecated option 'masters' in pacemaker 2
+#   Defaults to undef
+#
 # [*options*]
 #   (optional) Options to be passed to the docker run command
 #   Defaults to undef
@@ -126,6 +131,7 @@ define pacemaker::resource::bundle(
   $container_options  = undef,
   $replicas           = undef,
   $masters            = undef,
+  $promoted_max       = undef,
   $options            = undef,
   $run_command        = undef,
   $storage_maps       = undef,
@@ -150,12 +156,33 @@ define pacemaker::resource::bundle(
   # target-dir=/var/log options=ro storage-map id=bar-storage-test
   # source-dir=/foo target-dir=/bar options=wr
 
+  if $promoted_max {
+    if !$::pacemaker::pcs_010 {
+      fail('Cannot use \'promoted_max\' without pacemaker 2 and pcs >= 0.10')
+    } else {
+      $used_promoted_max = $promoted_max
+    }
+  }
+
+  # promoted_max supersedes masters in pacemaker 2 (pcs >= 0.10)
+  if $masters and $::pacemaker::pcs_010 {
+    if $promoted_max {
+      warning('Both \'masters\' and \'promoted_max\' specified, using option \'promoted_max\'')
+    } else {
+      $used_promoted_max = $masters
+    }
+    $used_masters = undef
+  } else {
+    $used_masters = $masters
+  }
+
   pcmk_bundle { $name:
     ensure             => $ensure,
     image              => $image,
     container_options  => $container_options,
     replicas           => $replicas,
-    masters            => $masters,
+    masters            => $used_masters,
+    promoted_max       => $used_promoted_max,
     options            => $options,
     run_command        => $run_command,
     storage_maps       => $storage_maps,

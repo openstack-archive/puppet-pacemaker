@@ -116,6 +116,21 @@ Puppet::Type.newtype(:pcmk_bundle) do
     end
   end
 
+  newproperty(:promoted_max) do
+    desc "number of clones promotable to master"
+
+    munge do |value|
+      if value.is_a?(String)
+        unless value =~ /^[\d]+$/
+          raise ArgumentError, "promoted_max must be an integer"
+        end
+        value = Integer(value)
+      end
+      raise ArgumentError, "promoted_max must be an integer >= 1" if value < 1
+      value
+    end
+  end
+
   newproperty(:options) do
     desc "docker options"
   end
