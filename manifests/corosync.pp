@@ -92,6 +92,10 @@
 #   node via pcs if we detect a new node compared to the existing cluster)
 #   Defaults to true
 #
+# [*force_authkey*]
+#   (optional) Forces the use of the autkey parameter even when we're using pcs 0.10
+#   Default to false
+#
 # === Dependencies
 #
 #  None
@@ -128,6 +132,7 @@ class pacemaker::corosync(
   $cluster_start_try_sleep = '20',
   $manage_fw               = true,
   $remote_authkey          = undef,
+  $force_authkey           = undef,
   $settle_timeout          = '3600',
   $settle_tries            = '360',
   $settle_try_sleep        = '10',
@@ -371,7 +376,8 @@ class pacemaker::corosync(
   }
 
   # pcs 0.10/pcmk 2.0 take care of the authkey internally by themselves
-  if $remote_authkey and !$::pacemaker::pcs_010 {
+  # unless force_authkey is true in which case we forcefully use remote_authkey
+  if $remote_authkey and (!$::pacemaker::pcs_010 or $force_authkey) {
     file { 'etc-pacemaker':
       ensure => directory,
       path   => '/etc/pacemaker',
@@ -386,7 +392,16 @@ class pacemaker::corosync(
       mode    => '0640',
       content => $remote_authkey,
     }
-    File['etc-pacemaker-authkey'] -> Service['pcsd']
+    # On the bootstrap node we want to make sure that authkey is imposed
+    # after we create the cluster (because cluster create destroys it and regenerates a new one
+    # but before we start. On non bootstrap nodes we just let it before pcsd
+    if $setup_cluster {
+      Exec<| title == "Create Cluster ${cluster_name}" |> -> File<| title == 'etc-pacemaker-authkey' |>
+      File<| title == 'etc-pacemaker-authkey' |> -> Exec<| title == "Start Cluster ${cluster_name}" |>
+    } else {
+      File['etc-pacemaker-authkey'] -> Service['pcsd']
+    }
+
   }
 
   exec {'wait-for-settle':

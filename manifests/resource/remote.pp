@@ -111,13 +111,16 @@ define pacemaker::resource::remote(
   $try_sleep          = 0,
   $verify_on_create   = false,
   $force              = false,
+  $force_oldstyle     = false,
   $pcs_user           = 'hacluster',
   $pcs_password       = undef,
   $location_rule      = undef,
   $deep_compare       = hiera('pacemaker::resource::remote::deep_compare', false),
   $update_settle_secs = hiera('pacemaker::resource::remote::update_settle_secs', 600),
 ) {
-  if $::pacemaker::params::pcs_010 {
+  # If we use pcs 0.10 we use the new pcs node remote-add way of adding
+  # remotes *except* if force_oldstyle is set to true
+  if $::pacemaker::params::pcs_010 and !$force_oldstyle {
     pcmk_remote { $name:
       ensure             => $ensure,
       remote_address     => $remote_address,
