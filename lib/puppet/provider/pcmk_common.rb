@@ -19,7 +19,7 @@ else
 end
 
 PCS_BIN = "#{prefix_path}pcs" unless defined? PCS_BIN
-CRMDIFF_BIN = "#{prefix_path}crm_diff unless" unless defined? CRMDIFF_BIN
+CRMDIFF_BIN = "#{prefix_path}crm_diff" unless defined? CRMDIFF_BIN
 CRMSIMULATE_BIN = "#{prefix_path}crm_simulate" unless defined? CRMSIMULATE_BIN
 CRMRESOURCE_BIN = "#{prefix_path}crm_resource" unless defined? CRMRESOURCE_BIN
 TIMEOUT_BIN = "#{prefix_path}timeout" unless defined? TIMEOUT_BIN
