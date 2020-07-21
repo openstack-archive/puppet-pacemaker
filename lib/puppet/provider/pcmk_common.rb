@@ -113,29 +113,38 @@ def pcs(name, resource_name, cmd, tries=1, try_sleep=0,
   if name.start_with?("create") && verify_on_create
     return pcs_create_with_verify(name, resource_name, cmd, tries, try_sleep)
   end
-  max_tries = name.include?('show') ? 1 : tries
+  max_tries = tries
   max_tries.times do |try|
-    cib = backup_cib()
-    try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
-    Puppet.debug("#{try_text}#{PCS_BIN} -f #{cib} #{cmd}")
-    pcs_out = `#{PCS_BIN} -f #{cib} #{cmd} 2>&1`
-    if name.include?('show')
-      delete_cib(cib)
-      # return output for good exit or false for failure.
-      return $?.exitstatus == 0 ? pcs_out : false
-    end
-    if $?.exitstatus == 0
-      # If push_cib failed, we stay in the loop and keep trying
-      if push_cib(cib) == 0
-        sleep post_success_sleep
-        return pcs_out
+    begin
+      try_text = max_tries > 1 ? "try #{try+1}/#{max_tries}: " : ''
+      cib = backup_cib()
+      Puppet.debug("#{try_text}#{PCS_BIN} -f #{cib} #{cmd}")
+      pcs_out = `#{PCS_BIN} -f #{cib} #{cmd} 2>&1`
+      if name.include?('show')
+        delete_cib(cib)
+        # return output for good exit or false for failure.
+        return $?.exitstatus == 0 ? pcs_out : false
       end
+      if $?.exitstatus == 0
+        # If push_cib failed, we stay in the loop and keep trying
+        if push_cib(cib) == 0
+          sleep post_success_sleep
+          return pcs_out
+        end
+      end
+      Puppet.debug("Error: #{pcs_out}")
+    rescue Puppet::Error
+      Puppet.debug("cib_backup failed. Retrying #{try_text}")
     end
-    Puppet.debug("Error: #{pcs_out}")
     if try == max_tries-1
-      delete_cib(cib)
-      pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
-      raise Puppet::Error, "pcs -f #{cib} #{name} failed: #{pcs_out_line}"
+      # need to consider the case that pcs_out was always nil due to cib_backup() always failing
+      delete_cib(cib) if cib
+      if pcs_out == nil
+        pcs_out_line = ''
+      else
+        pcs_out_line = pcs_out.lines.first ? pcs_out.lines.first.chomp! : ''
+      end
+      raise Puppet::Error, "pcs -f #{cib} #{cmd} failed: #{pcs_out_line}. Too many tries"
     end
     if try_sleep > 0
       Puppet.debug("Sleeping for #{try_sleep} seconds between tries")
