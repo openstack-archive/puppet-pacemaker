@@ -44,6 +44,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to undef
 #
+# [*force_authkey*]
+#   (optional) Forces the use of the autkey parameter even when we're using pcs 0.10
+#   Default to false
+#
 class pacemaker::remote (
   $remote_authkey,
   $use_pcsd        = false,
@@ -52,6 +56,7 @@ class pacemaker::remote (
   $manage_fw       = true,
   $pcsd_debug      = false,
   $pcsd_bind_addr  = undef,
+  $force_authkey   = undef,
   $tls_priorities  = undef,
 ) {
   include ::pacemaker::params
@@ -133,9 +138,19 @@ class pacemaker::remote (
       enable     => true,
       require    => Class['::pacemaker::install'],
     }
-  } else {
-  # This gets managed by pcsd directly when pcs is < 0.10
+    Service<| title == 'pcsd' |> -> Pcmk_constraint<||>
+    Service<| title == 'pcsd' |> -> Pcmk_resource<||>
+    Service<| title == 'pcsd' |> -> Pcmk_property<||>
+    Service<| title == 'pcsd' |> -> Pcmk_bundle<||>
+    Service<| title == 'pcsd' |> -> Pcmk_remote<||>
+  }
+  # We manage our own authkey in two cases
+  # 1) normally when use pcsd is set to false, aka we are using the old method pre 0.10
+  #    to manage remotes
+  # 2) When we explicitly passe force_authkey
+  if !$use_pcsd or $force_authkey {
     Package<| title == 'pacemaker-remote' |> -> File <| title == 'etc-pacemaker' |>
+    File <| title == 'etc-pacemaker-authkey' |> -> Service<| title == 'pacemaker_remote' |>
     file { 'etc-pacemaker':
       ensure => directory,
       path   => '/etc/pacemaker',
@@ -154,5 +169,10 @@ class pacemaker::remote (
       ensure => running,
       enable => true,
     }
+    Service<| title == 'pacemaker_remote' |> -> Pcmk_constraint<||>
+    Service<| title == 'pacemaker_remote' |> -> Pcmk_resource<||>
+    Service<| title == 'pacemaker_remote' |> -> Pcmk_property<||>
+    Service<| title == 'pacemaker_remote' |> -> Pcmk_bundle<||>
+    Service<| title == 'pacemaker_remote' |> -> Pcmk_remote<||>
   }
 }
