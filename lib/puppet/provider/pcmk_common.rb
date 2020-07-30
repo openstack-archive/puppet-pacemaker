@@ -20,6 +20,7 @@ end
 
 PCS_BIN = "#{prefix_path}pcs" unless defined? PCS_BIN
 CRMDIFF_BIN = "#{prefix_path}crm_diff" unless defined? CRMDIFF_BIN
+CRMNODE_BIN = "#{prefix_path}crm_node" unless defined? CRMNODE_BIN
 CRMSIMULATE_BIN = "#{prefix_path}crm_simulate" unless defined? CRMSIMULATE_BIN
 CRMRESOURCE_BIN = "#{prefix_path}crm_resource" unless defined? CRMRESOURCE_BIN
 TIMEOUT_BIN = "#{prefix_path}timeout" unless defined? TIMEOUT_BIN
@@ -34,6 +35,15 @@ def pcs_cli_version()
     pcs_cli_version = ''
   end
   return pcs_cli_version
+end
+
+def crm_node_l()
+  begin
+    nodes = `#{CRMNODE_BIN} -l`
+  rescue
+    nodes = ''
+  end
+  return nodes
 end
 
 
