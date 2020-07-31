@@ -3,3 +3,10 @@
       - puppet-openstack-check-jobs
       - puppet-openstack-module-unit-jobs
       - release-notes-jobs-python3
+    check:
+      jobs:
+        - tripleo-ci-centos-8-scenario004-standalone
+    gate:
+      jobs:
+        - tripleo-ci-centos-8-scenario004-standalone
+      queue: tripleo
