@@ -59,7 +59,7 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
     # because we do not know why we're being created (if for both or
     # only for one)
     did_stonith_resource_exist = @resources_state[@resource[:name]] == PCMK_NOCHANGENEEDED
-    did_stonith_location_exist = @locations_state[@resource[:name]] == PCMK_NOCHANGENEEDED
+    did_stonith_location_exist = @locations_state[@resource[:name]]
 
     Puppet.debug("Create: stonith exists #{did_stonith_resource_exist} location exists #{did_stonith_location_exist}")
 
@@ -93,7 +93,7 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
     @locations_state[@resource[:name]] = stonith_location_exists?
     @resources_state[@resource[:name]] = stonith_resource_exists?
     did_stonith_resource_exist = @resources_state[@resource[:name]] == PCMK_NOCHANGENEEDED
-    did_stonith_location_exist = @locations_state[@resource[:name]] == PCMK_NOCHANGENEEDED
+    did_stonith_location_exist = @locations_state[@resource[:name]]
 
     Puppet.debug("Exists: stonith resource exists #{did_stonith_resource_exist} location exists #{did_stonith_location_exist}")
     if did_stonith_resource_exist and did_stonith_location_exist
