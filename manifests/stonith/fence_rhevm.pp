@@ -88,6 +88,9 @@
 # [*pcmk_host_list*]
 #   List of Pacemaker hosts.
 #
+# [*disable_http_filter*]
+#   (optional) Set HTTP Filter header to false
+#
 # [*meta_attr*]
 #   (optional) String of meta attributes
 #   Defaults to undef
@@ -146,6 +149,8 @@ define pacemaker::stonith::fence_rhevm (
 
   $tries          = undef,
   $try_sleep      = undef,
+
+  $disable_http_filter = undef,
 
 ) {
   $ipaddr_chunk = $ipaddr ? {
@@ -227,6 +232,10 @@ define pacemaker::stonith::fence_rhevm (
   $power_wait_chunk = $power_wait ? {
     undef   => '',
     default => "power_wait=\"${power_wait}\"",
+  }
+  $disable_http_filter_chunk = $disable_http_filter ? {
+    undef   => '',
+    default => "disable_http_filter=\"${disable_http_filter}\"",
   }
   $delay_chunk = $delay ? {
     undef   => '',
