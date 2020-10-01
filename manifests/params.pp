@@ -44,8 +44,9 @@ class pacemaker::params {
       } else {
         $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs', 'pacemaker-remote']
       }
-      # Detect pcs 0.10.x versions and use different commands
-      if (versioncmp($::os['release']['full'], '8.0') > 0) {
+      # Detect pcs 0.10.x versions and use different commands.
+      # If full version == '8', we're using 8-stream or check if newer than 8.0
+      if $::os['release']['full'] == '8' or (versioncmp($::os['release']['full'], '8.0') > 0) {
         $pcs_010 = true
       } else {
         $pcs_010 = false
