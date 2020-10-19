@@ -70,7 +70,7 @@ Puppet::Type.newtype(:pcmk_stonith_level) do
 
   newparam(:verify_on_create, :boolean => true, :parent => Puppet::Parameter::Boolean) do
      desc "Whether to verify pcs resource creation with an additional
-     call to 'pcs resource show' rather than just relying on the exit
+     call to 'pcs resource config' rather than just relying on the exit
      status of 'pcs resource create'.  When true, $try_sleep
      determines how long to wait to verify and $post_success_sleep is
      ignored.  Defaults to `false`."

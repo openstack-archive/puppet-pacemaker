@@ -79,7 +79,7 @@ Puppet::Type.type(:pcmk_remote).provide(:default) do
   end
 
   def resource_exists?
-    cmd = 'resource show ' + @resource[:name] + ' > /dev/null 2>&1'
+    cmd = 'resource config ' + @resource[:name] + ' > /dev/null 2>&1'
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], false, @resource[:post_success_sleep])
     if ret == false then

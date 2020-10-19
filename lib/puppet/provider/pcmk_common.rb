@@ -191,7 +191,7 @@ def pcs_create_with_verify(name, resource_name, cmd, tries=1, try_sleep=0)
     pcs_out = `#{PCS_BIN} #{cmd} 2>&1`
     if $?.exitstatus == 0
       sleep try_sleep
-      cmd_show = "#{PCS_BIN} resource show " + resource_name
+      cmd_show = "#{PCS_BIN} resource config " + resource_name
       Puppet.debug("Verifying with: "+cmd_show)
       `#{cmd_show}`
       if $?.exitstatus == 0
