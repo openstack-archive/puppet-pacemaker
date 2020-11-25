@@ -28,6 +28,8 @@ Puppet::Type.type(:pcmk_remote).provide(:default) do
     if not_empty_string(@resource[:remote_address])
       cmd += ' ' + @resource[:remote_address]
     end
+    # reconnect_interval always has a default
+    cmd += " reconnect_interval=#{@resource[:reconnect_interval]}"
     if not_empty_string(resource_params)
       cmd += ' ' + resource_params
     end
