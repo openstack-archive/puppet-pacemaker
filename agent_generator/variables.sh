@@ -9,6 +9,7 @@ cmd_pkg_map=(
     "fence_cisco_mds:fence-agents-cisco-mds"
     "fence_cisco_ucs:fence-agents-cisco-ucs"
     "fence_compute:fence-agents-compute"
+    "fence_crosslink:None"
     "fence_drac5:fence-agents-drac5"
     "fence_eaton_snmp:fence-agents-eaton-snmp"
     "fence_eps:fence-agents-eps"
