@@ -37,6 +37,17 @@ def pcs_cli_version()
   return pcs_cli_version
 end
 
+# returns 'show' or 'config' depending on the pcs version
+# In case pcs returns '' we choose the more recent 'config' default
+# (Although in that case it is likely it will fail differently anyways)
+def pcs_config_or_show()
+  if Puppet::Util::Package.versioncmp(pcs_cli_version(), '0.10.0') < 0
+    return 'show'
+  else
+    return 'config'
+  end
+end
+
 def crm_node_l()
   begin
     nodes = `#{CRMNODE_BIN} -l`
@@ -191,7 +202,7 @@ def pcs_create_with_verify(name, resource_name, cmd, tries=1, try_sleep=0)
     pcs_out = `#{PCS_BIN} #{cmd} 2>&1`
     if $?.exitstatus == 0
       sleep try_sleep
-      cmd_show = "#{PCS_BIN} resource config " + resource_name
+      cmd_show = "#{PCS_BIN} resource " + pcs_config_or_show() + " " + resource_name
       Puppet.debug("Verifying with: "+cmd_show)
       `#{cmd_show}`
       if $?.exitstatus == 0

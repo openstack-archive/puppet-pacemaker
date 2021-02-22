@@ -103,7 +103,7 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
   end
 
   def stonith_resource_exists?
-    cmd = 'stonith config ' + @resource[:name] + ' > /dev/null 2>&1'
+    cmd = 'stonith ' + pcs_config_or_show() + ' ' + @resource[:name] + ' > /dev/null 2>&1'
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
     if ret == false then
