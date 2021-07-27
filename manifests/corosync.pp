@@ -36,7 +36,7 @@
 #
 # [*cluster_start_tries*]
 #   (optional) Number of tries for cluster start.
-#   Defaults to 10
+#   Defaults to 50
 #
 # [*cluster_start_try_sleep*]
 #   (optional) Time to sleep after each cluster start try.
@@ -128,7 +128,7 @@ class pacemaker::corosync(
   $cluster_name            = 'clustername',
   $cluster_setup_extras    = {},
   $cluster_start_timeout   = '300',
-  $cluster_start_tries     = '10',
+  $cluster_start_tries     = '50',
   $cluster_start_try_sleep = '20',
   $manage_fw               = true,
   $remote_authkey          = undef,
