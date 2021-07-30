@@ -23,22 +23,26 @@ describe "pcmk_common functions" do
     expect(pcs_offline('resource update ip-172.16.11.97 cidr_netmask=32', 'cib-noop.xml')).to eq ""
     expect(pcs_offline('resource update stonith-fence_ipmilan-stonith-fence-1 passwd=renVamyep3!', 'cib-noop.xml')).to eq ""
   end
-  it "pcmk_restart_resource? noop" do
-    expect(pcmk_restart_resource?('foo', "cib-noop.xml")).to eq false
-    expect(pcmk_restart_resource?('ip-172.16.11.97', "cib-noop.xml")).to eq false
-    expect(pcmk_restart_resource?('stonith-fence_ipmilan-stonith-fence-1', "cib-noop.xml")).to eq false
+  context 'when crm_diff is not buggy', if: is_crm_diff_buggy?() == true do
+    it "pcmk_restart_resource? noop" do
+      expect(pcmk_restart_resource?('foo', "cib-noop.xml")).to eq false
+      expect(pcmk_restart_resource?('ip-172.16.11.97', "cib-noop.xml")).to eq false
+      expect(pcmk_restart_resource?('stonith-fence_ipmilan-stonith-fence-1', "cib-noop.xml")).to eq false
+    end
   end
   it "pcs_offline update to resource definition" do
     expect(pcs_offline('resource update ip-172.16.11.97 cidr_netmask=31', 'cib-resource.xml')).to eq ""
     expect(pcs_offline('resource update stonith-fence_ipmilan-stonith-fence-1 passwd=NewPassword', 'cib-resource.xml')).to eq ""
   end
-  it "pcmk_restart_resource? vip resource" do
-    expect(pcmk_restart_resource?('foo', "cib-resource.xml")).to eq false
-    expect(pcmk_restart_resource?('ip-172.16.11.97', "cib-resource.xml")).to eq true
-  end
-  it "pcmk_restart_resource? stonith resource" do
-    expect(pcmk_restart_resource?('foo', "cib-resource.xml")).to eq false
-    expect(pcmk_restart_resource?('stonith-fence_ipmilan-stonith-fence-1', "cib-resource.xml")).to eq true
+  context 'when crm_diff is not buggy', if: is_crm_diff_buggy?() == true do
+    it "pcmk_restart_resource? vip resource" do
+      expect(pcmk_restart_resource?('foo', "cib-resource.xml")).to eq false
+      expect(pcmk_restart_resource?('ip-172.16.11.97', "cib-resource.xml")).to eq true
+    end
+    it "pcmk_restart_resource? stonith resource" do
+      expect(pcmk_restart_resource?('foo', "cib-resource.xml")).to eq false
+      expect(pcmk_restart_resource?('stonith-fence_ipmilan-stonith-fence-1', "cib-resource.xml")).to eq true
+    end
   end
 
   it "pcs_offline update to bundle definition" do
