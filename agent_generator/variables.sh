@@ -28,6 +28,7 @@ cmd_pkg_map=(
     "fence_ipmilan:fence-agents-ipmilan"
     "fence_ironic:None"
     "fence_kdump:fence-agents-kdump"
+    "fence_kubevirt:None"
     "fence_rhevm:fence-agents-rhevm"
     "fence_rsb:fence-agents-rsb"
     "fence_scsi:fence-agents-scsi"
@@ -40,4 +41,8 @@ cmd_pkg_map=(
     # Until https://bugzilla.redhat.com/show_bug.cgi?id=1677020 is fixed properly
     # we need to manually use deprecated parameters
     #"fence_redfish:fence-agents-redfish"
+
+    # re fence_kubevirt:
+    # change to fence-agents-kubevirt when we have it with
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1984803
 )
