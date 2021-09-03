@@ -25,6 +25,9 @@
 # [*kubeconfig*]
 #   Kubeconfig file path
 #
+# [*apiversion*]
+#   Version of the KubeVirt API.
+#
 # [*quiet*]
 #   Disable logging to stderr. Does not affect --verbose or --debug-file or logging to syslog.
 #
@@ -128,6 +131,7 @@ define pacemaker::stonith::fence_kubevirt (
   $ssl_insecure         = undef,
   $namespace            = undef,
   $kubeconfig           = undef,
+  $apiversion           = undef,
   $quiet                = undef,
   $verbose              = undef,
   $verbose_level        = undef,
@@ -177,6 +181,10 @@ define pacemaker::stonith::fence_kubevirt (
   $kubeconfig_chunk = $kubeconfig ? {
     undef   => '',
     default => "kubeconfig=\"${kubeconfig}\"",
+  }
+  $apiversion_chunk = $apiversion ? {
+    undef   => '',
+    default => "apiversion=\"${apiversion}\"",
   }
   $quiet_chunk = $quiet ? {
     undef   => '',
@@ -250,7 +258,7 @@ define pacemaker::stonith::fence_kubevirt (
 
   Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
-  $param_string = "${action_chunk} ${plug_chunk} ${port_chunk} ${ssl_insecure_chunk} ${namespace_chunk} ${kubeconfig_chunk} ${quiet_chunk} ${verbose_chunk} ${verbose_level_chunk} ${debug_chunk} ${debug_file_chunk} ${separator_chunk} ${delay_chunk} ${disable_timeout_chunk} ${login_timeout_chunk} ${power_timeout_chunk} ${power_wait_chunk} ${shell_timeout_chunk} ${stonith_status_sleep_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
+  $param_string = "${action_chunk} ${plug_chunk} ${port_chunk} ${ssl_insecure_chunk} ${namespace_chunk} ${kubeconfig_chunk} ${apiversion_chunk} ${quiet_chunk} ${verbose_chunk} ${verbose_level_chunk} ${debug_chunk} ${debug_file_chunk} ${separator_chunk} ${delay_chunk} ${disable_timeout_chunk} ${login_timeout_chunk} ${power_timeout_chunk} ${power_wait_chunk} ${shell_timeout_chunk} ${stonith_status_sleep_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
 
   pcmk_stonith { "stonith-fence_kubevirt-${safe_title}":
