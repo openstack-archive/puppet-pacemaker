@@ -66,7 +66,9 @@ Puppet::Type.type(:pcmk_constraint).provide(:default) do
                 resource_location = @resource[:location].gsub(':', '.')
                 resource_resource = @resource[:resource].gsub(':', '.')
                 if @resource[:master_slave]
-                  return true if line.include? resource_resource + ' with ' + resource_location and line.include? "with-rsc-role:Master"
+                  # pacemaker 2.1 started returning Promoted instead of Master
+                  # so we need to cater to both
+                  return true if line.include? resource_resource + ' with ' + resource_location and (line.include? "with-rsc-role:Master" or line.include? "with-rsc-role:Promoted")
                 else
                   return true if line.include? resource_resource + ' with ' + resource_location
                 end
