@@ -310,7 +310,7 @@ class pacemaker::corosync(
             }
           }
           exec {"Adding Cluster node: ${node_to_add} to Cluster ${cluster_name}":
-            unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
+            unless    => "${::pacemaker::pcs_bin} status 2>&1 | grep -we \"Online:.* ${node_name} .*\"",
             command   => "${::pacemaker::pcs_bin} cluster node add ${node_to_add} ${node_add_start_part} --wait",
             timeout   => $cluster_start_timeout,
             tries     => $cluster_start_tries,
@@ -319,7 +319,7 @@ class pacemaker::corosync(
             tag       => 'pacemaker-scaleup',
           }
           exec {"node-cluster-start-${node_name}":
-            unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -e \"^Online:.* ${node_name} .*\"",
+            unless      => "${::pacemaker::pcs_bin} status 2>&1 | grep -we \"Online:.* ${node_name} .*\"",
             command     => "${::pacemaker::pcs_bin} cluster start ${node_name} --wait",
             timeout     => $cluster_start_timeout,
             tries       => $cluster_start_tries,
