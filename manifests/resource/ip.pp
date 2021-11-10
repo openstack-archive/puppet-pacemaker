@@ -133,8 +133,8 @@ define pacemaker::resource::ip(
   $location_rule      = undef,
   $deep_compare       = hiera('pacemaker::resource::ip::deep_compare', false),
   $update_settle_secs = hiera('pacemaker::resource::ip::update_settle_secs', 600),
-  ) {
-  if !is_ipv6_address($ip_address) and $ipv6_addrlabel != '' {
+) {
+  if !($ip_address =~ Stdlib::Compat::Ipv6) and $ipv6_addrlabel != '' {
     fail("ipv6_addrlabel ${ipv6_addrlabel} was specified, but ${ip_address} is not an ipv6 address")
   }
 
