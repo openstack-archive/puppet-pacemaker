@@ -35,14 +35,14 @@ class pacemaker::params {
       $pcs_bin          = '/sbin/pcs'
       $pcsd_sysconfig   = '/etc/sysconfig/pcsd'
       $pcmk_sysconfig   = '/etc/sysconfig/pacemaker'
-      $package_list     = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
+      $package_list     = ['pacemaker','pcs','fence-agents-redfish','fence-agents-ipmilan','fence-agents-kdump','fence-agents-rhevm','pacemaker-libs']
       $pcsd_mode        = true
       $services_manager = 'systemd'
       # Starting with 7.3 we have a separate pacemaker-remote package
       if (versioncmp($::os['release']['full'], '7.2') < 1) {
-        $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs']
+        $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-redfish','fence-agents-ipmilan','fence-agents-kdump','fence-agents-rhevm','pacemaker-libs']
       } else {
-        $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-all','pacemaker-libs', 'pacemaker-remote']
+        $pcmk_remote_package_list = ['pacemaker','pcs','fence-agents-redfish','fence-agents-ipmilan','fence-agents-kdump','fence-agents-rhevm','pacemaker-libs','pacemaker-remote']
       }
       # Detect pcs 0.10.x versions and use different commands.
       # If full version == '8', we're using 8-stream or check if newer than 8.0

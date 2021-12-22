@@ -17,12 +17,12 @@ describe "pcmk_common functions" do
 
   it "pcs_offline noop update" do
     expect(pcs_offline('resource update ip-172.16.11.97 cidr_netmask=32', 'cib-noop.xml')).to eq ""
-    expect(pcs_offline('resource update stonith-fence_ipmilan-stonith-fence-1 passwd=renVamyep3!', 'cib-noop.xml')).to eq ""
+    expect(pcs_offline('resource update stonith-fence_ipmilan-stonith-fence-1 password=renVamyep3!', 'cib-noop.xml')).to eq ""
   end
 
   it "pcs_offline update to resource definition" do
     expect(pcs_offline('resource update ip-172.16.11.97 cidr_netmask=31', 'cib-resource.xml')).to eq ""
-    expect(pcs_offline('resource update stonith-fence_ipmilan-stonith-fence-1 passwd=NewPassword', 'cib-resource.xml')).to eq ""
+    expect(pcs_offline('resource update stonith-fence_ipmilan-stonith-fence-1 password=NewPassword', 'cib-resource.xml')).to eq ""
   end
 
   it "pcs_offline update to bundle definition" do

@@ -32,7 +32,7 @@
       <primitive class="stonith" id="stonith-fence_ipmilan-stonith-fence-1" type="fence_ipmilan">
         <instance_attributes id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes">
           <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-ipaddr" name="ipaddr" value="192.0.3.99"/>
-          <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-password" name="password" value="renVamyep3!"/>
           <nvpair id="stonith-fence_ipmilan-stonith-fence-1-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-0"/>
         </instance_attributes>
         <operations>
@@ -42,7 +42,7 @@
       <primitive class="stonith" id="stonith-fence_ipmilan-stonith-fence-2" type="fence_ipmilan">
         <instance_attributes id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes">
           <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-ipaddr" name="ipaddr" value="192.0.2.100"/>
-          <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-password" name="password" value="renVamyep3!"/>
           <nvpair id="stonith-fence_ipmilan-stonith-fence-2-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-1"/>
         </instance_attributes>
         <operations>
@@ -52,7 +52,7 @@
       <primitive class="stonith" id="stonith-fence_ipmilan-stonith-fence-3" type="fence_ipmilan">
         <instance_attributes id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes">
           <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-ipaddr" name="ipaddr" value="192.0.2.101"/>
-          <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-passwd" name="passwd" value="renVamyep3!"/>
+          <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-password" name="password" value="renVamyep3!"/>
           <nvpair id="stonith-fence_ipmilan-stonith-fence-3-instance_attributes-pcmk_host_list" name="pcmk_host_list" value="foobar-2"/>
         </instance_attributes>
         <operations>

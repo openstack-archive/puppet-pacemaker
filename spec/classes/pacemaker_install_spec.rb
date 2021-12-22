@@ -7,7 +7,7 @@ describe 'pacemaker::new::install', type: :class do
 
       package_list = begin
         if facts[:osfamily] == 'RedHat'
-          %w(pacemaker pcs fence-agents-all pacemaker-libs)
+          %w(pacemaker pcs fence-agents-redfish fence-agents-ipmilan fence-agents-kdump fence-agents-rhevm pacemaker-libs)
         elsif facts[:osfamily] == 'Debian'
           if facts[:operatingsystem] == 'Ubuntu' && facts[:operatingsystemmajrelease].to_i >= 16
             %w(pacemaker corosync pacemaker-cli-utils resource-agents)
