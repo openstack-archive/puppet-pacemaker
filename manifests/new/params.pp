@@ -8,7 +8,7 @@ class pacemaker::new::params {
   $minor = $::os['release']['minor']
 
   if $::os['family'] == 'RedHat' {
-    $package_list  = ['pacemaker', 'pcs', 'fence-agents-redfish', 'fence-agents-ipmilan', 'fence-agents-kdump', 'fence-agents-rhevm', 'pacemaker-libs']
+    $package_list  = ['pacemaker', 'pcs', 'pacemaker-libs']
     $pcsd_mode     = true
     $cluster_user  = 'hacluster'
     $cluster_group = 'haclient'
