@@ -149,7 +149,7 @@ define pacemaker::stonith::fence_kdump (
   $param_string = "${nodename_chunk} ${ipport_chunk} ${family_chunk} ${action_chunk} ${timeout_chunk} ${verbose_chunk} ${usage_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    ensure_resource('package', 'fence-agents-kdump', { ensure => 'installed' })
+    ensure_packages('fence-agents-kdump', { ensure => 'installed' })
     Package['fence-agents-kdump'] -> Pcmk_stonith["stonith-fence_kdump-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_kdump-${safe_title}":

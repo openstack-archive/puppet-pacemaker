@@ -205,7 +205,7 @@ define pacemaker::stonith::fence_ilo3 (
   $param_string = "${auth_chunk} ${ipaddr_chunk} ${passwd_chunk} ${passwd_script_chunk} ${lanplus_chunk} ${login_chunk} ${action_chunk} ${timeout_chunk} ${cipher_chunk} ${method_chunk} ${power_wait_chunk} ${delay_chunk} ${privlvl_chunk} ${verbose_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    ensure_resource('package', 'fence-agents-ipmilan', { ensure => 'installed' })
+    ensure_packages('fence-agents-ipmilan', { ensure => 'installed' })
     Package['fence-agents-ipmilan'] -> Pcmk_stonith["stonith-fence_ilo3-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ilo3-${safe_title}":

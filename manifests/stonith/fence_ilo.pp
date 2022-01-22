@@ -261,7 +261,7 @@ define pacemaker::stonith::fence_ilo (
   $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${ssl_chunk} ${notls_chunk} ${ribcl_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${ssl_secure_chunk} ${ssl_insecure_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    ensure_resource('package', 'fence-agents-ilo2', { ensure => 'installed' })
+    ensure_packages('fence-agents-ilo2', { ensure => 'installed' })
     Package['fence-agents-ilo2'] -> Pcmk_stonith["stonith-fence_ilo-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_ilo-${safe_title}":

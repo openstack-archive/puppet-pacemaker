@@ -353,7 +353,7 @@ class pacemaker::corosync(
       require   => Exec["Create Cluster ${cluster_name}"],
     }
     if $enable_sbd {
-      ensure_resource('package', 'sbd', { ensure => present })
+      ensure_packages('sbd', { ensure => present })
       exec {'Enable SBD':
         unless  => "${::pacemaker::pcs_bin} status | grep -q 'sbd: active/enabled' > /dev/null 2>&1",
         command => "${::pacemaker::pcs_bin} stonith sbd enable SBD_WATCHDOG_TIMEOUT=${sbd_watchdog_timeout}",

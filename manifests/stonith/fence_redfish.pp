@@ -343,7 +343,7 @@ define pacemaker::stonith::fence_redfish (
   $param_string = "${action_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${ip_chunk} ${ipaddr_chunk} ${ipport_chunk} ${login_chunk} ${passwd_chunk} ${passwd_script_chunk} ${password_chunk} ${password_script_chunk} ${plug_chunk} ${port_chunk} ${redfish_uri_chunk} ${ssl_chunk} ${ssl_insecure_chunk} ${ssl_secure_chunk} ${systems_uri_chunk} ${username_chunk} ${quiet_chunk} ${verbose_chunk} ${debug_chunk} ${debug_file_chunk} ${delay_chunk} ${login_timeout_chunk} ${port_as_ip_chunk} ${power_timeout_chunk} ${power_wait_chunk} ${shell_timeout_chunk} ${retry_on_chunk} ${gnutlscli_path_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    ensure_resource('package', 'fence-agents-redfish', { ensure => 'installed' })
+    ensure_packages('fence-agents-redfish', { ensure => 'installed' })
     Package['fence-agents-redfish'] -> Pcmk_stonith["stonith-fence_redfish-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_redfish-${safe_title}":

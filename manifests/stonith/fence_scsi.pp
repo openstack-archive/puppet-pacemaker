@@ -149,7 +149,7 @@ define pacemaker::stonith::fence_scsi (
   $param_string = "${aptpl_chunk} ${devices_chunk} ${logfile_chunk} ${delay_chunk} ${key_chunk} ${action_chunk} ${nodename_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
-    ensure_resource('package', 'fence-agents-scsi', { ensure => 'installed' })
+    ensure_packages('fence-agents-scsi', { ensure => 'installed' })
     Package['fence-agents-scsi'] -> Pcmk_stonith["stonith-fence_scsi-${safe_title}"]
   }
   pcmk_stonith { "stonith-fence_scsi-${safe_title}":

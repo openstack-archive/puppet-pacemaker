@@ -60,7 +60,7 @@ class pacemaker::remote (
   $tls_priorities  = undef,
 ) {
   include pacemaker::params
-  ensure_resource('package', $::pacemaker::params::pcmk_remote_package_list, {
+  ensure_packages( $::pacemaker::params::pcmk_remote_package_list, {
     ensure => present
   })
   # pacemaker remote needs pcsd only with pcs >= 0.10
