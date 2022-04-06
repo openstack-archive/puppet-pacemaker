@@ -5,13 +5,12 @@
       - release-notes-jobs-python3
     check:
       jobs:
-        - tripleo-ci-centos-8-scenario004-standalone:
+        - tripleo-ci-centos-8-scenario004-standalone: &scen4_vars
+            branches: master
             vars:
               build_container_images: true
     gate:
       jobs:
-        - tripleo-ci-centos-8-scenario004-standalone:
-            vars:
-              build_container_images: true
+        - tripleo-ci-centos-8-scenario004-standalone: *scen4_vars
       queue: tripleo
 
