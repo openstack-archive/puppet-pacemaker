@@ -93,7 +93,7 @@
 #   (optional) When deep_compare is enabled and puppet updates a resource, this
 #   parameter represents the number (in seconds) to wait for the cluster to settle
 #   after the resource update.
-#   Defaults to hiera('pacemaker::resource::filesystem::update_settle_secs', 600) (seconds)
+#   Defaults to lookup('pacemaker::resource::filesystem::update_settle_secs', undef, undef, 600) (seconds)
 #
 #
 # === Dependencies
@@ -139,7 +139,7 @@ define pacemaker::resource::filesystem(
   $force              = false,
   $location_rule      = undef,
   $deep_compare       = false,
-  $update_settle_secs = hiera('pacemaker::resource::filesystem::update_settle_secs', 600),
+  $update_settle_secs = lookup('pacemaker::resource::filesystem::update_settle_secs', undef, undef, 600),
 ) {
   $resource_id = delete("fs-${directory}", '/')
 

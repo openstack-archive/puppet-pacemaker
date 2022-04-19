@@ -73,7 +73,7 @@
 #   (optional) When deep_compare is enabled and puppet updates a resource, this
 #   parameter represents the number (in seconds) to wait for the cluster to settle
 #   after the resource update.
-#   Defaults to hiera('pacemaker::resource::remote::update_settle_secs', 600) (seconds)
+#   Defaults to lookup('pacemaker::resource::remote::update_settle_secs', undef, undef, 600) (seconds)
 #
 # === Dependencies
 #
@@ -115,8 +115,8 @@ define pacemaker::resource::remote(
   $pcs_user           = 'hacluster',
   $pcs_password       = undef,
   $location_rule      = undef,
-  $deep_compare       = hiera('pacemaker::resource::remote::deep_compare', false),
-  $update_settle_secs = hiera('pacemaker::resource::remote::update_settle_secs', 600),
+  $deep_compare       = lookup('pacemaker::resource::remote::deep_compare', undef, undef, false),
+  $update_settle_secs = lookup('pacemaker::resource::remote::update_settle_secs', undef, undef, 600),
 ) {
   # If we use pcs 0.10 we use the new pcs node remote-add way of adding
   # remotes *except* if force_oldstyle is set to true

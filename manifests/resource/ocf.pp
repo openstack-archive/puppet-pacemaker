@@ -88,7 +88,7 @@
 #   (optional) When deep_compare is enabled and puppet updates a resource, this
 #   parameter represents the number (in seconds) to wait for the cluster to settle
 #   after the resource update.
-#   Defaults to hiera('pacemaker::resource::ocf::update_settle_secs', 600) (seconds)
+#   Defaults to lookup('pacemaker::resource::ocf::update_settle_secs', undef, undef, 600) (seconds)
 #
 # === Dependencies
 #
@@ -131,8 +131,8 @@ define pacemaker::resource::ocf(
   $verify_on_create   = false,
   $force              = false,
   $location_rule      = undef,
-  $deep_compare       = hiera('pacemaker::resource::ocf::deep_compare', false),
-  $update_settle_secs = hiera('pacemaker::resource::ocf::update_settle_secs', 600),
+  $deep_compare       = lookup('pacemaker::resource::ocf::deep_compare', undef, undef, false),
+  $update_settle_secs = lookup('pacemaker::resource::ocf::update_settle_secs', undef, undef, 600),
 ) {
   pcmk_resource { $name:
     ensure             => $ensure,
