@@ -82,13 +82,13 @@
 #   (optional) Enable deep comparing of resources and bundles
 #   When set to true a resource will be compared in full (options, meta parameters,..)
 #   to the existing one and in case of difference it will be repushed to the CIB
-#   Defaults to hiera('pacemaker::resource::ip::deep_compare', false)
+#   Defaults to lookup('pacemaker::resource::ip::deep_compare', undef, undef, false)
 #
 # [*update_settle_secs*]
 #   (optional) When deep_compare is enabled and puppet updates a resource, this
 #   parameter represents the number (in seconds) to wait for the cluster to settle
 #   after the resource update.
-#   Defaults to hiera('pacemaker::resource::ip::update_settle_secs', 600) (seconds)
+#   Defaults to lookup('pacemaker::resource::ip::update_settle_secs', undef, undef, 600) (seconds)
 #
 # === Dependencies
 #
@@ -131,8 +131,8 @@ define pacemaker::resource::ip(
   $verify_on_create   = false,
   $force              = false,
   $location_rule      = undef,
-  $deep_compare       = hiera('pacemaker::resource::ip::deep_compare', false),
-  $update_settle_secs = hiera('pacemaker::resource::ip::update_settle_secs', 600),
+  $deep_compare       = lookup('pacemaker::resource::ip::deep_compare', undef, undef, false),
+  $update_settle_secs = lookup('pacemaker::resource::ip::update_settle_secs', undef, undef, 600),
 ) {
   if !($ip_address =~ Stdlib::Compat::Ipv6) and $ipv6_addrlabel != '' {
     fail("ipv6_addrlabel ${ipv6_addrlabel} was specified, but ${ip_address} is not an ipv6 address")

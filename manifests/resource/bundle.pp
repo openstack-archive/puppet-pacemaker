@@ -99,7 +99,7 @@
 #   (optional) When deep_compare is enabled and puppet updates a resource, this
 #   parameter represents the number (in seconds) to wait for the cluster to settle
 #   after the resource update.
-#   Defaults to hiera('pacemaker::resource::bundle::update_settle_secs', 600) (seconds)
+#   Defaults to lookup('pacemaker::resource::bundle::update_settle_secs', undef, undef, 600) (seconds)
 #
 # === Dependencies
 #
@@ -143,8 +143,8 @@ define pacemaker::resource::bundle(
   $force              = false,
   $location_rule      = undef,
   $container_backend  = 'docker',
-  $deep_compare       = hiera('pacemaker::resource::bundle::deep_compare', false),
-  $update_settle_secs = hiera('pacemaker::resource::bundle::update_settle_secs', 600),
+  $deep_compare       = lookup('pacemaker::resource::bundle::deep_compare', undef, undef, false),
+  $update_settle_secs = lookup('pacemaker::resource::bundle::update_settle_secs', undef, undef, 600),
   ) {
   if $image == undef {
     fail("Cannot create bundle ${name} without specifying an image")

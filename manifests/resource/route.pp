@@ -83,7 +83,7 @@
 #   (optional) When deep_compare is enabled and puppet updates a resource, this
 #   parameter represents the number (in seconds) to wait for the cluster to settle
 #   after the resource update.
-#   Defaults to hiera('pacemaker::resource::route::update_settle_secs', 600) (seconds)
+#   Defaults to lookup('pacemaker::resource::route::update_settle_secs', undef, undef, 600) (seconds)
 #
 # === Dependencies
 #
@@ -126,7 +126,7 @@ define pacemaker::resource::route(
   $force              = false,
   $location_rule      = undef,
   $deep_compare       = false,
-  $update_settle_secs = hiera('pacemaker::resource::route::update_settle_secs', 600),
+  $update_settle_secs = lookup('pacemaker::resource::route::update_settle_secs', undef, undef, 600),
 ) {
 
   $nic_option = $nic ? {
