@@ -156,23 +156,19 @@ define pacemaker::resource::bundle(
   # target-dir=/var/log options=ro storage-map id=bar-storage-test
   # source-dir=/foo target-dir=/bar options=wr
 
-  if $promoted_max {
-    if !$::pacemaker::pcs_010 {
-      fail('Cannot use \'promoted_max\' without pacemaker 2 and pcs >= 0.10')
-    } else {
-      $used_promoted_max = $promoted_max
-    }
-  }
-
-  # promoted_max supersedes masters in pacemaker 2 (pcs >= 0.10)
-  if $masters and $::pacemaker::pcs_010 {
-    if $promoted_max {
+  if $::pacemaker::pcs_010 {
+    if $promoted_max and $masters {
       warning('Both \'masters\' and \'promoted_max\' specified, using option \'promoted_max\'')
-    } else {
-      $used_promoted_max = $masters
     }
+
+    # promoted_max supersedes masters in pacemaker 2 (pcs >= 0.10)
+    $used_promoted_max = pick_default($promoted_max, $masters)
     $used_masters = undef
   } else {
+    if $promoted_max {
+      fail('Cannot use \'promoted_max\' without pacemaker 2 and pcs >= 0.10')
+    }
+    $used_promoted_max = undef
     $used_masters = $masters
   }
 
