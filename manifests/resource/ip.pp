@@ -90,6 +90,10 @@
 #   after the resource update.
 #   Defaults to lookup('pacemaker::resource::ip::update_settle_secs', undef, undef, 600) (seconds)
 #
+# [*run_arping*]
+#   (optional) when run_arping is enabled pacemaker runs arping for IPv4 collision detection check.
+#   Defaults to undef
+#
 # === Dependencies
 #
 #  None
@@ -133,6 +137,7 @@ define pacemaker::resource::ip(
   $location_rule      = undef,
   $deep_compare       = lookup('pacemaker::resource::ip::deep_compare', undef, undef, false),
   $update_settle_secs = lookup('pacemaker::resource::ip::update_settle_secs', undef, undef, 600),
+  $run_arping         = lookup('pacemaker::resource::ip::run_arping', undef, undef, undef),
 ) {
   if !($ip_address =~ Stdlib::Compat::Ipv6) and $ipv6_addrlabel != '' {
     fail("ipv6_addrlabel ${ipv6_addrlabel} was specified, but ${ip_address} is not an ipv6 address")
@@ -152,13 +157,18 @@ define pacemaker::resource::ip(
       default => " lvs_ipv6_addrlabel=true lvs_ipv6_addrlabel_value=${ipv6_addrlabel}"
   }
 
+  $run_arping_option = $run_arping ? {
+      undef   => '',
+      default => " run_arping=${run_arping}"
+  }
+
   # pcs dislikes colons from IPv6 addresses. Replacing them with dots.
   $resource_name = regsubst($ip_address, '(:)', '.', 'G')
 
   pcmk_resource { "ip-${resource_name}":
     ensure             => $ensure,
     resource_type      => 'IPaddr2',
-    resource_params    => join(['ip=', $ip_address, $cidr_option, $nic_option, $ipv6_addrlabel_option]),
+    resource_params    => join(['ip=', $ip_address, $cidr_option, $nic_option, $ipv6_addrlabel_option, $run_arping_option]),
     group_params       => $group_params,
     meta_params        => $meta_params,
     op_params          => $op_params,
