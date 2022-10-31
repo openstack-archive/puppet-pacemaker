@@ -1,16 +1,19 @@
 - project:
+    queue: tripleo
     templates:
       - puppet-openstack-check-jobs
       - puppet-openstack-module-unit-jobs
       - release-notes-jobs-python3
     check:
       jobs:
-        - tripleo-ci-centos-8-scenario004-standalone: &scen4_vars
-            branches: master
+        - puppet-openstack-unit-7.16-centos-9-stream:
+            voting: false
+        - tripleo-ci-centos-9-scenario004-standalone: &scen4_vars
             vars:
               build_container_images: true
+              containers_base_image: registry.access.redhat.com/ubi9:latest
     gate:
       jobs:
-        - tripleo-ci-centos-8-scenario004-standalone: *scen4_vars
-      queue: tripleo
-
+        - puppet-openstack-unit-7.16-centos-9-stream:
+            voting: false
+        - tripleo-ci-centos-9-scenario004-standalone: *scen4_vars

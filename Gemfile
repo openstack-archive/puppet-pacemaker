@@ -18,6 +18,7 @@ group :test do
   gem 'dry-inflector', '~> 0.1.2',                                  :require => false
   gem 'signet', '~> 0.11.0',                                        :require => false
   gem 'minitest', '~> 5.11.3',                                      :require => false
+  gem 'mocha', '< 2.0.0',                                           :require => false
   gem 'rspec-puppet',                                               :require => false
   gem 'puppet-lint', '~> 1.1.0',                                    :require => false
   gem 'metadata-json-lint',                                         :require => false
