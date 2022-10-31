@@ -58,6 +58,9 @@
 # [*power_timeout*]
 #   Test X seconds for status change after ON/OFF
 #
+# [*disable_http_filter*]
+#   Set HTTP Filter header to false
+#
 # [*shell_timeout*]
 #   Wait X seconds for cmd prompt after issuing command
 #
@@ -87,9 +90,6 @@
 #
 # [*pcmk_host_list*]
 #   List of Pacemaker hosts.
-#
-# [*disable_http_filter*]
-#   (optional) Set HTTP Filter header to false
 #
 # [*meta_attr*]
 #   (optional) String of meta attributes
@@ -131,38 +131,37 @@
 # under the License.
 #
 define pacemaker::stonith::fence_rhevm (
-  $ipaddr         = undef,
-  $login          = undef,
-  $passwd         = undef,
-  $ssl            = undef,
-  $notls          = undef,
-  $port           = undef,
-  $ipport         = undef,
-  $inet4_only     = undef,
-  $inet6_only     = undef,
-  $passwd_script  = undef,
-  $ssl_secure     = undef,
-  $ssl_insecure   = undef,
-  $action         = undef,
-  $verbose        = undef,
-  $debug          = undef,
-  $separator      = undef,
-  $power_timeout  = undef,
-  $shell_timeout  = undef,
-  $login_timeout  = undef,
-  $power_wait     = undef,
-  $delay          = undef,
-  $retry_on       = undef,
-
-  $meta_attr      = undef,
-  $interval       = '60s',
-  $ensure         = present,
-  $pcmk_host_list = undef,
-
-  $tries          = undef,
-  $try_sleep      = undef,
-
+  $ipaddr              = undef,
+  $login               = undef,
+  $passwd              = undef,
+  $ssl                 = undef,
+  $notls               = undef,
+  $port                = undef,
+  $ipport              = undef,
+  $inet4_only          = undef,
+  $inet6_only          = undef,
+  $passwd_script       = undef,
+  $ssl_secure          = undef,
+  $ssl_insecure        = undef,
+  $action              = undef,
+  $verbose             = undef,
+  $debug               = undef,
+  $separator           = undef,
+  $power_timeout       = undef,
   $disable_http_filter = undef,
+  $shell_timeout       = undef,
+  $login_timeout       = undef,
+  $power_wait          = undef,
+  $delay               = undef,
+  $retry_on            = undef,
+
+  $meta_attr           = undef,
+  $interval            = '60s',
+  $ensure              = present,
+  $pcmk_host_list      = undef,
+
+  $tries               = undef,
+  $try_sleep           = undef,
 
   $deep_compare       = false,
   $update_settle_secs = 600,
@@ -235,6 +234,10 @@ define pacemaker::stonith::fence_rhevm (
     undef   => '',
     default => "power_timeout=\"${power_timeout}\"",
   }
+  $disable_http_filter_chunk = $disable_http_filter ? {
+    undef   => '',
+    default => "disable_http_filter=\"${disable_http_filter}\"",
+  }
   $shell_timeout_chunk = $shell_timeout ? {
     undef   => '',
     default => "shell_timeout=\"${shell_timeout}\"",
@@ -246,10 +249,6 @@ define pacemaker::stonith::fence_rhevm (
   $power_wait_chunk = $power_wait ? {
     undef   => '',
     default => "power_wait=\"${power_wait}\"",
-  }
-  $disable_http_filter_chunk = $disable_http_filter ? {
-    undef   => '',
-    default => "disable_http_filter=\"${disable_http_filter}\"",
   }
   $delay_chunk = $delay ? {
     undef   => '',
@@ -275,7 +274,7 @@ define pacemaker::stonith::fence_rhevm (
 
   Exec<| title == 'wait-for-settle' |> -> Pcmk_stonith<||>
 
-  $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${ssl_chunk} ${notls_chunk} ${port_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${ssl_secure_chunk} ${ssl_insecure_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
+  $param_string = "${ipaddr_chunk} ${login_chunk} ${passwd_chunk} ${ssl_chunk} ${notls_chunk} ${port_chunk} ${ipport_chunk} ${inet4_only_chunk} ${inet6_only_chunk} ${passwd_script_chunk} ${ssl_secure_chunk} ${ssl_insecure_chunk} ${action_chunk} ${verbose_chunk} ${debug_chunk} ${separator_chunk} ${power_timeout_chunk} ${disable_http_filter_chunk} ${shell_timeout_chunk} ${login_timeout_chunk} ${power_wait_chunk} ${delay_chunk} ${retry_on_chunk}  op monitor interval=${interval} ${meta_attr_value_chunk}"
 
   if $ensure != 'absent' {
     ensure_resource('package', 'fence-agents-rhevm', { ensure => 'installed' })
