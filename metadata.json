@@ -1,6 +1,6 @@
 {
   "name": "openstack-pacemaker",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "author": "OpenStack Contributors",
   "summary": "Puppet module for Pacemaker",
   "license": "Apache-2.0",
@@ -12,19 +12,20 @@
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "8"
+        "8",
+        "9"
       ]
     },
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "8"
+        "8",
+        "9"
       ]
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "16.04",
         "18.04"
       ]
     }
@@ -32,7 +33,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": ">= 5.0.0 <6.0.0"
+      "version_requirement": ">= 5.0.0 <9.0.0"
     },
     {
       "name": "puppetlabs/firewall",
@@ -42,7 +43,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 6.0.0 < 7.0.0"
+      "version_requirement": ">= 6.0.0 < 8.0.0"
     }
   ]
 }
