@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<resource-agent name="fence_watchdog" shortdesc="Dummy watchdog fence agent">
+<longdesc>fence_watchdog just provides
+meta-data - actual fencing is done by the pacemaker internal watchdog agent.</longdesc>
+<parameters>
+    <parameter name="action" required="1">
+      <getopt mixed="-o, --action=[action]" />
+      <content type="string" default="metadata" />
+      <shortdesc lang="en">Fencing Action</shortdesc>
+    </parameter>
+    <parameter name="nodename" required="0">
+      <getopt mixed="-N, --nodename" />
+      <content type="string"  />
+      <shortdesc lang="en">Ignored</shortdesc>
+    </parameter>
+    <parameter name="plug" required="1">
+      <getopt mixed="-n, --plug=[id]" />
+      <content type="string"  />
+      <shortdesc lang="en">Ignored</shortdesc>
+    </parameter>
+    <parameter name="version" required="0">
+      <getopt mixed="-V, --version" />
+      <content type="boolean"  />
+      <shortdesc lang="en">Display version information and exit</shortdesc>
+    </parameter>
+    <parameter name="help" required="0">
+      <getopt mixed="-h, --help" />
+      <content type="boolean"  />
+      <shortdesc lang="en">Display help and exit</shortdesc>
+    </parameter>
+  </parameters>
+ <actions>
+    <action name="on" />
+    <action name="off" />
+    <action name="reboot" />
+    <action name="monitor" />
+    <action name="list" />
+    <action name="metadata" />
+  </actions>
+</resource-agent>
