@@ -132,7 +132,7 @@ Puppet::Type.type(:pcmk_stonith).provide(:default) do
   def stonith_location_rule_create()
     pcmk_host_list = @resource[:pcmk_host_list]
     nodes_count = crm_node_l().lines.size
-    if not_empty_string(pcmk_host_list) and nodes_count > 1
+    if not_empty_string(pcmk_host_list) and nodes_count > 1 and @resource[:name] != 'watchdog'
       location_cmd = "constraint location #{@resource[:name]} avoids #{pcmk_host_list}=10000"
       Puppet.debug("stonith_location_rule_create: #{location_cmd}")
       pcs('create', @resource[:name], location_cmd, @resource[:tries],
