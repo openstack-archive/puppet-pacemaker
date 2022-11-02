@@ -1,19 +1,57 @@
+- job:
+    name: puppet-pacemaker-lint-ubuntu-focal
+    parent: puppet-openstack-lint-ubuntu-focal
+    override-checkout: stable/zed
+
+- job:
+    name: puppet-pacemaker-syntax-6-ubuntu-focal
+    parent: puppet-openstack-syntax-6-ubuntu-focal
+    override-checkout: stable/zed
+
+- job:
+    name: puppet-pacemaker-syntax-7-ubuntu-focal
+    parent: puppet-openstack-syntax-7-ubuntu-focal
+    override-checkout: stable/zed
+
+- job:
+    name: puppet-pacemaker-unit-7.16-centos-9-stream
+    parent: puppet-openstack-unit-7.16-centos-9-stream
+    voting: false
+    override-checkout: stable/zed
+
+- job:
+    name: puppet-pacemaker-unit-6.28-ubuntu-focal
+    parent: puppet-openstack-unit-6.28-ubuntu-focal
+    override-checkout: stable/zed
+
+- job:
+    name: puppet-pacemaker-unit-7.16-ubuntu-focal
+    parent: puppet-openstack-unit-7.16-ubuntu-focal
+    override-checkout: stable/zed
+
 - project:
     queue: tripleo
     templates:
-      - puppet-openstack-check-jobs
-      - puppet-openstack-module-unit-jobs
       - release-notes-jobs-python3
     check:
       jobs:
-        - puppet-openstack-unit-7.16-centos-9-stream:
-            voting: false
+        - puppet-pacemaker-lint-ubuntu-focal
+        - puppet-pacemaker-syntax-6-ubuntu-focal
+        - puppet-pacemaker-syntax-7-ubuntu-focal
+        - puppet-pacemaker-unit-7.16-centos-9-stream
+        - puppet-pacemaker-unit-6.28-ubuntu-focal
+        - puppet-pacemaker-unit-7.16-ubuntu-focal
         - tripleo-ci-centos-9-scenario004-standalone: &scen4_vars
+            override-checkout: stable/zed
             vars:
               build_container_images: true
               containers_base_image: registry.access.redhat.com/ubi9:latest
     gate:
       jobs:
-        - puppet-openstack-unit-7.16-centos-9-stream:
-            voting: false
+        - puppet-pacemaker-lint-ubuntu-focal
+        - puppet-pacemaker-syntax-6-ubuntu-focal
+        - puppet-pacemaker-syntax-7-ubuntu-focal
+        - puppet-pacemaker-unit-7.16-centos-9-stream
+        - puppet-pacemaker-unit-6.28-ubuntu-focal
+        - puppet-pacemaker-unit-7.16-ubuntu-focal
         - tripleo-ci-centos-9-scenario004-standalone: *scen4_vars
