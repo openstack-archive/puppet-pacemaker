@@ -162,7 +162,11 @@ define pacemaker::resource::bundle(
     }
 
     # promoted_max supersedes masters in pacemaker 2 (pcs >= 0.10)
-    $used_promoted_max = pick_default($promoted_max, $masters)
+    if $promoted_max {
+      $used_promoted_max = $promoted_max
+    } else {
+      $used_promoted_max = $masters
+    }
     $used_masters = undef
   } else {
     if $promoted_max {
