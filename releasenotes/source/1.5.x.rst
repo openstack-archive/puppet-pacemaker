@@ -1,0 +1,6 @@
+==========================
+1.5.X Series Release Notes
+==========================
+
+.. release-notes::
+   :branch: stable/1.5.x
