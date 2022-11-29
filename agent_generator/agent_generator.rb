@@ -126,11 +126,7 @@ define pacemaker::stonith::#{@parser.getAgentName} (
   $update_settle_secs = 600,
 ) {
 #{getVariableValues}
-  $pcmk_host_value_chunk = $pcmk_host_list ? {
-    undef   => '$(/usr/sbin/crm_node -n)',
-    default => $pcmk_host_list,
-  }
-
+#{getPcmkHostList}
   $meta_attr_value_chunk = $meta_attr ? {
     undef   => '',
     default => "meta ${meta_attr}",
@@ -144,26 +140,46 @@ define pacemaker::stonith::#{@parser.getAgentName} (
   $param_string = "#{getChunks} op monitor interval=${interval} ${meta_attr_value_chunk}"
 
 #{getPackageSnippet}
-  pcmk_stonith { "stonith-#{@parser.getAgentName}-${safe_title}":
-    ensure             => $ensure,
-    stonith_type       => '#{@parser.getAgentName}',
-    pcmk_host_list     => $pcmk_host_value_chunk,
-    pcs_param_string   => $param_string,
-    tries              => $tries,
-    try_sleep          => $try_sleep,
-    deep_compare       => $deep_compare,
-    update_settle_secs => $update_settle_secs,
-  }
-}
+#{getManifestCreate}}
 eos
   end
 
+  def getManifestCreate
+    agent_name = @parser.getAgentName == 'fence_watchdog' ? '\'watchdog\'' : "\"stonith-#{@parser.getAgentName}-${safe_title}\""
+    text = ''
+    text += "  pcmk_stonith { #{agent_name}:\n"
+    text += "    ensure             => $ensure,\n"
+    text += "    stonith_type       => '#{@parser.getAgentName}',\n"
+    text += "    pcmk_host_list     => $pcmk_host_value_chunk,\n"
+    text += "    pcs_param_string   => $param_string,\n"
+    text += "    tries              => $tries,\n"
+    text += "    try_sleep          => $try_sleep,\n"
+    text += "    deep_compare       => $deep_compare,\n"
+    text += "    update_settle_secs => $update_settle_secs,\n"
+    text += "  }\n"
+    text
+  end
+
+  def getPcmkHostList
+    text = ''
+    if @parser.getAgentName == 'fence_watchdog'
+      text += "  $pcmk_host_value_chunk = '$(crm_node -l |awk \\'{print $2}\\' |paste -sd, -)'\n"
+    else
+      text += "  $pcmk_host_value_chunk = $pcmk_host_list ? {\n"
+      text += "    undef   => '$(/usr/sbin/crm_node -n)',\n"
+      text += "    default => $pcmk_host_list,\n"
+      text += "  }\n"
+    end
+    text
+  end
+
   def getPackageSnippet
+    agent_name = @parser.getAgentName == 'fence_watchdog' ? '\'watchdog\'' : "\"stonith-#{@parser.getAgentName}-${safe_title}\""
     text = ''
     if @parser.getPackageName != 'None'
       text += "  if $ensure != 'absent' {\n"
-      text += "    ensure_resource('package', '#{@parser.getPackageName}', { ensure => 'installed' })\n"
-      text += "    Package['#{@parser.getPackageName}'] -> Pcmk_stonith[\"stonith-#{@parser.getAgentName}-${safe_title}\"]\n"
+      text += "    ensure_packages('#{@parser.getPackageName}', { ensure => 'installed' })\n"
+      text += "    Package['#{@parser.getPackageName}'] -> Pcmk_stonith[#{agent_name}]\n"
       text += "  }"
     end
     text
