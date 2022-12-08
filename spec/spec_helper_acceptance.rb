@@ -28,7 +28,7 @@ RSpec.configure do |c|
       on host, puppet('module', 'install', 'puppetlabs-stdlib')
 
       install_package host, 'git'
-      shell 'test -d /etc/puppet/modules/corosync || git clone git://github.com/voxpupuli/puppet-corosync.git /etc/puppet/modules/corosync'
+      shell 'test -d /etc/puppet/modules/corosync || git clone https://github.com/voxpupuli/puppet-corosync.git /etc/puppet/modules/corosync'
 
       apply_manifest(host_manifest, debug: true, catch_failures: true)
       apply_manifest(setup_manifest, debug: true, catch_failures: true)

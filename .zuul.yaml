@@ -1,17 +1,44 @@
+- job:
+    name: puppet-pacemaker-lint-ubuntu-focal
+    parent: puppet-openstack-lint-ubuntu-focal
+    override-checkout: stable/wallaby
+
+- job:
+    name: puppet-pacemaker-syntax-6-ubuntu-focal
+    parent: puppet-openstack-syntax-6-ubuntu-focal
+    override-checkout: stable/wallaby
+
+- job:
+    name: puppet-pacemaker-unit-6.21-centos-8-stream
+    parent: puppet-openstack-unit-6.21-centos-8-stream
+    voting: false
+    override-checkout: stable/wallaby
+
+- job:
+    name: puppet-pacemaker-unit-6.21-ubuntu-focal
+    parent: puppet-openstack-unit-6.21-ubuntu-focal
+    voting: false
+    override-checkout: stable/wallaby
+
 - project:
+    queue: tripleo
     templates:
-      - puppet-openstack-check-jobs
-      - puppet-openstack-module-unit-jobs
       - release-notes-jobs-python3
     check:
       jobs:
-        - tripleo-ci-centos-8-scenario004-standalone:
+        - puppet-pacemaker-lint-ubuntu-focal
+        - puppet-pacemaker-syntax-6-ubuntu-focal
+        - puppet-pacemaker-unit-6.21-centos-8-stream
+        - puppet-pacemaker-unit-6.21-ubuntu-focal
+        - tripleo-ci-centos-8-scenario004-standalone: &scen4_vars
+            override-checkout: stable/wallaby
             vars:
               build_container_images: true
+              containers_base_image: registry.access.redhat.com/ubi8:latest
     gate:
       jobs:
-        - tripleo-ci-centos-8-scenario004-standalone:
-            vars:
-              build_container_images: true
-      queue: tripleo
-
+        - puppet-pacemaker-lint-ubuntu-focal
+        - puppet-pacemaker-syntax-6-ubuntu-focal
+        - puppet-pacemaker-unit-6.21-centos-8-stream
+        - puppet-pacemaker-unit-6.21-ubuntu-focal
+        - tripleo-ci-centos-8-scenario004-standalone: *scen4_vars
