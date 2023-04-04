@@ -81,7 +81,7 @@ describe 'pacemaker::stonith::fence_ipmilan', type: :define do
           :ensure           => 'present',
           :pcmk_host_list   => 'pcmk_host_list',
           :stonith_type     => 'fence_ipmilan',
-          :pcs_param_string => "auth=\"auth\" ipaddr=\"ipaddr\" ipport=\"ipport\" passwd=\"passwd\" passwd_script=\"passwd_script\" lanplus=\"lanplus\" login=\"login\" action=\"action\" timeout=\"timeout\" cipher=\"cipher\" method=\"method\" power_wait=\"power_wait\" delay=\"delay\" privlvl=\"privlvl\" verbose=\"verbose\"  op monitor interval=60s meta provides=unfencing",
+          :pcs_param_string => "auth=\"auth\" ipaddr=\"ipaddr\" ipport=\"ipport\" passwd='passwd' passwd_script=\"passwd_script\" lanplus=\"lanplus\" login=\"login\" action=\"action\" timeout=\"timeout\" cipher=\"cipher\" method=\"method\" power_wait=\"power_wait\" delay=\"delay\" privlvl=\"privlvl\" verbose=\"verbose\"  op monitor interval=60s meta provides=unfencing",
           :tries            => 1,
           :try_sleep        => 5,
 	)

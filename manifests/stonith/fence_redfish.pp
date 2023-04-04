@@ -228,7 +228,7 @@ define pacemaker::stonith::fence_redfish (
   }
   $passwd_chunk = $passwd ? {
     undef   => '',
-    default => "passwd=\"${passwd}\"",
+    default => "passwd=\'${passwd}\'",
   }
   $passwd_script_chunk = $passwd_script ? {
     undef   => '',

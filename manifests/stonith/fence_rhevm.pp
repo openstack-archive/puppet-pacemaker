@@ -176,7 +176,7 @@ define pacemaker::stonith::fence_rhevm (
   }
   $passwd_chunk = $passwd ? {
     undef   => '',
-    default => "passwd=\"${passwd}\"",
+    default => "passwd=\'${passwd}\'",
   }
   $ssl_chunk = $ssl ? {
     undef   => '',
