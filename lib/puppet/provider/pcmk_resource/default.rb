@@ -188,7 +188,7 @@ Puppet::Type.type(:pcmk_resource).provide(:default) do
         constraint_name += '-master'
       end
     end
-    cmd = "constraint list | grep #{constraint_name} > /dev/null 2>&1"
+    cmd = "constraint show --full | grep #{constraint_name} > /dev/null 2>&1"
     ret = pcs('show', @resource[:name], cmd, @resource[:tries],
               @resource[:try_sleep], @resource[:verify_on_create], @resource[:post_success_sleep])
     return ret == false ? PCMK_NOTEXISTS : PCMK_NOCHANGENEEDED
