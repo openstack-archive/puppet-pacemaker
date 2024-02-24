@@ -1,5 +1,0 @@
----
-issues:
-  - |
-    Add verify_on_create support for remote resources so we are guaranteed
-    for the resource to exist in the cluster when set to true.

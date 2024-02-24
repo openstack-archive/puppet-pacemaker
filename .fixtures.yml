@@ -1,9 +1,0 @@
----
-fixtures:
-  repositories:
-    stdlib:
-      repo: "https://github.com/puppetlabs/puppetlabs-stdlib"
-      ref: "4.16.0"
-    firewall: "https://github.com/puppetlabs/puppetlabs-firewall"
-  symlinks:
-    pacemaker: "#{source_dir}"

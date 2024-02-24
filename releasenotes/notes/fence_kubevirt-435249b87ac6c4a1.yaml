@@ -1,4 +1,0 @@
----
-features:
-  - |
-    Adds support for fence_kubevirt fencing agent.
